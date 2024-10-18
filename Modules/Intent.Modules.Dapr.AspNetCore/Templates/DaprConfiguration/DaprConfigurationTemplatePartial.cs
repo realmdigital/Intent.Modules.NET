@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,7 +28,7 @@ namespace Intent.Modules.Dapr.AspNetCore.Templates.DaprConfiguration
         public DaprConfigurationTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
             ExecutionContext.EventDispatcher.Subscribe<DaprServiceRegistration>(_services.Add);
-            AddNugetDependency(NuGetPackages.DaprAspNetCore);
+            AddNugetDependency(NugetPackages.DaprAspNetCore(outputTarget));
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .IntentManagedFully()

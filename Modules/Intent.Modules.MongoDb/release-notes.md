@@ -1,3 +1,24 @@
+### Version 1.0.16
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 1.0.15
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 1.0.14
+
+- Improvement: Updated NuGet package `MongoFramework` to latest(0.29.0).
+- Improvement: Now support documents with Identity which is not auto-assigned.
+
+### Version 1.0.13
+
+- Improvement: Updated Interoperable dependency versions.
+
+### Version 1.0.12
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
 ### Version 1.0.6
 
 - Improvement: Domain Events being published now accepts cancellation token and code slightly reformatted.

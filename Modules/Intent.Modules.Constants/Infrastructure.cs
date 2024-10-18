@@ -62,4 +62,36 @@ public static class Infrastructure
         }
     }
 
+    public static class Oracle
+    {
+        public const string Name = nameof(Oracle);
+        public static class Property
+        {
+            public const string ConnectionStringName = nameof(ConnectionStringName);
+            public const string ConnectionStringSettingPath = nameof(ConnectionStringSettingPath);
+        }
+    }
+
+    public static class Redis
+    {
+        public const string Name = nameof(Redis);
+
+        public static class Property
+        {
+            public const string ConnectionStringName = nameof(ConnectionStringName);
+            public const string ConnectionStringSettingPath = nameof(ConnectionStringSettingPath);
+        }
+    }
+
+    public static class Kafka
+    {
+        public const string Name = nameof(Kafka);
+
+        public static class Property
+        {
+            public const string KafkaSettingsPath = nameof(KafkaSettingsPath);
+            public const string KafkaSettingsName = nameof(KafkaSettingsName);
+            public const string KafkaSchemaRegistryUrl = nameof(KafkaSchemaRegistryUrl);
+        }
+    }
 }

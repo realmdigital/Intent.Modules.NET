@@ -13,7 +13,10 @@ using Intent.Modules.Common.Plugins;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
 using Intent.Modules.Metadata.WebApi.Models;
+using Intent.Modules.UnitOfWork.Persistence.Shared;
+using Intent.Plugins.FactoryExtensions;
 using Intent.RoslynWeaver.Attributes;
+using Microsoft.Build.Evaluation;
 
 [assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.ModuleBuilder.Templates.FactoryExtension", Version = "1.0")]
@@ -30,7 +33,12 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
 
         protected override void OnAfterTemplateRegistrations(IApplication application)
         {
-            var templates = application.FindTemplateInstances<ControllerTemplate>(TemplateDependency.OnTemplate(TemplateFulfillingRoles.Distribution.WebApi.Controller));
+
+            var templates = application.FindTemplateInstances<IControllerTemplate<IControllerModel>>(TemplateDependency.OnTemplate(TemplateRoles.Distribution.Custom.Dispatcher));
+            if (!templates.Any())
+            {
+                templates = application.FindTemplateInstances<IControllerTemplate<IControllerModel>>(TemplateDependency.OnTemplate(TemplateRoles.Distribution.WebApi.Controller));
+            }
             foreach (var template in templates)
             {
                 if (template.Model is not ServiceControllerModel)
@@ -38,22 +46,21 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
                     continue;
                 }
 
-                InstallContractDispatch(template);
+                InstallServiceContractDispatch(template);
                 InstallValidation(template);
                 InstallTransactionWithUnitOfWork(template, application);
                 InstallMessageBus(template, application);
-                InstallMongoDbUnitOfWork(template, application);
             }
         }
 
-        private static void InstallValidation(ControllerTemplate template)
+        private static void InstallValidation(IControllerTemplate<IControllerModel> template)
         {
-            if (!template.TryGetTypeName(TemplateFulfillingRoles.Application.Common.ValidationServiceInterface, out var validationProviderName))
+            if (!template.TryGetTypeName(TemplateRoles.Application.Common.ValidationServiceInterface, out var validationProviderName))
             {
                 return;
             }
 
-            if (template.Model.Operations.All(o => o.Parameters.All(x => !template.TryGetTypeName(TemplateFulfillingRoles.Application.Validation.Dto, x.TypeReference.Element, out _))))
+            if (template.Model.Operations.All(o => o.Parameters.All(x => !template.TryGetTypeName(TemplateRoles.Application.Validation.Dto, x.TypeReference.Element, out _))))
             {
                 return;
             }
@@ -79,7 +86,8 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
             });
         }
 
-        private void InstallContractDispatch(ControllerTemplate template)
+        // Please look at FastEndpoints to see how this can be refactored towards
+        private void InstallServiceContractDispatch(IControllerTemplate<IControllerModel> template)
         {
             template.AddTypeSource(DtoModelTemplate.TemplateId, "List<{0}>");
             template.CSharpFile.OnBuild(file =>
@@ -96,7 +104,15 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
                     if (method.TryGetMetadata<IControllerOperationModel>("model", out var operationModel))
                     {
                         var awaitModifier = string.Empty;
-                        var arguments = template.GetArguments(operationModel.Parameters);
+                        var arguments = string.Join(", ", operationModel.Parameters.Select((x) => x.Name ?? ""));
+                        if (FileTransferHelper.IsFileUploadOperation(operationModel))
+                        {
+
+                            FileTransferHelper.AddControllerStreamLogic(template, method, operationModel);
+
+
+                            arguments = string.Join(", ", operationModel.Parameters.Select((x) => FileTransferHelper.IsStreamType(x.TypeReference) ? $"stream" : x.Name ?? ""));
+                        }
 
                         if (!operationModel.InternalElement.HasStereotype("Synchronous"))
                         {
@@ -118,27 +134,27 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
                                 stmt => stmt.AddMetadata("service-contract-dispatch", true));
                         }
 
-                        method.AddStatement(template.GetReturnStatement(operationModel));
+                        var returnStatement = template.GetReturnStatement(operationModel);
+                        if (returnStatement != null)
+                        {
+                            method.AddStatement(returnStatement);
+                        }
                     }
                 }
             });
         }
 
-        private static void InstallTransactionWithUnitOfWork(ControllerTemplate template, IApplication application)
+        private static void InstallTransactionWithUnitOfWork(IControllerTemplate<IControllerModel> template, IApplication application)
         {
-            if (!InteropCoordinator.ShouldInstallUnitOfWork(application))
+            if (!InteropCoordinator.ShouldInstallUnitOfWork(template))
             {
                 return;
             }
 
             template.CSharpFile.OnBuild(file =>
             {
+
                 var @class = file.Classes.First();
-                var ctor = @class.Constructors.First();
-                ctor.AddParameter(GetUnitOfWork(template), "unitOfWork", p =>
-                {
-                    p.IntroduceReadonlyField((_, assignment) => assignment.ThrowArgumentNullException());
-                });
 
                 foreach (var method in @class.Methods)
                 {
@@ -148,27 +164,36 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
                         continue;
                     }
 
-                    template.AddUsing("System.Transactions");
-
                     var dispatchStmt = method.FindStatement(stmt => stmt.HasMetadata("service-contract-dispatch"));
                     if (dispatchStmt == null)
                     {
                         continue;
                     }
 
-                    var transactionScopeStmt = new CSharpStatementBlock(@"using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-                new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))")
-                        .AddStatement("await _unitOfWork.SaveChangesAsync(cancellationToken);")
-                        .AddStatement("transaction.Complete();");
-                    transactionScopeStmt.AddMetadata("transaction-scope", true);
-                    dispatchStmt.InsertAbove(transactionScopeStmt);
+                    //remove current dispatch statement (UOW implementation replaces it)
                     dispatchStmt.Remove();
-                    transactionScopeStmt.InsertStatement(0, dispatchStmt);
+                    method.ApplyUnitOfWorkImplementations(
+                        template: template,
+                        constructor: @class.Constructors.First(),
+                        invocationStatement: dispatchStmt,
+                        returnType: null,
+                        resultVariableName: "result",
+                        fieldSuffix: "unitOfWork",
+                        includeComments: false);
+
+                    //Move return statement to the end
+                    var returnStatement = method.Statements.LastOrDefault(x => x.ToString()!.Trim().StartsWith("return "));
+                    if (returnStatement != null)
+                    {
+                        returnStatement.Remove();
+                        method.AddStatement(returnStatement);
+                    }
+
                 }
             }, order: 1);
         }
 
-        private static void InstallMessageBus(ControllerTemplate template, IApplication application)
+        private static void InstallMessageBus(IControllerTemplate<IControllerModel> template, IApplication application)
         {
             if (!InteropCoordinator.ShouldInstallMessageBus(application))
             {
@@ -179,7 +204,7 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
             {
                 var @class = file.Classes.First();
                 var ctor = @class.Constructors.First();
-                ctor.AddParameter(template.GetTypeName(TemplateFulfillingRoles.Application.Eventing.EventBusInterface), "eventBus",
+                ctor.AddParameter(template.GetTypeName(TemplateRoles.Application.Eventing.EventBusInterface), "eventBus",
                     p => { p.IntroduceReadonlyField((_, assignment) => assignment.ThrowArgumentNullException()); });
 
                 foreach (var method in @class.Methods.Where(x => x.Attributes.All(a => !a.ToString()!.StartsWith("[HttpGet"))))
@@ -190,42 +215,15 @@ namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract.Factory
             }, order: -100);
         }
 
-        private static void InstallMongoDbUnitOfWork(ControllerTemplate template, IApplication application)
+        private static string GetUnitOfWork(IControllerTemplate<IControllerModel> template)
         {
-            if (!InteropCoordinator.ShouldInstallMongoDbUnitOfWork(application))
-            {
-                return;
-            }
-
-            template.CSharpFile.AfterBuild(file =>
-            {
-                var @class = file.Classes.First();
-                var ctor = @class.Constructors.First();
-                ctor.AddParameter(template.GetTypeName("Domain.UnitOfWork.MongoDb"), "mongoDbUnitOfWork", p => { p.IntroduceReadonlyField((_, assignment) => assignment.ThrowArgumentNullException()); });
-
-                foreach (var method in @class.Methods)
-                {
-                    if (!method.TryGetMetadata<IControllerOperationModel>("model", out var operation) ||
-                        operation.Verb == HttpVerb.Get)
-                    {
-                        continue;
-                    }
-
-                    method.Statements.LastOrDefault(x => x.ToString()!.StartsWith("return "))
-                        ?.InsertAbove("await _mongoDbUnitOfWork.SaveChangesAsync(cancellationToken);");
-                }
-            }, -150);
-        }
-
-        private static string GetUnitOfWork(ControllerTemplate template)
-        {
-            if (template.TryGetTypeName(TemplateFulfillingRoles.Domain.UnitOfWork, out var unitOfWork) ||
-                template.TryGetTypeName(TemplateFulfillingRoles.Application.Common.DbContextInterface, out unitOfWork) ||
-                template.TryGetTypeName(TemplateFulfillingRoles.Infrastructure.Data.DbContext, out unitOfWork))
+            if (template.TryGetTypeName(TemplateRoles.Domain.UnitOfWork, out var unitOfWork) ||
+                template.TryGetTypeName(TemplateRoles.Application.Common.DbContextInterface, out unitOfWork) ||
+                template.TryGetTypeName(TemplateRoles.Infrastructure.Data.DbContext, out unitOfWork))
             {
                 return unitOfWork;
             }
-            throw new Exception($"A unit of work interface could not be resolved. Please ensure an interface with the role [{TemplateFulfillingRoles.Domain.UnitOfWork}] exists.");
+            throw new Exception($"A unit of work interface could not be resolved. Please ensure an interface with the role [{TemplateRoles.Domain.UnitOfWork}] exists.");
         }
     }
 }

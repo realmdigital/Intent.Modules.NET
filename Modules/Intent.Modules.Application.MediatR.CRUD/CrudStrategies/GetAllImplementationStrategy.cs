@@ -2,20 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
-using Intent.Metadata.Models;
 using Intent.Modelers.Domain.Api;
 using Intent.Modelers.Services.Api;
 using Intent.Modelers.Services.CQRS.Api;
+using Intent.Modelers.Services.DomainInteractions.Api;
 using Intent.Modules.Application.MediatR.CRUD.Decorators;
 using Intent.Modules.Application.MediatR.Templates;
-using Intent.Modules.Application.MediatR.Templates.CommandHandler;
-using Intent.Modules.Application.MediatR.Templates.QueryHandler;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
-using Intent.Modules.Entities.Repositories.Api.Templates;
-using Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInterface;
 
 namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
 {
@@ -39,7 +35,23 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                 return false;
             }
 
+            var returnDto = _template.Model.TypeReference?.Element.AsDTOModel();
+            if (returnDto is not null)
+            {
+                var foundEntity = returnDto.Mapping?.Element.AsClassModel();
+                var nestedCompOwner = foundEntity?.GetNestedCompositionalOwner();
+                if (nestedCompOwner != null)
+                {
+                    return _template.Model.Properties.GetNestedCompositionalOwnerIdFields(nestedCompOwner).Any();
+                }
+            }
+
             return _matchingElementDetails.Value.IsMatch;
+        }
+
+        public void BindToTemplate(ICSharpFileBuilderTemplate template)
+        {
+            template.CSharpFile.AfterBuild(_ => ApplyStrategy());
         }
 
         public void ApplyStrategy()
@@ -74,7 +86,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                 codeLines.Add($"var aggregateRoot = await {repository.FieldName}.FindByIdAsync({nestedCompOwnerIdFields.GetEntityIdFromRequest(_template.Model.InternalElement)}, cancellationToken);");
                 codeLines.Add($"if (aggregateRoot == null)");
                 codeLines.Add(new CSharpStatementBlock()
-                    .AddStatement($@"throw new InvalidOperationException($""{{nameof({_template.GetTypeName(TemplateFulfillingRoles.Domain.Entity.Primary, nestedCompOwner)})}} of Id '{nestedCompOwnerIdFields.GetEntityIdFromRequestDescription()}' could not be found"");"));
+                    .AddStatement($@"throw new InvalidOperationException($""{{nameof({_template.GetTypeName(TemplateRoles.Domain.Entity.Primary, nestedCompOwner)})}} of Id '{nestedCompOwnerIdFields.GetEntityIdFromRequestDescription()}' could not be found"");"));
 
                 var association = nestedCompOwner.GetNestedCompositeAssociation(foundEntity);
                 codeLines.Add($@"return aggregateRoot.{association.Name.ToCSharpIdentifier(CapitalizationBehaviour.AsIs)}.MapTo{_template.GetDtoName(result.DtoToReturn)}List(_mapper);");                
@@ -90,6 +102,11 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
 
         private StrategyData GetMatchingElementDetails()
         {
+            if (_template.Model.QueryEntityActions().Any())
+            {
+                return NoMatch;
+            }
+
             if (!_template.Model.TypeReference?.IsCollection == true)
             {
                 return NoMatch;
@@ -103,18 +120,21 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
             }
 
             var foundEntity = returnDto.Mapping.Element.AsClassModel();
+            if (foundEntity is null)
+            {
+                return NoMatch;
+            }
             var dtoToReturn = _application.MetadataManager.Services(_application)
                 .GetDTOModels().SingleOrDefault(x =>
-                    x.Id == _template.Model.TypeReference.Element.Id && x.IsMapped &&
-                    x.Mapping.ElementId == foundEntity.Id);
+                    x.Id == _template.Model.TypeReference.Element?.Id && x.IsMapped &&
+                    x.Mapping?.ElementId == foundEntity.Id);
             if (dtoToReturn == null)
             {
                 return NoMatch;
             }
 
             var nestedCompOwner = foundEntity.GetNestedCompositionalOwner();
-            var repositoryInterface = _template.GetEntityRepositoryInterfaceName(nestedCompOwner != null ? nestedCompOwner : foundEntity);
-            if (repositoryInterface == null)
+            if (!_template.TryGetTypeName(TemplateRoles.Repository.Interface.Entity, nestedCompOwner != null ? nestedCompOwner : foundEntity, out var repositoryInterface))
             {
                 return NoMatch;
             }

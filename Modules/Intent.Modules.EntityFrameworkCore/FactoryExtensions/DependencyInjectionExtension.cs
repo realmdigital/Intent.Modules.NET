@@ -10,6 +10,7 @@ using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Plugins;
 using Intent.Modules.Common.VisualStudio;
 using Intent.Modules.Constants;
+using Intent.Modules.EntityFrameworkCore.Helpers;
 using Intent.Modules.EntityFrameworkCore.Settings;
 using Intent.Modules.EntityFrameworkCore.Templates;
 using Intent.Modules.Metadata.RDBMS.Settings;
@@ -28,147 +29,272 @@ namespace Intent.Modules.EntityFrameworkCore.FactoryExtensions
 
         private const string ConfigSectionCosmos = "Cosmos";
 
-        [IntentManaged(Mode.Ignore)]
-        public override int Order => 0;
+        [IntentManaged(Mode.Ignore)] public override int Order => 0;
 
-        /// <summary>
-        /// This is an example override which would extend the
-        /// <see cref="ExecutionLifeCycleSteps.Start"/> phase of the Software Factory execution.
-        /// See <see cref="FactoryExtensionBase"/> for all available overrides.
-        /// </summary>
-        /// <remarks>
-        /// It is safe to update or delete this method.
-        /// </remarks>
         protected override void OnAfterTemplateRegistrations(IApplication application)
         {
-            var dependencyInjection = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Infrastructure.DependencyInjection);
-            if (dependencyInjection == null)
+            var dependencyInjectionTemplate = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateRoles.Infrastructure.DependencyInjection);
+            if (dependencyInjectionTemplate is null)
             {
                 return;
             }
 
-            switch (dependencyInjection.ExecutionContext.Settings.GetDatabaseSettings().DatabaseProvider().AsEnum())
-            {
-                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.InMemory:
-                    dependencyInjection.AddNugetDependency(NugetPackages.EntityFrameworkCoreInMemory(dependencyInjection.OutputTarget.GetProject()));
-                    break;
-                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.SqlServer:
-                    dependencyInjection.AddNugetDependency(NugetPackages.EntityFrameworkCoreSqlServer(dependencyInjection.OutputTarget.GetProject()));
-                    application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
-                        name: "DefaultConnection",
-                        connectionString: $"Server=.;Initial Catalog={dependencyInjection.OutputTarget.ApplicationName()};Integrated Security=true;MultipleActiveResultSets=True{GetSqlServerExtendedConnectionString(dependencyInjection.OutputTarget.GetProject())}",
-                        providerName: "System.Data.SqlClient"));
-                    application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.SqlServer.Name)
-                        .WithProperty(Infrastructure.SqlServer.Property.ConnectionStringName, "DefaultConnection"));
-                    break;
-                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Postgresql:
-                    dependencyInjection.AddNugetDependency(NugetPackages.NpgsqlEntityFrameworkCorePostgreSQL(dependencyInjection.OutputTarget.GetProject()));
-                    application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
-                        name: "DefaultConnection",
-                        connectionString: $"Host=127.0.0.1;Port=5432;Database={dependencyInjection.OutputTarget.ApplicationName()};Username=postgres;Password=password;",
-                        providerName: ""));
-                    application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.PostgreSql.Name)
-                        .WithProperty(Infrastructure.PostgreSql.Property.ConnectionStringName, "DefaultConnection"));
-                    break;
-                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.MySql:
-                    dependencyInjection.AddNugetDependency(NugetPackages.MySqlEntityFrameworkCore(dependencyInjection.OutputTarget.GetProject()));
-                    application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
-                        name: "DefaultConnection",
-                        connectionString: $"Server=localhost;Database={dependencyInjection.OutputTarget.ApplicationName()};Uid=root;Pwd=P@ssw0rd;",
-                        providerName: ""));
-                    application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.MySql.Name)
-                        .WithProperty(Infrastructure.MySql.Property.ConnectionStringName, "DefaultConnection"));
-                    break;
-                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos:
-                    dependencyInjection.AddNugetDependency(NugetPackages.EntityFrameworkCoreCosmos(dependencyInjection.OutputTarget.GetProject()));
-                    application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:AccountEndpoint", "https://localhost:8081"));
-                    application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:AccountKey", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="));
-                    application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:DatabaseName", $"{dependencyInjection.OutputTarget.GetProject().ApplicationName()}DB"));
-                    application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:EnsureDbCreated", true));
-                    application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.CosmosDb.Name)
-                        .WithProperty(Infrastructure.CosmosDb.Property.ConnectionStringName, "DefaultConnection"));
-                    break;
-                default:
-                    break;
-            }
+            var dbContexts = DbContextManager.GetDbContexts(application.Id, application.MetadataManager);
+            ApplyApplicationSettings(dependencyInjectionTemplate, application, dbContexts);
+            ApplyConfigurationStatements(dependencyInjectionTemplate, dbContexts);
+        }
 
-            dependencyInjection.CSharpFile.OnBuild(file =>
+        private static void ApplyApplicationSettings(ICSharpFileBuilderTemplate dependencyInjectionTemplate, IApplication application, IEnumerable<DbContextInstance> dbContexts)
+        {
+            foreach (var dbContextInstance in dbContexts)
+            {
+                var targetDbProvider = DbContextManager.GetDatabaseProviderForDbContext(dbContextInstance.DbProvider, dependencyInjectionTemplate.ExecutionContext);
+                switch (targetDbProvider)
+                {
+                    case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.InMemory:
+                        dependencyInjectionTemplate.AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreInMemory(dependencyInjectionTemplate.OutputTarget.GetProject()));
+                        break;
+
+                    case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.SqlServer:
+                        dependencyInjectionTemplate.AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreSqlServer(dependencyInjectionTemplate.OutputTarget.GetProject()));
+
+                        if (ShouldInstallErikEJEntityFrameworkCoreSqlServerDateOnlyTimeOnly(dependencyInjectionTemplate.OutputTarget))
+                        {
+                            dependencyInjectionTemplate.AddNugetDependency(
+                                NugetPackages.ErikEJEntityFrameworkCoreSqlServerDateOnlyTimeOnly(dependencyInjectionTemplate.OutputTarget));
+                        }
+                        else
+                        {
+                            application.EventDispatcher.Publish(new RemoveNugetPackageEvent(
+                                NugetPackages.ErikEJEntityFrameworkCoreSqlServerDateOnlyTimeOnly(dependencyInjectionTemplate.OutputTarget).Name,
+                                dependencyInjectionTemplate.OutputTarget));
+                        }
+
+                        application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
+                            name: dbContextInstance.ConnectionStringName,
+                            connectionString:
+                            $"Server=.;Initial Catalog={dependencyInjectionTemplate.OutputTarget.ApplicationName()};Integrated Security=true;MultipleActiveResultSets=True{GetSqlServerExtendedConnectionString(dependencyInjectionTemplate.OutputTarget.GetProject())}",
+                            providerName: "System.Data.SqlClient"));
+                        application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.SqlServer.Name)
+                            .WithProperty(Infrastructure.SqlServer.Property.ConnectionStringName, dbContextInstance.ConnectionStringName));
+                        break;
+
+                    case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Postgresql:
+                        dependencyInjectionTemplate.AddNugetDependency(NugetPackages.NpgsqlEntityFrameworkCorePostgreSQL(dependencyInjectionTemplate.OutputTarget.GetProject()));
+                        application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
+                            name: dbContextInstance.ConnectionStringName,
+                            connectionString:
+                            $"Host=127.0.0.1;Port=5432;Database={dependencyInjectionTemplate.OutputTarget.ApplicationName()};Username=postgres;Password=password;",
+                            providerName: ""));
+                        application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.PostgreSql.Name)
+                            .WithProperty(Infrastructure.PostgreSql.Property.ConnectionStringName, dbContextInstance.ConnectionStringName));
+                        break;
+
+                    case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.MySql:
+                        dependencyInjectionTemplate.AddNugetDependency(NugetPackages.PomeloEntityFrameworkCoreMySql(dependencyInjectionTemplate.OutputTarget.GetProject()));
+                        application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
+                            name: dbContextInstance.ConnectionStringName,
+                            connectionString: $"Server=localhost;Database={dependencyInjectionTemplate.OutputTarget.ApplicationName()};Uid=root;Pwd=P@ssw0rd;",
+                            providerName: ""));
+                        application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.MySql.Name)
+                            .WithProperty(Infrastructure.MySql.Property.ConnectionStringName, dbContextInstance.ConnectionStringName));
+                        break;
+
+                    case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos:
+                        dependencyInjectionTemplate.AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreCosmos(dependencyInjectionTemplate.OutputTarget.GetProject()));
+                        application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:AccountEndpoint", "https://localhost:8081"));
+                        application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:AccountKey",
+                            "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="));
+                        application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:DatabaseName",
+                            $"{dependencyInjectionTemplate.OutputTarget.GetProject().ApplicationName()}DB"));
+                        application.EventDispatcher.Publish(new AppSettingRegistrationRequest($"{ConfigSectionCosmos}:EnsureDbCreated", true));
+                        application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.CosmosDb.Name)
+                            .WithProperty(Infrastructure.CosmosDb.Property.ConnectionStringName, dbContextInstance.ConnectionStringName));
+                        break;
+
+                    case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Oracle:
+                        dependencyInjectionTemplate.AddNugetDependency(NugetPackages.OracleEntityFrameworkCore(dependencyInjectionTemplate.OutputTarget.GetProject()));
+                        application.EventDispatcher.Publish(new ConnectionStringRegistrationRequest(
+                            name: dbContextInstance.ConnectionStringName,
+                            connectionString:
+                            $"Data Source={dependencyInjectionTemplate.OutputTarget.ApplicationName()};User Id=myUsername;Password=myPassword;Integrated Security=no;",
+                            providerName: ""));
+                        application.EventDispatcher.Publish(new InfrastructureRegisteredEvent(Infrastructure.Oracle.Name)
+                            .WithProperty(Infrastructure.Oracle.Property.ConnectionStringName, dbContextInstance.ConnectionStringName));
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private static string GetSqlServerExtendedConnectionString(ICSharpProject project)
+        {
+            return project.TryGetMaxNetAppVersion(out var version) && version.Major >= 7
+                ? ";Encrypt=False"
+                : string.Empty;
+        }
+
+        private static void ApplyConfigurationStatements(ICSharpFileBuilderTemplate dependencyInjectionTemplate, IEnumerable<DbContextInstance> dbContexts)
+        {
+            dependencyInjectionTemplate.CSharpFile.OnBuild(file =>
             {
                 file.AddUsing("Microsoft.EntityFrameworkCore");
-                file.Classes.First().FindMethod("AddInfrastructure")
-                    .AddStatement(CreateAddDbContextStatement(dependencyInjection));
+                var method = file.Classes.First().FindMethod("AddInfrastructure");
+                foreach (var dbContextInstance in dbContexts)
+                {
+                    method.AddStatement(CreateAddDbContextStatement(dependencyInjectionTemplate, dbContextInstance, dependencyInjectionTemplate.ExecutionContext));
+                }
             });
         }
 
-        private string GetSqlServerExtendedConnectionString(ICSharpProject project)
+        private static AddDbContextStatement CreateAddDbContextStatement(ICSharpFileBuilderTemplate dependencyInjection,
+            DbContextInstance dbContextInstance,
+            ISoftwareFactoryExecutionContext executionContext)
         {
-            if (project.IsNetApp(7))
-            {
-                return ";Encrypt=False";
-            }
-            return string.Empty;
-        }
+            var connectionString = $@"""{dbContextInstance.ConnectionStringName}""";
 
-        private AddDbContextStatement CreateAddDbContextStatement(ICSharpFileBuilderTemplate dependencyInjection)
-        {
-            var addDbContext = new AddDbContextStatement(dependencyInjection.GetDbContextName());
-            var connection = "\"DefaultConnection\"";
+            var addDbContext = new AddDbContextStatement(dbContextInstance.GetTypeName(dependencyInjection));
             var statements = new List<CSharpStatement>();
 
-            switch (dependencyInjection.ExecutionContext.Settings.GetDatabaseSettings().DatabaseProvider().AsEnum())
+            var enableSplitQueriesGlobally = dependencyInjection.ExecutionContext.Settings.GetDatabaseSettings().EnableSplitQueriesGlobally();
+
+            var migrationsAssemblyStatement = $"MigrationsAssembly(typeof({dbContextInstance.DbContextName}).Assembly.FullName)";
+
+            var dbContextOptionsBuilderStatement = new CSharpLambdaBlock("b");
+            var builderStatements = new List<CSharpStatement>();
+            builderStatements.Add($"b.{migrationsAssemblyStatement}");
+            if (enableSplitQueriesGlobally)
+            {
+                builderStatements.Add("b.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)");
+            }
+
+            if (dbContextInstance.IsApplicationDbContext && !string.IsNullOrWhiteSpace(dependencyInjection.ExecutionContext.Settings.GetDatabaseSettings().DefaultSchemaName()))
+            {
+                dependencyInjection.AddUsing("Microsoft.EntityFrameworkCore.Migrations");
+                builderStatements.Add($@"b.MigrationsHistoryTable(HistoryRepository.DefaultTableName, ""{dependencyInjection.ExecutionContext.Settings.GetDatabaseSettings().DefaultSchemaName()}"");");
+            }
+
+            var targetDbProvider = DbContextManager.GetDatabaseProviderForDbContext(dbContextInstance.DbProvider, executionContext);
+            switch (targetDbProvider)
             {
                 case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.InMemory:
-                    dependencyInjection.AddNugetDependency(NugetPackages.EntityFrameworkCoreInMemory(dependencyInjection.OutputTarget.GetProject()));
+                    dependencyInjection.AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreInMemory(dependencyInjection.OutputTarget.GetProject()));
 
-                    statements.Add(new CSharpInvocationStatement($@"options.UseInMemoryDatabase")
-                        .AddArgument($@"{connection}", a => a.AddMetadata("is-connection-string", true)));
+                    statements.Add(new CSharpInvocationStatement("options.UseInMemoryDatabase")
+                        .AddArgument($"{connectionString}", a => a.AddMetadata("is-connection-string", true)));
                     break;
+
                 case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.SqlServer:
-                    dependencyInjection.AddNugetDependency(NugetPackages.EntityFrameworkCoreSqlServer(dependencyInjection.OutputTarget.GetProject()));
+                    dependencyInjection.AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreSqlServer(dependencyInjection.OutputTarget.GetProject()));
 
-                    statements.Add(new CSharpInvocationStatement($@"options.UseSqlServer")
+                    statements.Add(new CSharpInvocationStatement("options.UseSqlServer")
                         .WithArgumentsOnNewLines()
-                        .AddArgument($@"configuration.GetConnectionString({connection})", a => a.AddMetadata("is-connection-string", true))
-                        .AddArgument($@"b => b.MigrationsAssembly(typeof({dependencyInjection.GetDbContextName()}).Assembly.FullName)"));
+                        .AddArgument($"configuration.GetConnectionString({connectionString})", a => a.AddMetadata("is-connection-string", true))
+                        .AddArgument(dbContextOptionsBuilderStatement));
+
+                    if (ShouldInstallErikEJEntityFrameworkCoreSqlServerDateOnlyTimeOnly(dependencyInjection.OutputTarget))
+                    {
+                        builderStatements.Add("b.UseDateOnlyTimeOnly()");
+                    }
+
+
+                    ConfigureNetTopologySuite(dependencyInjection, dbContextInstance, builderStatements, NugetPackages.MicrosoftEntityFrameworkCoreSqlServerNetTopologySuite(dependencyInjection.OutputTarget));
+
                     break;
+
                 case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Postgresql:
                     dependencyInjection.AddNugetDependency(NugetPackages.NpgsqlEntityFrameworkCorePostgreSQL(dependencyInjection.OutputTarget.GetProject()));
 
-                    statements.Add(new CSharpInvocationStatement($@"options.UseNpgsql")
+                    statements.Add(new CSharpInvocationStatement("options.UseNpgsql")
                         .WithArgumentsOnNewLines()
-                        .AddArgument($@"configuration.GetConnectionString({connection})", a => a.AddMetadata("is-connection-string", true))
-                        .AddArgument($@"b => b.MigrationsAssembly(typeof({dependencyInjection.GetDbContextName()}).Assembly.FullName)"));
+                        .AddArgument($"configuration.GetConnectionString({connectionString})", a => a.AddMetadata("is-connection-string", true))
+                        .AddArgument(dbContextOptionsBuilderStatement));
+
+                    ConfigureNetTopologySuite(dependencyInjection, dbContextInstance, builderStatements, NugetPackages.NpgsqlEntityFrameworkCorePostgreSQLNetTopologySuite(dependencyInjection.OutputTarget));
+
                     break;
+
                 case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.MySql:
-                    dependencyInjection.AddNugetDependency(NugetPackages.MySqlEntityFrameworkCore(dependencyInjection.OutputTarget.GetProject()));
+                    dependencyInjection.AddNugetDependency(NugetPackages.PomeloEntityFrameworkCoreMySql(dependencyInjection.OutputTarget.GetProject()));
 
-                    statements.Add(new CSharpInvocationStatement($@"options.UseMySql")
-                        .AddArgument($"configuration.GetConnectionString({connection})", a => a.AddMetadata("is-connection-string", true))
-                        .AddArgument($@"ServerVersion.Parse(""8.0"")"));
+                    statements.Add(new CSharpInvocationStatement("options.UseMySql")
+                        .AddArgument($"configuration.GetConnectionString({connectionString})", a => a.AddMetadata("is-connection-string", true))
+                        .AddArgument(@"ServerVersion.Parse(""8.0"")")
+                        .AddArgument(dbContextOptionsBuilderStatement));
+
+                    ConfigureNetTopologySuite(dependencyInjection, dbContextInstance, builderStatements, NugetPackages.PomeloEntityFrameworkCoreMySqlNetTopologySuite(dependencyInjection.OutputTarget));
+
                     break;
-                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos:
-                    dependencyInjection.AddNugetDependency(NugetPackages.EntityFrameworkCoreCosmos(dependencyInjection.OutputTarget.GetProject()));
 
-                    statements.Add(new CSharpInvocationStatement($@"options.UseCosmos")
+                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos:
+                    dependencyInjection.AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreCosmos(dependencyInjection.OutputTarget.GetProject()));
+
+                    statements.Add(new CSharpInvocationStatement("options.UseCosmos")
                         .WithArgumentsOnNewLines()
                         .AddArgument(@"configuration[""Cosmos:AccountEndpoint""]")
                         .AddArgument(@"configuration[""Cosmos:AccountKey""]")
                         .AddArgument(@"configuration[""Cosmos:DatabaseName""]", a => a.AddMetadata("is-connection-string", true)));
                     break;
+
+                case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Oracle:
+                    dependencyInjection.AddNugetDependency(NugetPackages.OracleEntityFrameworkCore(dependencyInjection.OutputTarget.GetProject()));
+
+                    statements.Add(new CSharpInvocationStatement("options.UseOracle")
+                        .WithArgumentsOnNewLines()
+                        .AddArgument($"configuration.GetConnectionString({connectionString})", a => a.AddMetadata("is-connection-string", true))
+                        .AddArgument(dbContextOptionsBuilderStatement));
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException(null, "Database Provider has not been set to a valid value. Please fix in the Database Settings.");
             }
+
+            if (builderStatements.Count == 1)
+            {
+                dbContextOptionsBuilderStatement.WithExpressionBody(builderStatements.First());
+            }
+            else
+            {
+                foreach (var statement in builderStatements)
+                {
+                    dbContextOptionsBuilderStatement.AddStatement(statement.WithSemicolon());
+                }
+            }
+
             if (dependencyInjection.ExecutionContext.Settings.GetDatabaseSettings().LazyLoadingWithProxies())
             {
-                statements.Add($@"options.UseLazyLoadingProxies();");
+                statements.Add("options.UseLazyLoadingProxies();");
             }
+
             addDbContext.AddConfigOptionStatements(statements);
             return addDbContext;
         }
 
-        public IEnumerable<string> DeclareUsings()
+        private static void ConfigureNetTopologySuite(ICSharpFileBuilderTemplate dependencyInjection, DbContextInstance dbContextInstance, List<CSharpStatement> builderStatements,
+            NugetPackageInfo nuget)
         {
-            yield return "Microsoft.EntityFrameworkCore";
+            // Determining which DbContext is using the Geometry types and targeting that one only requires that you determine which
+            // Domain package contains Models that are referencing those types. A simple way to achieve that is to have the TypeResolver
+            // publish an Event (which needs to be introduced to both EF and NetTopologySuite modules) and upon detection figure out
+            // the package in question. Not doing that for now and only assuming main DB context is using this.
+            if (NetTopologySuiteHelper.IsInstalled(dependencyInjection.ExecutionContext) && dbContextInstance.IsApplicationDbContext)
+            {
+                dependencyInjection.AddNugetDependency(nuget);
+                builderStatements.Add("b.UseNetTopologySuite();");
+            }
         }
+
+        public static bool ShouldInstallErikEJEntityFrameworkCoreSqlServerDateOnlyTimeOnly(IOutputTarget outputTarget)
+        {
+            return outputTarget.GetMaxNetAppVersion() switch
+            {
+                (6, 0) => true,
+                (7, 0) => true,
+                _ => false
+            };
+        }
+
     }
 }

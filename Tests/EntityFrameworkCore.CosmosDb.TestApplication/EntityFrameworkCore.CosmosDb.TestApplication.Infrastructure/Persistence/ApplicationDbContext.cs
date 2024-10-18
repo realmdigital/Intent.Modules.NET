@@ -28,6 +28,7 @@ using EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistence.Co
 using EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Services;
 using Intent.RoslynWeaver.Attributes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 [assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.EntityFrameworkCore.DbContext", Version = "1.0")]
@@ -37,15 +38,15 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
     public class ApplicationDbContext : DbContext, IUnitOfWork
     {
         private readonly IDomainEventService _domainEventService;
-        private readonly ICurrentUserService _currentUserService;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,
-            IDomainEventService domainEventService,
-            ICurrentUserService currentUserService) : base(options)
+            ICurrentUserService currentUserService,
+            IDomainEventService domainEventService) : base(options)
         {
-            _domainEventService = domainEventService;
             _currentUserService = currentUserService;
+            _domainEventService = domainEventService;
         }
+        private readonly ICurrentUserService _currentUserService;
 
         [IntentManaged(Mode.Ignore)]
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -86,7 +87,6 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
         public DbSet<G_RequiredCompositeNav> G_RequiredCompositeNavs { get; set; }
         public DbSet<H_MultipleDependent> H_MultipleDependents { get; set; }
         public DbSet<H_OptionalAggregateNav> H_OptionalAggregateNavs { get; set; }
-        public DbSet<ImplicitKeyClass> ImplicitKeyClasses { get; set; }
         public DbSet<NormalEntity> NormalEntities { get; set; }
         public DbSet<SelfContainedEntity> SelfContainedEntities { get; set; }
         public DbSet<J_MultipleAggregate> J_MultipleAggregates { get; set; }
@@ -100,6 +100,8 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
         public DbSet<P_SourceNameDiff> P_SourceNameDiffs { get; set; }
         public DbSet<Q_DestNameDiff> Q_DestNameDiffs { get; set; }
         public DbSet<R_SourceNameDiff> R_SourceNameDiffs { get; set; }
+        public DbSet<S_NoPkInComposite> S_NoPkInComposites { get; set; }
+        public DbSet<T_NoPkInComposite> T_NoPkInComposites { get; set; }
         public DbSet<Audit_DerivedClass> Audit_DerivedClasses { get; set; }
         public DbSet<Audit_SoloClass> Audit_SoloClasses { get; set; }
         public DbSet<FolderEntity> FolderEntities { get; set; }
@@ -136,7 +138,6 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
 
             ConfigureModel(modelBuilder);
             modelBuilder.ApplyConfiguration(new ExplicitKeyClassConfiguration());
-            modelBuilder.ApplyConfiguration(new ImplicitKeyClassConfiguration());
             modelBuilder.ApplyConfiguration(new NormalEntityConfiguration());
             modelBuilder.ApplyConfiguration(new SelfContainedEntityConfiguration());
             modelBuilder.ApplyConfiguration(new A_RequiredCompositeConfiguration());
@@ -162,6 +163,8 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
             modelBuilder.ApplyConfiguration(new P_SourceNameDiffConfiguration());
             modelBuilder.ApplyConfiguration(new Q_DestNameDiffConfiguration());
             modelBuilder.ApplyConfiguration(new R_SourceNameDiffConfiguration());
+            modelBuilder.ApplyConfiguration(new S_NoPkInCompositeConfiguration());
+            modelBuilder.ApplyConfiguration(new T_NoPkInCompositeConfiguration());
             modelBuilder.ApplyConfiguration(new Audit_DerivedClassConfiguration());
             modelBuilder.ApplyConfiguration(new Audit_SoloClassConfiguration());
             modelBuilder.ApplyConfiguration(new FolderEntityConfiguration());
@@ -209,7 +212,7 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
         }
 
         /// <summary>
-        /// Calling EnsureCreatedAsync is necessary to create the required containers and insert the seed data if present in the model. 
+        /// Calling EnsureCreatedAsync is necessary to create the required containers and insert the seed data if present in the model.
         /// However EnsureCreatedAsync should only be called during deployment, not normal operation, as it may cause performance issues.
         /// </summary>
         public async Task EnsureDbCreatedAsync()
@@ -245,6 +248,7 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
                 .Select(entry => new
                 {
                     entry.State,
+                    Property = new Func<string, PropertyEntry>(entry.Property),
                     Auditable = (IAuditable)entry.Entity
                 })
                 .ToArray();
@@ -254,7 +258,7 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
                 return;
             }
 
-            var userId = _currentUserService.UserId ?? throw new InvalidOperationException("UserId is null");
+            var userIdentifier = _currentUserService.UserId ?? throw new InvalidOperationException("UserId is null");
             var timestamp = DateTimeOffset.UtcNow;
 
             foreach (var entry in auditableEntries)
@@ -262,10 +266,12 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure.Persistenc
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Auditable.SetCreated(userId, timestamp);
+                        entry.Auditable.SetCreated(userIdentifier, timestamp);
                         break;
                     case EntityState.Modified or EntityState.Deleted:
-                        entry.Auditable.SetUpdated(userId, timestamp);
+                        entry.Auditable.SetUpdated(userIdentifier, timestamp);
+                        entry.Property("CreatedBy").IsModified = false;
+                        entry.Property("CreatedDate").IsModified = false;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

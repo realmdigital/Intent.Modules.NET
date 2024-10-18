@@ -14,6 +14,7 @@
           <text>Paginate</text>
           <shortcut>ctrl + shift + g</shortcut>
           <icon type="FontAwesome" source="angle-double-right" />
+          <isOptionVisibleFunction>return typeReference.getIsCollection();</isOptionVisibleFunction>
           <script>/// &lt;reference path="../../../typings/elementmacro.context.api.d.ts" /&gt;
 function changeReturnType(element) {
     const pagedResultType = "9204e067-bdc8-45e7-8970-8a833fdc5253";
@@ -23,10 +24,12 @@ function changeReturnType(element) {
     element.typeReference.setIsNullable(false);
 }
 function addPagingParameters(element, childElementType) {
+    var _a;
     const commonTypes = {
         guid: "6b649125-18ea-48fd-a6ba-0bfff0d8f488",
         long: "33013006-E404-48C2-AC46-24EF5A5774FD",
-        int: "fb0a362d-e9e2-40de-b6ff-5ce8167cbe74"
+        int: "fb0a362d-e9e2-40de-b6ff-5ce8167cbe74",
+        string: "d384db9c-a279-45e1-801e-e4e8099625f2"
     };
     var pageOffsetAttributes = ["pageno", "pageindex"];
     if (!element.getChildren(childElementType).find(x =&gt; pageOffsetAttributes.includes(x.getName().toLowerCase()))) {
@@ -36,6 +39,16 @@ function addPagingParameters(element, childElementType) {
     if (!element.getChildren(childElementType).find(x =&gt; x.getName().toLowerCase() == "pagesize")) {
         let pageSize = createElement(childElementType, "PageSize", element.id);
         pageSize.typeReference.setType(commonTypes.int);
+    }
+    // Dynamic OrderBy doesn't work for Mongo have logged a ticket 
+    //https://github.com/TurnerSoftware/MongoFramework/issues/383
+    if (application.installedModules.find(m =&gt; m.id == "Intent.MongoDb")) {
+        return;
+    }
+    if (!element.getChildren(childElementType).find(x =&gt; x.getName().toLowerCase() == "orderby")) {
+        let pageSize = createElement(childElementType, "OrderBy", element.id);
+        pageSize.typeReference.setType(commonTypes.string);
+        (_a = pageSize.typeReference) === null || _a === void 0 ? void 0 : _a.setIsNullable(true);
     }
 }
 /// &lt;reference path="../common/common-paginate.ts" /&gt;
@@ -53,6 +66,7 @@ addPagination(element);
 </script>
         </option>
       </scriptOptions>
+      <mappingOptions />
       <typeOrder />
       <mappingSettings />
     </elementExtension>
@@ -63,6 +77,7 @@ addPagination(element);
           <text>Paginate</text>
           <shortcut>ctrl + shift + g</shortcut>
           <icon type="FontAwesome" source="angle-double-right" />
+          <isOptionVisibleFunction>return typeReference.getIsCollection();</isOptionVisibleFunction>
           <script>/// &lt;reference path="../../../typings/elementmacro.context.api.d.ts" /&gt;
 function changeReturnType(element) {
     const pagedResultType = "9204e067-bdc8-45e7-8970-8a833fdc5253";
@@ -72,10 +87,12 @@ function changeReturnType(element) {
     element.typeReference.setIsNullable(false);
 }
 function addPagingParameters(element, childElementType) {
+    var _a;
     const commonTypes = {
         guid: "6b649125-18ea-48fd-a6ba-0bfff0d8f488",
         long: "33013006-E404-48C2-AC46-24EF5A5774FD",
-        int: "fb0a362d-e9e2-40de-b6ff-5ce8167cbe74"
+        int: "fb0a362d-e9e2-40de-b6ff-5ce8167cbe74",
+        string: "d384db9c-a279-45e1-801e-e4e8099625f2"
     };
     var pageOffsetAttributes = ["pageno", "pageindex"];
     if (!element.getChildren(childElementType).find(x =&gt; pageOffsetAttributes.includes(x.getName().toLowerCase()))) {
@@ -85,6 +102,16 @@ function addPagingParameters(element, childElementType) {
     if (!element.getChildren(childElementType).find(x =&gt; x.getName().toLowerCase() == "pagesize")) {
         let pageSize = createElement(childElementType, "PageSize", element.id);
         pageSize.typeReference.setType(commonTypes.int);
+    }
+    // Dynamic OrderBy doesn't work for Mongo have logged a ticket 
+    //https://github.com/TurnerSoftware/MongoFramework/issues/383
+    if (application.installedModules.find(m =&gt; m.id == "Intent.MongoDb")) {
+        return;
+    }
+    if (!element.getChildren(childElementType).find(x =&gt; x.getName().toLowerCase() == "orderby")) {
+        let pageSize = createElement(childElementType, "OrderBy", element.id);
+        pageSize.typeReference.setType(commonTypes.string);
+        (_a = pageSize.typeReference) === null || _a === void 0 ? void 0 : _a.setIsNullable(true);
     }
 }
 /// &lt;reference path="../common/common-paginate.ts" /&gt;
@@ -102,10 +129,15 @@ addPagination(element);
 </script>
         </option>
       </scriptOptions>
+      <mappingOptions />
       <typeOrder />
       <mappingSettings />
     </elementExtension>
   </elementExtensions>
   <associationSettings />
   <associationExtensions />
+  <mappingSettings />
+  <mappableElementPackages />
+  <mappableElementPackageExtensions />
+  <scripts />
 </settings>

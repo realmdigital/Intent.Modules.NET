@@ -1,3 +1,20 @@
+### Version 4.1.2
+
+- Improvement: Updated module NuGet packages infrastructure.
+- Improvement: Updated templates to use new NuGet package system.
+
+### Version 4.1.1
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.1.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+- 
+### Version 4.0.7
+
+- Improvement: Updated to be compatible with .NET 8.
+
 ### Version 4.0.6
 
 - Improvement: `AddApplication` extension method will now receive `IConfiguration` as a parameter.

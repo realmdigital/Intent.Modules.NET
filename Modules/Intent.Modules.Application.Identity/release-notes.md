@@ -1,3 +1,11 @@
+### Version 3.5.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 3.5.2
+
+- Improvement: Added support for different UserId Types (guid, long, int).
+
 ### Version 3.5.1
 
 - Improvement: The generated `AuthorizeAttribute` will no longer cause nullable warnings.

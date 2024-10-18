@@ -8,6 +8,7 @@ using Entities.PrivateSetters.EF.SqlServer.Domain.Entities;
 using Entities.PrivateSetters.EF.SqlServer.Infrastructure.Persistence.Configurations;
 using Intent.RoslynWeaver.Attributes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 [assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.EntityFrameworkCore.DbContext", Version = "1.0")]
@@ -78,6 +79,7 @@ namespace Entities.PrivateSetters.EF.SqlServer.Infrastructure.Persistence
                 .Select(entry => new
                 {
                     entry.State,
+                    Property = new Func<string, PropertyEntry>(entry.Property),
                     Auditable = (IAuditable)entry.Entity
                 })
                 .ToArray();
@@ -87,7 +89,7 @@ namespace Entities.PrivateSetters.EF.SqlServer.Infrastructure.Persistence
                 return;
             }
 
-            var userId = _currentUserService.UserId ?? throw new InvalidOperationException("UserId is null");
+            var userIdentifier = _currentUserService.UserId ?? throw new InvalidOperationException("UserId is null");
             var timestamp = DateTimeOffset.UtcNow;
 
             foreach (var entry in auditableEntries)
@@ -95,10 +97,12 @@ namespace Entities.PrivateSetters.EF.SqlServer.Infrastructure.Persistence
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Auditable.SetCreated(userId, timestamp);
+                        entry.Auditable.SetCreated(userIdentifier, timestamp);
                         break;
                     case EntityState.Modified or EntityState.Deleted:
-                        entry.Auditable.SetUpdated(userId, timestamp);
+                        entry.Auditable.SetUpdated(userIdentifier, timestamp);
+                        entry.Property("CreatedBy").IsModified = false;
+                        entry.Property("CreatedDate").IsModified = false;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

@@ -1,43 +1,41 @@
-﻿using Intent.Engine;
-using Intent.Modules.Common.CSharp.VisualStudio;
-using Intent.Modules.Common.VisualStudio;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Intent.Engine;
+using Intent.Modules.Common.CSharp.Nuget;
+using Intent.Modules.Common.VisualStudio;
+using Intent.RoslynWeaver.Attributes;
+
+[assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.NugetPackages", Version = "1.0")]
 
 namespace Intent.Modules.Blazor.WebAssembly
 {
-    public static class NuGetPackages
+    public class NugetPackages : INugetPackages
     {
-        public static INugetPackageInfo MicrosoftAspNetCoreComponentsWebAssembly(IOutputTarget outputTarget)
-        {
-            var project = outputTarget.GetProject();
-            var version = project switch
-            {
-                _ when project.IsNetApp(5) => "5.0.0",
-                _ when project.IsNetApp(6) => "6.0.20",
-                _ when project.IsNetApp(7) => "7.0.3",
-                _ => "6.0.20"
-            };
+        public const string MicrosoftAspNetCoreComponentsWebAssemblyPackageName = "Microsoft.AspNetCore.Components.WebAssembly";
+        public const string MicrosoftAspNetCoreComponentsWebAssemblyDevServerPackageName = "Microsoft.AspNetCore.Components.WebAssembly.DevServer";
 
-            return new NugetPackageInfo("Microsoft.AspNetCore.Components.WebAssembly", version);
+        public void RegisterPackages()
+        {
+            NugetRegistry.Register(MicrosoftAspNetCoreComponentsWebAssemblyPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.7"),
+                        ( >= 7, 0) => new PackageVersion("7.0.20"),
+                        ( >= 6, 0) => new PackageVersion("6.0.32"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftAspNetCoreComponentsWebAssemblyPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftAspNetCoreComponentsWebAssemblyDevServerPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0", locked: true),
+                        ( >= 7, 0) => new PackageVersion("7.0.14", locked: true),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftAspNetCoreComponentsWebAssemblyDevServerPackageName}'"),
+                    }
+                );
         }
 
-        public static INugetPackageInfo MicrosoftAspNetCoreComponentsWebAssemblyDevServer(IOutputTarget outputTarget)
-        {
-            var project = outputTarget.GetProject();
-            var version = project switch
-            {
-                _ when project.IsNetApp(5) => "5.0.0",
-                _ when project.IsNetApp(6) => "6.0.20",
-                _ when project.IsNetApp(7) => "7.0.3",
-                _ => "6.0.20"
-            };
-
-            return new NugetPackageInfo("Microsoft.AspNetCore.Components.WebAssembly.DevServer", version)
-            .SpecifyAssetsBehaviour(new[] { "all" }, new string[0]);
-        }
+        public static NugetPackageInfo MicrosoftAspNetCoreComponentsWebAssembly(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftAspNetCoreComponentsWebAssemblyPackageName, outputTarget.GetMaxNetAppVersion());
+        public static NugetPackageInfo MicrosoftAspNetCoreComponentsWebAssemblyDevServer(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftAspNetCoreComponentsWebAssemblyDevServerPackageName, outputTarget.GetMaxNetAppVersion());
     }
 }

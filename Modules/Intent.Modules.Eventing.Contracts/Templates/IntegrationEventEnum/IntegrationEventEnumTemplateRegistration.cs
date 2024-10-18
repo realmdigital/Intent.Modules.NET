@@ -4,6 +4,7 @@ using System.Linq;
 using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Eventing.Api;
+using Intent.Modelers.Services.EventInteractions;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Registrations;
 using Intent.Modules.Common.Types.Api;
@@ -28,6 +29,7 @@ namespace Intent.Modules.Eventing.Contracts.Templates.IntegrationEventEnum
 
         public override string TemplateId => IntegrationEventEnumTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, EnumModel model)
         {
             return new IntegrationEventEnumTemplate(outputTarget, model);
@@ -36,9 +38,17 @@ namespace Intent.Modules.Eventing.Contracts.Templates.IntegrationEventEnum
         [IntentManaged(Mode.Merge, Body = Mode.Ignore, Signature = Mode.Fully)]
         public override IEnumerable<EnumModel> GetModels(IApplication application)
         {
-            return _metadataManager.GetSubscribedToEnumModels(application)
+            return Enumerable.Empty<EnumModel>()
+                .Union(_metadataManager.GetSubscribedToEnumModels(application))
                 .Union(_metadataManager.GetPublishedEnumModels(application))
-                .Except(_metadataManager.GetDesigner(application.Id, "Domain").GetEnumModels())
+                .Union(_metadataManager.GetAssociatedMessageEnumModels(application))
+                .Except(_metadataManager
+                    .GetDesigner(application.Id, "Domain")
+                    .GetEnumModels())
+                /*
+                .Except(_metadataManager
+                    .GetDesigner(application.Id, "Services")
+                    .GetEnumModels())*/
                 .ToArray();
         }
     }

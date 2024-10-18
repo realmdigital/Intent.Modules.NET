@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Intent.Engine;
+using Intent.Metadata.Models;
 using Intent.Modelers.Services.Api;
 using Intent.Modelers.Services.CQRS.Api;
 using Intent.Modules.Application.FluentValidation.Settings;
@@ -24,36 +26,40 @@ namespace Intent.Modules.Application.MediatR.FluentValidation.Templates.CommandV
         public const string TemplateId = "Intent.Application.MediatR.FluentValidation.CommandValidator";
 
         [IntentManaged(Mode.Merge, Signature = Mode.Fully)]
-        public CommandValidatorTemplate(IOutputTarget outputTarget, CommandModel model)
+        public CommandValidatorTemplate(IOutputTarget outputTarget, CommandModel model, IEnumerable<IAssociationEnd> associationedElements)
             : base(
                 templateId: TemplateId,
                 outputTarget: outputTarget,
                 model: new DTOModel(model.InternalElement),
                 toValidateTemplateId: CommandModelsTemplate.TemplateId,
-                dtoTemplateId: TemplateFulfillingRoles.Application.Contracts.Dto,
-                dtoValidatorTemplateId: TemplateFulfillingRoles.Application.Validation.Dto,
+                dtoTemplateId: TemplateRoles.Application.Contracts.Dto,
+                dtoValidatorTemplateId: TemplateRoles.Application.Validation.Dto,
                 modelParameterName: "command",
                 validatorProviderInterfaceTemplateId: "Application.Common.ValidatorProviderInterface",
                 uniqueConstraintValidationEnabled: outputTarget.ExecutionContext.Settings.GetFluentValidationApplicationLayer().UniqueConstraintValidation().IsDefaultEnabled(),
                 repositoryInjectionEnabled: true,
+                customValidationEnabled: true,
+                associationedElements: associationedElements,
                 additionalFolders: outputTarget.ExecutionContext.Settings.GetCQRSSettings().ConsolidateCommandQueryAssociatedFilesIntoSingleFile()
                     ? Array.Empty<string>()
                     : new[] { model.GetConceptName() })
         {
-            FulfillsRole(TemplateFulfillingRoles.Application.Validation.Command);
+            FulfillsRole(TemplateRoles.Application.Validation.Command);
         }
 
-        public static void Configure(CSharpTemplateBase<CommandModel> template)
+        public static void Configure(CSharpTemplateBase<CommandModel> template, IEnumerable<IAssociationEnd> associationedElements)
         {
             template.ConfigureForValidation(
                 dtoModel: new DTOModel(template.Model.InternalElement),
                 toValidateTemplateId: CommandModelsTemplate.TemplateId,
                 modelParameterName: "command",
-                dtoTemplateId: TemplateFulfillingRoles.Application.Contracts.Dto,
-                dtoValidatorTemplateId: TemplateFulfillingRoles.Application.Validation.Dto,
+                dtoTemplateId: TemplateRoles.Application.Contracts.Dto,
+                dtoValidatorTemplateId: TemplateRoles.Application.Validation.Dto,
                 validatorProviderInterfaceTemplateId: "Application.Common.ValidatorProviderInterface",
                 uniqueConstraintValidationEnabled: template.ExecutionContext.Settings.GetFluentValidationApplicationLayer().UniqueConstraintValidation().IsDefaultEnabled(),
-                repositoryInjectionEnabled: true);
+                repositoryInjectionEnabled: true,
+                customValidationEnabled: true,
+                associationedElements: associationedElements);
         }
 
         public override bool CanRunTemplate()

@@ -9,6 +9,7 @@ using Intent.Modelers.Services.Api;
 using Intent.Modelers.Types.ServiceProxies.Api;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Registrations;
+using Intent.Modules.Contracts.Clients.Http.Shared;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
@@ -29,6 +30,7 @@ namespace Intent.Modules.Application.Contracts.Clients.Templates.ServiceContract
 
         public override string TemplateId => ServiceContractTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, ServiceProxyModel model)
         {
             return new ServiceContractTemplate(outputTarget, model);
@@ -38,6 +40,7 @@ namespace Intent.Modules.Application.Contracts.Clients.Templates.ServiceContract
         public override IEnumerable<ServiceProxyModel> GetModels(IApplication application)
         {
             return _metadataManager.ServiceProxies(application).GetServiceProxyModels()
+                .Union(_metadataManager.Services(application).GetServiceProxyModels())
                 .Where(x => x.HasMappedEndpoints())
                 .ToArray();
         }

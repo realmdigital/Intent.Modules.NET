@@ -1,3 +1,19 @@
+### Version 1.0.13
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 1.0.12
+
+- Improvement: Updated dependency versions.
+
+### Version 1.0.11
+
+- Improvement: Updated dependency versions.
+
+### Version 1.0.10
+
+- Improvement: Few small fixes on using directives.
+
 ### Version 1.0.6
 
 - Updated to ensure variable name of entity to publish event for matches that in generated method implmentation by the CRUD module.

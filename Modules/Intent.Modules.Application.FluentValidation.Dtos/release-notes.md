@@ -1,3 +1,48 @@
+### Version 3.10.0
+
+- Fixed: Domain constraints not being propagated into validators when the data graph is more than two levels deep.
+- Fixed: Validations not being applied when mapping to constructor parameters.
+
+### Version 3.9.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 3.9.2
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 3.9.1
+
+- Improvement: Added `TODO` comments on `NotImplementedException`.
+- Fix: Unique Constraint validation ignores Included columns.
+
+### Version 3.9.0
+
+- Improvement: Added Regular Expressions for Validation.
+- Improvement: Module project updated to .NET 8.
+- Fix: Fixed issue where DTO's for compositional entities does not include validation rules.
+
+### Version 3.8.2
+
+- Improvement: Ignore custom validation rules when generating service proxies.
+
+### Version 3.8.1
+
+- Improvement: Added IntentManaged Body Merge attribute to the `ConfigureValidationRules` method to prevent it from being updated when the Software Factory is re-executed.
+
+### Version 3.8.0
+
+- Fixed: Only creates validations for inbound DTOs and not outbound ones.
+
+### Version 3.7.3
+
+- Improvement: Removed `// IntentMatch(...)` code management instructions from templates which are no longer needed since version `4.4.0` of the `Intent.OutputManager.RoslynWeaver` module.
+- Improvement: Added CascadeMode option on Fluent Validations to specify this behaviour.
+ 
+### Version 3.7.2
+
+- Fixed: Migration improvement using Roslyn instead of Regex to avoid updating incorrect IntentManaged attributes. 
+
 ### Version 3.7.1
 
 - Improvement: Added support for the [new Email Address](https://github.com/IntentArchitect/Intent.Modules.NET/blob/development/Modules/Intent.Modules.Application.FluentValidation/release-notes.md#version-383) option on the Validation stereotype.

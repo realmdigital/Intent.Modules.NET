@@ -93,7 +93,7 @@ public partial class ExceptionFilterTemplate : CSharpTemplateBase<object>, ICSha
         }
 
         switchStatement.AddCase(UseType("System.UnauthorizedAccessException"),
-            block => block.AddStatement("context.Result = new ForbidResult();")
+            block => block.AddStatement("context.Result = new UnauthorizedResult();")
                 .AddStatement("context.ExceptionHandled = true;")
                 .WithBreak());
 
@@ -119,7 +119,8 @@ public partial class ExceptionFilterTemplate : CSharpTemplateBase<object>, ICSha
             .FindStatement(p => p.HasMetadata("exception-switch"));
     }
 
-    [IntentManaged(Mode.Fully)] public CSharpFile CSharpFile { get; }
+    [IntentManaged(Mode.Fully)]
+    public CSharpFile CSharpFile { get; }
 
     [IntentManaged(Mode.Fully)]
     protected override CSharpFileConfig DefineFileConfig()

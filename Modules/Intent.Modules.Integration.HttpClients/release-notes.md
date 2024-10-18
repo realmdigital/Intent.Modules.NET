@@ -1,4 +1,79 @@
-﻿### Version 5.0.7
+### Version 5.2.0
+
+- Fixed: Presents a friendlier error message when an expected Header Name field is missing from the metadata.
+
+### Version 5.1.13
+
+- Improvement: Only generates `HttpClientHeaderHandler` if your authorization is set `Transmittable Access Token`.
+- Fixed: HttpClients are able to generate into `netstandard2.*` projects.
+
+### Version 5.1.12
+
+- Improvement: Improved content type filter int the `HttpClientRequestException`.
+
+### Version 5.1.11
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.1.10
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 5.1.9
+
+- New Feature: Added a new authorization option `Authorization Header Provider`, which allow for using dependency injection to set the `Authorization` header for proxy calls.
+- Improvement: Service Proxies now respecting Applications Services `Serialize Enums as Strings` setting.
+- Improvement: Http Client configuration now group per package for simpler configuration.
+
+### Version 5.1.8
+
+- Fixed: Default value for Authorization Setup.
+
+### Version 5.1.7
+
+- Improvement: Added shared template infrastructure to support service proxies being able to respect `Serialize Enum as String` setting.
+
+### Version 5.1.6
+
+- Fixed: Fixed Service Proxies dependency - Until the Intent Architect client is fixed for this scenario, the Service Proxies package will not be installed in the Services designer.
+
+### Version 5.1.5
+
+- Improvement: Updated the logic which converts types to query parameters to be more standard in how it coverts types to string.
+
+### Version 5.1.4
+
+- Fixed: Updated important dependency module version.
+
+### Version 5.1.3
+
+- Improvement: Added support for gathering Service Proxy information from the Services designer too.
+- Fixed and Improved: Added setting to either make use of Transmittable Access Token or Client Access Token Management (both cannot be used at the same time per http client).
+
+### Version 5.1.2
+
+- Improvement: Added support for deserializing ProblemDetails for client HTTP calls.
+
+### Version 5.1.1
+
+- Improvement: File transfer ( upload / download ) support.
+- Improvement: Improved internal processes for working with Service Proxies.
+
+### Version 5.1.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+- Improvement: Upgraded Microsoft.Extensions.Http NuGet package to version 8.0.0
+
+### Version 5.0.8
+
+- Improvement: Underlying proxy templates updated to support alternate Metadata models.
+
+### Version 5.0.8
+
+- Fixed: Bug in HttpClient where the query string was not correctly handling a collection type.
+- Improvement: Added support for configuring headers in HttpClient requests either through request header propagation or from the Session.
+
+### Version 5.0.7
 
 - Improvement: Will now respect query string parameter names as introduced in [`Intent.Metadata.WebApi` version `4.3.2`](https://github.com/IntentArchitect/Intent.Modules/blob/development/Modules/Intent.Modules.Metadata.WebApi/release-notes.md#version-432).
 

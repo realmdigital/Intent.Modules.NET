@@ -3,7 +3,7 @@
   <ApplicationId>95c39cbb-fdbb-46ee-806b-2392da2438bd</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#78b93fa2-4a87-49bf-8d3f-8527deb7f90f</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#78b93fa2-4a87-49bf-8d3f-8527deb7f90f</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
@@ -26,26 +26,10 @@
     </FileLog>
     <FileLog>
       <ProjectId>04b769d0-8cb9-42be-a063-6eeb73b19b9a</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.Templates.Api.ApiElementModel#575edd35-9438-406d-b0a7-b99d6f29b560</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Api/StoredProcedureModel.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>StoredProcedureModel.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>04b769d0-8cb9-42be-a063-6eeb73b19b9a</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.Templates.Api.ApiElementModelExtensions#575edd35-9438-406d-b0a7-b99d6f29b560</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Api/StoredProcedureModelStereotypeExtensions.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>StoredProcedureModelStereotypeExtensions.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>04b769d0-8cb9-42be-a063-6eeb73b19b9a</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.Templates.Api.ApiElementModel#5823b192-eb03-47c8-90d8-5501c922e9a5</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Api/StoredProcedureParameterModel.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>StoredProcedureParameterModel.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -58,6 +42,14 @@
     </FileLog>
     <FileLog>
       <ProjectId>c65a7d10-e6c8-49bf-b699-5a7ffd06b41f</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#1cf00c3d-11a6-4a5b-b6f8-ba684a21be4a</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>FactoryExtensions/DbContextInterfaceExtension.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>DbContextInterfaceExtension.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>c65a7d10-e6c8-49bf-b699-5a7ffd06b41f</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#03e4264c-744e-4b91-a96d-ae175d36008b</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>FactoryExtensions/EntityRepositoryInterfaceSyncExtension.cs</ApplicationRelativeFilePath>
@@ -66,10 +58,10 @@
     </FileLog>
     <FileLog>
       <ProjectId>c65a7d10-e6c8-49bf-b699-5a7ffd06b41f</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#5a0baf83-b93a-428d-8f47-3bf1b6a67f99</CorrelationId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#043fffe7-7452-4ce7-9d0b-3bbc740c0049</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>FactoryExtensions/PagedListFactoryExtension.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedListFactoryExtension.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>FactoryExtensions/EntityRepositoryOperationExtension.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>EntityRepositoryOperationExtension.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -81,7 +73,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>5dd354ae-1260-4a29-a506-037941ec04ae</ProjectId>
+      <ProjectId>3e5e932f-a74c-4c96-ad5a-e6eb4356f9a4</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.IModSpecFile</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.EntityFrameworkCore.Repositories.imodspec</ApplicationRelativeFilePath>
@@ -89,8 +81,8 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>5dd354ae-1260-4a29-a506-037941ec04ae</ProjectId>
-      <CorrelationId>Intent.VisualStudio.Projects.CoreLibrary.CSProject#5dd354ae-1260-4a29-a506-037941ec04ae</CorrelationId>
+      <ProjectId>3e5e932f-a74c-4c96-ad5a-e6eb4356f9a4</ProjectId>
+      <CorrelationId>Intent.VisualStudio.Projects.CSharpProject#3e5e932f-a74c-4c96-ad5a-e6eb4356f9a4</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Modules.EntityFrameworkCore.Repositories.csproj</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Intent.Modules.EntityFrameworkCore.Repositories.csproj</ProjectRelativeFilePath>
@@ -178,22 +170,6 @@
     </FileLog>
     <FileLog>
       <ProjectId>d1adde7e-cf09-420d-814c-ae0f202fde68</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial#09506297-8b03-44b4-9f6b-09c0cdeaa5ef</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/PagedList/PagedListTemplatePartial.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedList/PagedListTemplatePartial.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>d1adde7e-cf09-420d-814c-ae0f202fde68</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.TemplateRegistration.Custom#09506297-8b03-44b4-9f6b-09c0cdeaa5ef</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/PagedList/PagedListTemplateRegistration.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedList/PagedListTemplateRegistration.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>d1adde7e-cf09-420d-814c-ae0f202fde68</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial#a78eb6c0-6400-436f-87d7-1b9cf35effa9</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Templates/Repository/RepositoryTemplatePartial.cs</ApplicationRelativeFilePath>
@@ -230,7 +206,7 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Templates/TemplateExtensions.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>TemplateExtensions.cs</ProjectRelativeFilePath>
-      <IsIgnored>true</IsIgnored>
+      <IsIgnored>false</IsIgnored>
     </FileLog>
   </FileLogs>
 </outputLog>

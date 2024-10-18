@@ -4,7 +4,6 @@
   <display>EventHandlers</display>
   <isAbstract>false</isAbstract>
   <sort-children>by-type-then-by-name</sort-children>
-  <order>1</order>
   <genericTypes />
   <isMapped>false</isMapped>
   <parentFolderId>05ad3928-787b-402d-86c3-46d14f58c8b6</parentFolderId>
@@ -48,6 +47,20 @@
       <parentFolderId>13319c45-d8e1-4de0-9358-e7fbc162c8c4</parentFolderId>
       <packageId>d6b1ee2c-b65f-4edd-8b70-4ced1335c0c4</packageId>
       <packageName>MultipleDocumentStores</packageName>
+      <stereotypes />
+      <metadata>
+        <entry key="status" value="assigned" />
+      </metadata>
+      <childElements />
+    </childElement>
+    <childElement id="d26d26a2-d432-4b39-bca0-ae90152b6fcd" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.MediatR.DomainEvents.DomainEventHandler</name>
+      <display>Intent.MediatR.DomainEvents.DomainEventHandler</display>
+      <externalReference>Intent.MediatR.DomainEvents</externalReference>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>13319c45-d8e1-4de0-9358-e7fbc162c8c4</parentFolderId>
       <stereotypes />
       <metadata>
         <entry key="status" value="assigned" />

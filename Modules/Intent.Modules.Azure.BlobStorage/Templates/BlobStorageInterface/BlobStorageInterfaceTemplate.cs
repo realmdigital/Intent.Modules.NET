@@ -22,7 +22,7 @@ namespace Intent.Modules.Azure.BlobStorage.Templates.BlobStorageInterface
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\BlobStorageInterface\BlobStorageInterfaceTemplate.tt"
+    #line 1 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\BlobStorageInterface\BlobStorageInterfaceTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class BlobStorageInterfaceTemplate : CSharpTemplateBase<object>
     {
@@ -34,14 +34,14 @@ namespace Intent.Modules.Azure.BlobStorage.Templates.BlobStorageInterface
         {
             this.Write("using System;\r\nusing System.Collections.Generic;\r\nusing System.IO;\r\nusing System.Threading;\r\nusing System.Threading.Tasks;\r\n\r\n[assembly: DefaultIntentManaged(Mode.Fully)]\r\n\r\nnamespace ");
             
-            #line 18 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\BlobStorageInterface\BlobStorageInterfaceTemplate.tt"
+            #line 18 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\BlobStorageInterface\BlobStorageInterfaceTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    /// <summary>\r\n    /// Represents a single item used for bulk uploads to blob storage.\r\n    /// </summary>\r\n    public record BulkBlobItem(string Name, Stream DataStream);\r\n\r\n    /// <summary>\r\n    /// A simplified service interface to access Blob Storage.\r\n    /// </summary>\r\n    public interface ");
             
-            #line 28 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\BlobStorageInterface\BlobStorageInterfaceTemplate.tt"
+            #line 28 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\BlobStorageInterface\BlobStorageInterfaceTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ClassName));
             
             #line default

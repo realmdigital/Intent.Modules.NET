@@ -36,7 +36,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.Tests.Templates.Owner.GetAllPa
             AddNugetDependency(NugetPackages.Xunit);
             AddNugetDependency(NugetPackages.XunitRunnerVisualstudio);
 
-            AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
+            AddTypeSource(TemplateRoles.Application.Contracts.Dto);
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddClass($"{Model.Name}HandlerTests")
@@ -148,7 +148,8 @@ namespace Intent.Modules.Application.MediatR.CRUD.Tests.Templates.Owner.GetAllPa
             templateInstance?.AddPaginationAssertionMethod(templateInstance.CSharpFile.Classes.First(), Model, domainModel);
         }
 
-        [IntentManaged(Mode.Fully)] public CSharpFile CSharpFile { get; }
+        [IntentManaged(Mode.Fully)]
+        public CSharpFile CSharpFile { get; }
 
         [IntentManaged(Mode.Fully)]
         protected override CSharpFileConfig DefineFileConfig()

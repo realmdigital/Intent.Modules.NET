@@ -1,3 +1,20 @@
+### Version 4.2.2
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.2.1
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.2.0
+
+- Improvement: Added Regular Expressions for Validation.
+- Improvement: Module project updated to .NET 8.
+
+### Version 4.1.7
+
+- Improvement: Updated icon to SVG format.
+
 ### Version 4.1.6
 
 - Fixed: Updated dependencies to introduce latest fixes.

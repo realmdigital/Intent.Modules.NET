@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Intent.Engine;
 using Intent.Eventing.MassTransit.Api;
 using Intent.Modelers.Eventing.Api;
+using Intent.Modelers.Services.Api;
+using Intent.Modelers.Services.EventInteractions;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Configuration;
@@ -12,8 +13,13 @@ using Intent.Modules.Common.CSharp.DependencyInjection;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Eventing.Contracts.Templates;
+using Intent.Modules.Eventing.Contracts.Templates.IntegrationCommand;
 using Intent.Modules.Eventing.Contracts.Templates.IntegrationEventMessage;
 using Intent.Modules.Eventing.MassTransit.Settings;
+using Intent.Modules.Eventing.MassTransit.Templates.MassTransitConfiguration.Consumers;
+using Intent.Modules.Eventing.MassTransit.Templates.MassTransitConfiguration.MessageBrokers;
+using Intent.Modules.Eventing.MassTransit.Templates.MassTransitConfiguration.Producers;
+using Intent.Modules.Modelers.Eventing;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 using Intent.Utils;
@@ -24,29 +30,26 @@ using Intent.Utils;
 namespace Intent.Modules.Eventing.MassTransit.Templates.MassTransitConfiguration;
 
 [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
+public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<object, MassTransitConfigurationDecoratorContract>, ICSharpFileBuilderTemplate
 {
     public const string TemplateId = "Intent.Eventing.MassTransit.MassTransitConfiguration";
 
     [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
     public MassTransitConfigurationTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
     {
-        AddNugetDependency(NuGetPackages.MassTransit);
+        AddNugetDependency(NugetPackages.MassTransit(OutputTarget));
 
-        var appModels = ExecutionContext.MetadataManager
-            .Eventing(ExecutionContext.GetApplicationConfig().Id).GetApplicationModels();
+        _messageBroker = GetMessageBroker();
+        var messageBrokerDependency = _messageBroker.GetNugetDependency(OutputTarget);
+        if (messageBrokerDependency is not null)
+        {
+            AddNugetDependency(messageBrokerDependency);
+        }
 
-        MessagesWithSettings = appModels
-            .SelectMany(x => x.SubscribedMessages())
-            .Select(x => x.TypeReference.Element.AsMessageModel())
-            .Union(appModels.SelectMany(x => x.PublishedMessages())
-                .Select(x => x.TypeReference.Element.AsMessageModel()))
-            .Where(p => p.HasMessageTopologySettings() && !string.IsNullOrWhiteSpace(p.GetMessageTopologySettings().EntityName()))
-            .ToList();
+        AddTypeSource(IntegrationEventMessageTemplate.TemplateId);
+        AddTypeSource(IntegrationCommandTemplate.TemplateId);
 
-        MessageHandlerModels = appModels
-            .SelectMany(x => x.SubscribedMessages())
-            .ToList();
+        _applicableMessages = GetApplicableMessages();
 
         CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
             .AddUsing("System")
@@ -55,13 +58,18 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
             .AddUsing("MassTransit.Configuration")
             .AddUsing("Microsoft.Extensions.Configuration")
             .AddUsing("Microsoft.Extensions.DependencyInjection")
+            .OnBuild(file =>
+            {
+                _consumers = GetConsumers();
+                _producers = GetProducers();
+            })
             .AddClass($"MassTransitConfiguration", @class =>
             {
                 @class.Static();
                 @class.AddMethod("void", "AddMassTransitConfiguration", method =>
                 {
                     method.Static();
-                    method.AddParameter("IServiceCollection", "services", parm => parm.WithThisModifier());
+                    method.AddParameter("IServiceCollection", "services", param => param.WithThisModifier());
                     method.AddParameter("IConfiguration", "configuration");
                     method.AddStatements(GetContainerRegistrationStatements());
                     method.AddInvocationStatement("services.AddMassTransit", stmt => stmt
@@ -70,18 +78,77 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
                         .SeparatedFromPrevious());
                 });
                 AddMessageTopologyConfiguration(@class);
-                @class.AddMethod("void", "AddConsumers", method =>
-                {
-                    method.Private().Static();
-                    method.AddParameter("IRegistrationConfigurator", "cfg", parm => parm.WithThisModifier());
-                    method.AddStatements(GetConsumerStatements("cfg"));
-                });
+                AddConsumers(@class);
+                AddReceivedEndpointsForCommandSubscriptions(@class);
+                AddEndpointConventionRegistrations(@class);
                 AddNonDefaultEndpointConfigurationMethods(@class);
             });
     }
 
-    private IReadOnlyCollection<MessageModel> MessagesWithSettings { get; }
-    private IReadOnlyCollection<MessageSubscribeAssocationTargetEndModel> MessageHandlerModels { get; }
+    private readonly MessageBrokerBase _messageBroker;
+    private IReadOnlyCollection<Consumer> _consumers;
+    private IReadOnlyCollection<Producer> _producers;
+    private readonly IReadOnlyList<MessageModel> _applicableMessages;
+
+    private MessageBrokerBase GetMessageBroker()
+    {
+        var messageBrokerSetting = this.ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum();
+        return messageBrokerSetting switch
+        {
+            EventingSettings.MessagingServiceProviderOptionsEnum.InMemory => new InMemoryMessageBroker(this),
+            EventingSettings.MessagingServiceProviderOptionsEnum.Rabbitmq => new RabbitMqMessageBroker(this),
+            EventingSettings.MessagingServiceProviderOptionsEnum.AzureServiceBus => new AzureServiceBusMessageBroker(this),
+            EventingSettings.MessagingServiceProviderOptionsEnum.AmazonSqs => new AmazonSqsMessageBroker(this),
+            _ => throw new InvalidOperationException(
+                $"Messaging Service Provider is set to a setting that is not supported: {messageBrokerSetting}")
+        };
+    }
+
+    private IReadOnlyCollection<Consumer> GetConsumers()
+    {
+        var consumers = new IConsumerFactory[]
+            {
+                new LegacyEventingConsumerFactory(this),
+                new ServiceIntegrationEventingConsumerFactory(this),
+                new ServiceIntegrationCommandConsumerFactory(this),
+            }
+            .Concat(GetDecorators().SelectMany(decorator => decorator.GetConsumerFactories() ?? Enumerable.Empty<IConsumerFactory>()))
+            .SelectMany(factory => factory.CreateConsumers())
+            .ToArray();
+        return consumers;
+    }
+
+    private IReadOnlyCollection<Producer> GetProducers()
+    {
+        var producers = new IProducerFactory[]
+            {
+                new ServiceIntegrationCommandSendProducerFactory(this)
+            }
+            .Concat(GetDecorators().SelectMany(decorator => decorator.GetProducerFactories() ?? Enumerable.Empty<IProducerFactory>()))
+            .SelectMany(factory => factory.CreateProducers())
+            .ToArray();
+        return producers;
+    }
+
+    private IReadOnlyList<MessageModel> GetApplicableMessages()
+    {
+        var eventApplications = ExecutionContext.MetadataManager.Eventing(ExecutionContext.GetApplicationConfig().Id).GetApplicationModels().ToList();
+        var legacySubscriptionMessages = eventApplications.SelectMany(x => x.SubscribedMessages())
+            .Select(x => x.TypeReference.Element.AsMessageModel());
+        var legacyPublishMessages = eventApplications.SelectMany(x => x.PublishedMessages())
+            .Select(x => x.TypeReference.Element.AsMessageModel());
+
+        var serviceIntegrationMessages = ExecutionContext.MetadataManager.Services(ExecutionContext.GetApplicationConfig().Id)
+            .GetMessageModels()
+            .Where(p => p.InternalElement.AssociatedElements.Any());
+
+        var filtered = legacySubscriptionMessages
+            .Union(legacyPublishMessages)
+            .Union(serviceIntegrationMessages);
+
+        var result = filtered.ToList();
+        return result;
+    }
 
     private IEnumerable<CSharpStatement> GetContainerRegistrationStatements()
     {
@@ -99,60 +166,10 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
             .AddStatement($"x.SetKebabCaseEndpointNameFormatter();")
             .AddStatement($"x.AddConsumers();");
 
-        switch (ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum())
-        {
-            case EventingSettings.MessagingServiceProviderOptionsEnum.InMemory:
-                block.AddInvocationStatement("x.UsingInMemory", memory => memory
-                    .AddArgument(new CSharpLambdaBlock("(context, cfg)")
-                        .AddStatement(GetMessageRetryStatement("cfg", configurationVarName))
-                        .AddStatements(GetPostHostConfigurationStatements()))
-                    .AddMetadata("message-broker", "memory")
-                    .SeparatedFromPrevious());
-                break;
-            case EventingSettings.MessagingServiceProviderOptionsEnum.Rabbitmq:
-                block.AddInvocationStatement("x.UsingRabbitMq", rabbitMq => rabbitMq
-                    .AddArgument(new CSharpLambdaBlock("(context, cfg)")
-                        .AddStatement(GetMessageRetryStatement("cfg", configurationVarName))
-                        .AddInvocationStatement("cfg.Host", host => host
-                            .AddArgument(@"configuration[""RabbitMq:Host""]")
-                            .AddArgument(@"configuration[""RabbitMq:VirtualHost""]")
-                            .AddArgument(new CSharpLambdaBlock("host")
-                                .AddStatement(@"host.Username(configuration[""RabbitMq:Username""]);")
-                                .AddStatement(@"host.Password(configuration[""RabbitMq:Password""]);"))
-                            .SeparatedFromPrevious())
-                        .AddStatements(GetPostHostConfigurationStatements()))
-                    .AddMetadata("message-broker", "rabbit-mq")
-                    .SeparatedFromPrevious());
-                break;
-            case EventingSettings.MessagingServiceProviderOptionsEnum.AzureServiceBus:
-                block.AddInvocationStatement("x.UsingAzureServiceBus", azBus => azBus
-                    .AddArgument(new CSharpLambdaBlock("(context, cfg)")
-                        .AddStatement(GetMessageRetryStatement("cfg", configurationVarName))
-                        .AddInvocationStatement("cfg.Host", host => host
-                            .AddArgument(@"configuration[""AzureMessageBus:ConnectionString""]")
-                            .SeparatedFromPrevious())
-                        .AddStatements(GetPostHostConfigurationStatements()))
-                    .AddMetadata("message-broker", "azure-service-bus")
-                    .SeparatedFromPrevious());
-                break;
-            case EventingSettings.MessagingServiceProviderOptionsEnum.AmazonSqs:
-                block.AddInvocationStatement("x.UsingAmazonSqs", sqs => sqs
-                    .AddArgument(new CSharpLambdaBlock("(context, cfg)")
-                        .AddStatement(GetMessageRetryStatement("cfg", configurationVarName))
-                        .AddInvocationStatement("cfg.Host", host => host
-                            .AddArgument(@"configuration[""AmazonSqs:Host""]")
-                            .AddArgument(new CSharpLambdaBlock("host")
-                                .AddStatement(@"host.AccessKey(configuration[""AmazonSqs:AccessKey""]);")
-                                .AddStatement(@"host.SecretKey(configuration[""AmazonSqs:SecretKey""]);"))
-                            .SeparatedFromPrevious())
-                        .AddStatements(GetPostHostConfigurationStatements()))
-                    .AddMetadata("message-broker", "amazon-sqs")
-                    .SeparatedFromPrevious());
-                break;
-            default:
-                throw new InvalidOperationException(
-                    $"Messaging Service Provider is set to a setting that is not supported: {ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum()}");
-        }
+        block.AddStatement(_messageBroker.AddMessageBrokerConfiguration(
+            busRegistrationVarName: "x",
+            factoryConfigVarName: "cfg",
+            moreConfiguration: GetPostHostConfigurationStatements("cfg", configurationVarName)));
 
         if (ExecutionContext.Settings.GetEventingSettings().OutboxPattern().IsInMemory())
         {
@@ -162,17 +179,19 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
         return block;
     }
 
-    private IEnumerable<CSharpStatement> GetPostHostConfigurationStatements()
+    private IEnumerable<CSharpStatement> GetPostHostConfigurationStatements(string factoryConfigVarName, string configurationVarName)
     {
-        yield return new CSharpStatement("cfg.ConfigureEndpoints(context);").AddMetadata("configure-endpoints", true);
-        if (MessageHandlerModels.Any(HasMessageBrokerStereotype))
+        yield return GetMessageRetryStatement(factoryConfigVarName, configurationVarName);
+
+        yield return new CSharpStatement($"{factoryConfigVarName}.ConfigureEndpoints(context);").AddMetadata("configure-endpoints", true).SeparatedFromPrevious();
+        if (ShouldConfigureNonDefaultEndpoints())
         {
-            yield return new CSharpStatement($@"cfg.ConfigureNonDefaultEndpoints(context);");
+            yield return new CSharpStatement($@"{factoryConfigVarName}.ConfigureNonDefaultEndpoints(context);");
         }
 
         if (ExecutionContext.Settings.GetEventingSettings().OutboxPattern().IsInMemory())
         {
-            yield return new CSharpStatement("cfg.UseInMemoryOutbox();");
+            yield return new CSharpStatement($"{factoryConfigVarName}.UseInMemoryOutbox(context);").AddMetadata("in-memory-outbox", true);
         }
         else if (ExecutionContext.Settings.GetEventingSettings().OutboxPattern().IsEntityFramework() &&
                  ExecutionContext.GetApplicationConfig().Modules.All(p => p.ModuleId != "Intent.Eventing.MassTransit.EntityFrameworkCore"))
@@ -180,15 +199,61 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
             Logging.Log.Warning("Please install Intent.Eventing.MassTransit.EntityFrameworkCore module for the Outbox pattern to persist to the database");
         }
 
-        if (MessagesWithSettings.Any())
+        if (ShouldConfigureMessageTopologies())
         {
-            yield return new CSharpStatement("cfg.AddMessageTopologyConfiguration();");
+            yield return new CSharpStatement($"{factoryConfigVarName}.AddMessageTopologyConfiguration();");
         }
+
+        if (ShouldAddReceiveEndpoints())
+        {
+            yield return new CSharpStatement($"{factoryConfigVarName}.AddReceiveEndpoints(context);");
+        }
+
+        if (_producers.Any())
+        {
+            yield return new CSharpStatement("EndpointConventionRegistration();");
+        }
+    }
+
+    private bool ShouldConfigureMessageTopologies()
+    {
+        return _applicableMessages.Any(ShouldConfigureMessageTopology);
+    }
+
+    private bool ShouldConfigureMessageTopology(MessageModel message)
+    {
+        return HasMessageTopologySettings(message);
+    }
+
+    private static bool HasMessageTopologySettings(MessageModel message)
+    {
+        return message.HasMessageTopologySettings() && !string.IsNullOrWhiteSpace(message.GetMessageTopologySettings().EntityName());
+    }
+
+    private bool ShouldConfigureNonDefaultEndpoints()
+    {
+        return _consumers.Any(ShouldConfigureNonDefaultEndpoint);
+    }
+
+    private static bool ShouldConfigureNonDefaultEndpoint(Consumer consumer)
+    {
+        return consumer.Settings.RabbitMqConsumerSettings is not null ||
+               consumer.Settings.AzureConsumerSettings is not null;
+    }
+
+    private bool ShouldAddReceiveEndpoints()
+    {
+        return _consumers.Any(ShouldAddReceiveEndpoint);
+    }
+
+    private static bool ShouldAddReceiveEndpoint(Consumer consumer)
+    {
+        return consumer.IsSpecificMessageConsumer;
     }
 
     private void AddMessageTopologyConfiguration(CSharpClass @class)
     {
-        if (!MessagesWithSettings.Any())
+        if (!ShouldConfigureMessageTopologies())
         {
             return;
         }
@@ -196,32 +261,44 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
         @class.AddMethod("void", "AddMessageTopologyConfiguration", method =>
         {
             method.Private().Static();
-            method.AddParameter(GetMessageBrokerBusFactoryConfiguratorName(), "cfg", param => param.WithThisModifier());
-            foreach (var messageModel in MessagesWithSettings)
+            method.AddParameter(_messageBroker.GetMessageBrokerBusFactoryConfiguratorName(), "cfg", param => param.WithThisModifier());
+
+            foreach (var messageModel in _applicableMessages)
             {
-                method.AddStatement($@"cfg.Message<{GetTypeName(IntegrationEventMessageTemplate.TemplateId, messageModel)}>(x => x.SetEntityName(""{messageModel.GetMessageTopologySettings().EntityName()}""));");
+                if (HasMessageTopologySettings(messageModel))
+                {
+                    method.AddStatement(
+                        $@"cfg.Message<{GetTypeName(IntegrationEventMessageTemplate.TemplateId, messageModel)}>(x => x.SetEntityName(""{messageModel.GetMessageTopologySettings().EntityName()}""));");
+                }
             }
         });
     }
 
-    private IReadOnlyCollection<CSharpStatement> GetConsumerStatements(string configParamName)
+    private void AddConsumers(CSharpClass @class)
     {
-        var statements = new List<CSharpStatement>();
-        foreach (var messageHandlerModel in MessageHandlerModels)
+        @class.AddMethod("void", "AddConsumers", method =>
         {
-            var messageName =
-                this.GetIntegrationEventMessageName(messageHandlerModel.TypeReference.Element.AsMessageModel());
-            var sanitizedAppName = ExecutionContext.GetApplicationConfig().Name.Replace("_", "-").Replace(" ", "-")
-                .Replace(".", "-");
-            var consumerDefinitionType =
-                $@"{this.GetIntegrationEventHandlerInterfaceName()}<{messageName}>, {messageName}";
-            var consumerWrapperType = $@"{this.GetWrapperConsumerName()}<{consumerDefinitionType}>";
+            method.Private().Static();
+            method.AddParameter("IRegistrationConfigurator", "cfg", param => param.WithThisModifier());
+            method.AddStatements(_consumers.Select(consumer => GetAddConsumerStatement("cfg", consumer)));
+        });
+    }
 
-            // Until we can do single-line method chaining this will have to do for now...
-            var addConsumer = $@"{configParamName}.AddConsumer<{consumerWrapperType}>"
-                              + $@"(typeof({this.GetWrapperConsumerName()}Definition<{consumerDefinitionType}>))";
+    private CSharpStatement GetAddConsumerStatement(string configParamName, Consumer consumer)
+    {
+        var sanitizedAppName = ExecutionContext.GetApplicationConfig().Name.Replace("_", "-").Replace(" ", "-")
+            .Replace(".", "-");
+        // Until we can do single-line method chaining this will have to do for now...
+        var addConsumer = $"{configParamName}.AddConsumer<{consumer.ConsumerTypeName}>"
+                          + $"(typeof({consumer.ConsumerDefinitionTypeName}))";
 
-            if (HasMessageBrokerStereotype(messageHandlerModel))
+        if (ShouldConfigureNonDefaultEndpoint(consumer))
+        {
+            addConsumer += $@".ExcludeFromConfigureEndpoints()";
+        }
+        else
+        {
+            if (consumer.IsSpecificMessageConsumer)
             {
                 addConsumer += $@".ExcludeFromConfigureEndpoints()";
             }
@@ -229,197 +306,126 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
             {
                 addConsumer += $@".Endpoint(config => config.InstanceId = ""{sanitizedAppName}"")";
             }
-
-            addConsumer += ";";
-            statements.Add(addConsumer);
         }
 
-        return statements;
+        addConsumer += ";";
+        return addConsumer;
     }
 
-    private string GetMessageBrokerBusFactoryConfiguratorName()
+    private void AddReceivedEndpointsForCommandSubscriptions(CSharpClass @class)
     {
-        return ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum() switch
-        {
-            EventingSettings.MessagingServiceProviderOptionsEnum.AmazonSqs => "IAmazonSqsBusFactoryConfigurator",
-            EventingSettings.MessagingServiceProviderOptionsEnum.InMemory => "IInMemoryBusFactoryConfigurator",
-            EventingSettings.MessagingServiceProviderOptionsEnum.Rabbitmq => "IRabbitMqBusFactoryConfigurator",
-            EventingSettings.MessagingServiceProviderOptionsEnum.AzureServiceBus => "IServiceBusBusFactoryConfigurator",
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    private string GetMessageBrokerReceiveEndpointConfiguratorName()
-    {
-        return ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum() switch
-        {
-            EventingSettings.MessagingServiceProviderOptionsEnum.AmazonSqs => "IAmazonSqsReceiveEndpointConfigurator",
-            EventingSettings.MessagingServiceProviderOptionsEnum.InMemory => "IInMemoryReceiveEndpointConfigurator",
-            EventingSettings.MessagingServiceProviderOptionsEnum.Rabbitmq => "IRabbitMqReceiveEndpointConfigurator",
-            EventingSettings.MessagingServiceProviderOptionsEnum.AzureServiceBus => "IServiceBusReceiveEndpointConfigurator",
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    private void AddNonDefaultEndpointConfigurationMethods(CSharpClass @class)
-    {
-        if (!MessageHandlerModels.Any(HasMessageBrokerStereotype))
+        if (!ShouldAddReceiveEndpoints())
         {
             return;
         }
 
+        @class.AddMethod("void", "AddReceiveEndpoints", method =>
+        {
+            method.Private().Static();
+            method.AddParameter(_messageBroker.GetMessageBrokerBusFactoryConfiguratorName(), "cfg", param => param.WithThisModifier());
+            method.AddParameter("IBusRegistrationContext", "context");
+
+            foreach (var consumerGroup in _consumers.Where(ShouldAddReceiveEndpoint).GroupBy(key =>
+                     {
+                         var destinationAddress = key.DestinationAddress;
+                         if (string.IsNullOrWhiteSpace(destinationAddress))
+                         {
+                             destinationAddress = $"{key.Message.MessageTypeFullName.ToKebabCase()}";
+                         }
+
+                         return destinationAddress;
+                     }))
+            {
+                method.AddInvocationStatement("cfg.ReceiveEndpoint", caller =>
+                {
+                    caller.AddArgument($@"""{consumerGroup.Key}""");
+                    var lambda = new CSharpLambdaBlock("e");
+                    caller.AddArgument(lambda);
+
+                    lambda.AddStatement("e.ConfigureConsumeTopology = false;");
+
+                    lambda.AddStatements(consumerGroup.Select(consumer => $"e.Consumer<{consumer.ConsumerTypeName}>(context);"));
+                });
+            }
+        });
+    }
+
+    private void AddEndpointConventionRegistrations(CSharpClass @class)
+    {
+        if (!_producers.Any())
+        {
+            return;
+        }
+
+        @class.AddMethod("void", "EndpointConventionRegistration", method =>
+        {
+            method.Private().Static();
+
+            method.AddStatements(_producers.Select(producer =>
+                $@"EndpointConvention.Map<{producer.MessageTypeName}>(new Uri(""{producer.Urn}""));"));
+        });
+    }
+
+    private void AddNonDefaultEndpointConfigurationMethods(CSharpClass @class)
+    {
+        if (!ShouldConfigureNonDefaultEndpoints())
+        {
+            return;
+        }
+
+        bool hasGeneratedConfigStatements = false;
+
         @class.AddMethod("void", "ConfigureNonDefaultEndpoints", method =>
         {
             method.Private().Static();
-            method.AddParameter(GetMessageBrokerBusFactoryConfiguratorName(), "cfg", parm => parm.WithThisModifier());
+            method.AddParameter(_messageBroker.GetMessageBrokerBusFactoryConfiguratorName(), "cfg", param => param.WithThisModifier());
             method.AddParameter("IBusRegistrationContext", "context");
 
-            foreach (var messageHandlerModel in MessageHandlerModels.Where(HasMessageBrokerStereotype))
+            foreach (var consumer in _consumers.Where(ShouldConfigureNonDefaultEndpoint))
             {
-                var messageName =
-                    this.GetIntegrationEventMessageName(messageHandlerModel.TypeReference.Element.AsMessageModel());
                 var sanitizedAppName = ExecutionContext.GetApplicationConfig().Name.Replace("_", "-").Replace(" ", "-")
                     .Replace(".", "-");
-                var consumerDefinitionType =
-                    $@"{this.GetIntegrationEventHandlerInterfaceName()}<{messageName}>, {messageName}";
-                var consumerWrapperType = $@"{this.GetWrapperConsumerName()}<{consumerDefinitionType}>";
 
-                method.AddInvocationStatement($"cfg.AddCustomConsumerEndpoint<{consumerWrapperType}>", inv => inv
-                    .AddArgument("context")
-                    .AddArgument($@"""{sanitizedAppName}""")
-                    .AddArgument(new CSharpLambdaBlock("endpoint")
-                        .AddStatements(AddMessageBrokerConfigurationStatements("endpoint", messageHandlerModel)))
-                    .WithArgumentsOnNewLines());
+                var statements = _messageBroker.GetCustomConfigurationStatements(consumer, sanitizedAppName).ToList();
+                hasGeneratedConfigStatements |= statements.Count != 0;
+                method.AddStatements(statements);
             }
         });
 
-        @class.AddMethod("void", "AddCustomConsumerEndpoint", method =>
+        if (!hasGeneratedConfigStatements)
         {
-            method.Private().Static();
-            method.AddGenericParameter("TConsumer", out var tConsumer);
-            method.AddGenericTypeConstraint(tConsumer, c => c.AddType("class").AddType("IConsumer"));
-            method.AddParameter(GetMessageBrokerBusFactoryConfiguratorName(), "cfg", parm => parm.WithThisModifier());
-            method.AddParameter("IBusRegistrationContext", "context");
-            method.AddParameter("string", "instanceId");
-            method.AddParameter($"Action<{GetMessageBrokerReceiveEndpointConfiguratorName()}>", "configuration");
-
-            method.AddInvocationStatement($"cfg.ReceiveEndpoint", stmt => stmt
-                .AddArgument(new CSharpInvocationStatement($"new ConsumerEndpointDefinition<{tConsumer}>")
-                    .WithoutSemicolon()
-                    .AddArgument(new CSharpObjectInitializerBlock($@"new EndpointSettings<IEndpointDefinition<{tConsumer}>>")
-                        .AddInitStatement("InstanceId", "instanceId")))
-                .AddArgument("KebabCaseEndpointNameFormatter.Instance")
-                .AddArgument(new CSharpLambdaBlock("endpoint")
-                    .AddStatement("configuration.Invoke(endpoint);")
-                    .AddStatement($"endpoint.ConfigureConsumer<{tConsumer}>(context);"))
-                .WithArgumentsOnNewLines());
-        });
-    }
-
-    private IEnumerable<CSharpStatement> AddMessageBrokerConfigurationStatements(string configVarName,
-        MessageSubscribeAssocationTargetEndModel messageHandlerModel)
-    {
-        if (messageHandlerModel.HasAzureServiceBusConsumerSettings() &&
-            ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().IsAzureServiceBus())
-        {
-            var settings = messageHandlerModel.GetAzureServiceBusConsumerSettings();
-            if (settings.PrefetchCount().HasValue)
-            {
-                yield return $@"{configVarName}.PrefetchCount = {settings.PrefetchCount()};";
-            }
-
-            yield return $@"{configVarName}.RequiresSession = {settings.RequiresSession().ToString().ToLower()};";
-            if (!string.IsNullOrWhiteSpace(settings.DefaultMessageTimeToLive()))
-            {
-                ValidateTimeSpanString(settings.DefaultMessageTimeToLive(), nameof(settings.DefaultMessageTimeToLive), out var ts);
-                yield return $@"{configVarName}.DefaultMessageTimeToLive = TimeSpan.Parse(""{ts}"");";
-            }
-
-            if (!string.IsNullOrWhiteSpace(settings.LockDuration()))
-            {
-                ValidateTimeSpanString(settings.LockDuration(), nameof(settings.LockDuration), out var ts);
-                yield return $@"{configVarName}.LockDuration = TimeSpan.Parse(""{ts}"");";
-            }
-
-            yield return $@"{configVarName}.RequiresDuplicateDetection = {settings.RequiresDuplicateDetection().ToString().ToLower()};";
-            if (settings.RequiresDuplicateDetection() && !string.IsNullOrWhiteSpace(settings.DuplicateDetectionHistoryTimeWindow()))
-            {
-                ValidateTimeSpanString(settings.DuplicateDetectionHistoryTimeWindow(), nameof(settings.DuplicateDetectionHistoryTimeWindow), out var ts);
-                yield return $@"{configVarName}.DuplicateDetectionHistoryTimeWindow = TimeSpan.Parse(""{ts}"");";
-            }
-
-            yield return $@"{configVarName}.EnableBatchedOperations = {settings.EnableBatchedOperations().ToString().ToLower()};";
-            yield return $@"{configVarName}.EnableDeadLetteringOnMessageExpiration = {settings.EnableDeadLetteringOnMessageExpiration().ToString().ToLower()};";
-            if (settings.MaxQueueSize().HasValue)
-            {
-                yield return $@"{configVarName}.MaxSizeInMegabytes = {settings.MaxQueueSize()};";
-            }
-
-            if (settings.MaxDeliveryCount().HasValue)
-            {
-                yield return $@"{configVarName}.MaxDeliveryCount = {settings.MaxDeliveryCount()};";
-            }
+            return;
         }
 
-        if (messageHandlerModel.HasRabbitMQConsumerSettings() &&
-            ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().IsRabbitmq())
+        foreach (var helperMethod in _messageBroker.GetCustomConfigurationHelperMethods(@class))
         {
-            var settings = messageHandlerModel.GetRabbitMQConsumerSettings();
-            if (settings.PrefetchCount().HasValue)
-            {
-                yield return $@"{configVarName}.PrefetchCount = {settings.PrefetchCount()};";
-            }
-
-            yield return $@"{configVarName}.Lazy = {settings.Lazy().ToString().ToLower()};";
-            yield return $@"{configVarName}.Durable = {settings.Durable().ToString().ToLower()};";
-            yield return $@"{configVarName}.PurgeOnStartup = {settings.PurgeOnStartup().ToString().ToLower()};";
-            yield return $@"{configVarName}.Exclusive = {settings.Exclusive().ToString().ToLower()};";
+            @class.Methods.Add(helperMethod);
         }
-
-        yield break;
-
-        // Until we get a nice UI text field that can capture time this will have to do
-        static void ValidateTimeSpanString(string settingStringValue, string memberName, out TimeSpan parsedTimeSpan)
-        {
-            if (!TimeSpan.TryParse(settingStringValue, out parsedTimeSpan))
-            {
-                throw new Exception($"Unable to parse '{settingStringValue}' for {memberName}. Ensure format is 'hh:mm:ss'.");
-            }
-        }
-    }
-
-    private bool HasMessageBrokerStereotype(MessageSubscribeAssocationTargetEndModel messageHandlerModel)
-    {
-        return (messageHandlerModel.HasAzureServiceBusConsumerSettings() &&
-                ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().IsAzureServiceBus())
-               ||
-               (messageHandlerModel.HasRabbitMQConsumerSettings() &&
-                ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().IsRabbitmq());
     }
 
     private CSharpStatement GetMessageRetryStatement(string configParamName, string configurationVarName)
     {
         return ExecutionContext.Settings.GetEventingSettings().RetryPolicy().AsEnum() switch
         {
-            EventingSettings.RetryPolicyOptionsEnum.RetryImmediate => GetCSharpRetryStatements("Immediate",
+            EventingSettings.RetryPolicyOptionsEnum.RetryImmediate => GetCSharpRetryStatement("Immediate",
                 ("int", "RetryLimit", "5")),
-            EventingSettings.RetryPolicyOptionsEnum.RetryInterval => GetCSharpRetryStatements("Interval",
+            EventingSettings.RetryPolicyOptionsEnum.RetryInterval => GetCSharpRetryStatement("Interval",
                 ("int", "RetryCount", "10"),
                 ("TimeSpan", "Interval", "TimeSpan.FromSeconds(5)")),
-            EventingSettings.RetryPolicyOptionsEnum.RetryIncremental => GetCSharpRetryStatements("Incremental",
+            EventingSettings.RetryPolicyOptionsEnum.RetryIncremental => GetCSharpRetryStatement("Incremental",
                 ("int", "RetryLimit", "10"),
                 ("TimeSpan", "InitialInterval", "TimeSpan.FromSeconds(5)"),
                 ("TimeSpan", "IntervalIncrement", "TimeSpan.FromSeconds(5)")),
-            EventingSettings.RetryPolicyOptionsEnum.RetryExponential => GetCSharpRetryStatements("Exponential",
+            EventingSettings.RetryPolicyOptionsEnum.RetryExponential => GetCSharpRetryStatement("Exponential",
                 ("int", "RetryLimit", "10"),
                 ("TimeSpan", "MinInterval", "TimeSpan.FromSeconds(5)"),
                 ("TimeSpan", "MaxInterval", "TimeSpan.FromMinutes(30)"),
                 ("TimeSpan", "IntervalDelta", "TimeSpan.FromSeconds(5)")),
-            EventingSettings.RetryPolicyOptionsEnum.RetryNone => GetCSharpRetryStatements("None"),
+            EventingSettings.RetryPolicyOptionsEnum.RetryNone => GetCSharpRetryStatement("None"),
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        CSharpStatement GetCSharpRetryStatements(string methodName, params (string Type, string Name, string DefaultValue)[] args)
+        CSharpStatement GetCSharpRetryStatement(string methodName, params (string Type, string Name, string DefaultValue)[] args)
         {
             var retry = new CSharpInvocationStatement($"r.{methodName}")
                 .WithoutSemicolon()
@@ -431,7 +437,8 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
             }
 
             return new CSharpInvocationStatement($@"{configParamName}.UseMessageRetry")
-                .AddArgument(new CSharpLambdaBlock("r").WithExpressionBody(retry));
+                .AddArgument(new CSharpLambdaBlock("r").WithExpressionBody(retry))
+                .SeparatedFromPrevious();
         }
     }
 
@@ -494,47 +501,10 @@ public partial class MassTransitConfigurationTemplate : CSharpTemplateBase<objec
 
         PublishRetryPoliciesAppSettings();
 
-        switch (ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum())
+        var settings = _messageBroker.GetAppSettings();
+        if (settings is not null)
         {
-            case EventingSettings.MessagingServiceProviderOptionsEnum.InMemory:
-                // InMemory doesn't require appsettings
-                break;
-            case EventingSettings.MessagingServiceProviderOptionsEnum.Rabbitmq:
-                AddNugetDependency(NuGetPackages.MassTransitRabbitMq);
-
-                ExecutionContext.EventDispatcher.Publish(
-                    new AppSettingRegistrationRequest("RabbitMq", new
-                    {
-                        Host = "localhost",
-                        VirtualHost = "/",
-                        Username = "guest",
-                        Password = "guest"
-                    }));
-
-                break;
-            case EventingSettings.MessagingServiceProviderOptionsEnum.AzureServiceBus:
-                AddNugetDependency(NuGetPackages.MassTransitAzureServiceBusCore);
-
-                ExecutionContext.EventDispatcher.Publish(
-                    new AppSettingRegistrationRequest("AzureMessageBus", new
-                    {
-                        ConnectionString = "your connection string"
-                    }));
-                break;
-            case EventingSettings.MessagingServiceProviderOptionsEnum.AmazonSqs:
-                AddNugetDependency(NuGetPackages.MassTransitAmazonSqs);
-
-                ExecutionContext.EventDispatcher.Publish(
-                    new AppSettingRegistrationRequest("AmazonSqs", new
-                    {
-                        Host = "us-east-1",
-                        AccessKey = "your-iam-access-key",
-                        SecretKey = "your-iam-secret-key"
-                    }));
-                break;
-            default:
-                throw new InvalidOperationException(
-                    $"Messaging Service Provider is set to a setting that is not supported: {ExecutionContext.Settings.GetEventingSettings().MessagingServiceProvider().AsEnum()}");
+            ExecutionContext.EventDispatcher.Publish(settings);
         }
     }
 

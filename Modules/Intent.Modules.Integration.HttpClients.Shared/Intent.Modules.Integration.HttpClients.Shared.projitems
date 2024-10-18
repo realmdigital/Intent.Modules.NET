@@ -9,9 +9,19 @@
     <Import_RootNamespace>Intent.Modules.Integration.HttpClients.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)FileTransferHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpClientHeaderConfiguratorHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NuGetPackages.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\Adapters\CQRSModelAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\Adapters\ServiceModelAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\Adapters\ServiceProxyModelAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\HttpClientConfiguration\HttpClientConfigurationBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\HttpClientHeaderHandler\HttpClientHeaderHandlerTemplateBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Templates\HttpClientRequestException\HttpClientRequestExceptionTemplateBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Templates\HttpClient\HttpClientTemplateBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\IServiceProxyModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Templates\JsonResponse\JsonResponseTemplateBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\ProblemDetailsWithErrors\ProblemDetailsWithErrorsBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Templates\ProxySettingsHelper.cs" />
   </ItemGroup>
 </Project>

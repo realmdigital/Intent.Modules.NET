@@ -3,10 +3,10 @@
   <name>modelers</name>
   <display>modelers</display>
   <isAbstract>false</isAbstract>
-  <order>3</order>
+  <sort-children>by-type-then-by-name</sort-children>
   <genericTypes />
   <isMapped>false</isMapped>
-  <parentFolderId>82458406-7d23-41f5-81a0-2083c0b7668d</parentFolderId>
+  <parentFolderId>42102847-cda1-437f-9e6e-0138fbcab2a9</parentFolderId>
   <packageId>c5b5e5f7-383a-460e-9697-20ca04132eb7</packageId>
   <packageName>Intent.Modules.NET</packageName>
   <stereotypes>
@@ -26,7 +26,6 @@
       <display>Intent.ModuleBuilder.DesignerConfig</display>
       <externalReference>Intent.ModuleBuilder</externalReference>
       <isAbstract>false</isAbstract>
-      <order>0</order>
       <genericTypes />
       <isMapped>false</isMapped>
       <parentFolderId>70100c30-0b7d-427d-92e8-ada8cb069d99</parentFolderId>
@@ -43,7 +42,6 @@
       <display>Intent.ModuleBuilder.DesignerSettings</display>
       <externalReference>Intent.ModuleBuilder</externalReference>
       <isAbstract>false</isAbstract>
-      <order>1</order>
       <genericTypes />
       <isMapped>false</isMapped>
       <parentFolderId>70100c30-0b7d-427d-92e8-ada8cb069d99</parentFolderId>

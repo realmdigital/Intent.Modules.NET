@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using DtoSettings.Class.Internal.Api.Filters;
 using DtoSettings.Class.Internal.Application;
 using Intent.RoslynWeaver.Attributes;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +31,7 @@ namespace DtoSettings.Class.Internal.Api.Configuration
                 {
                     options.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
                     options.SupportNonNullableReferenceTypes();
-                    options.CustomSchemaIds(x => x.FullName);
+                    options.CustomSchemaIds(x => x.FullName?.Replace("+", "_"));
 
                     var apiXmlFile = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
                     if (File.Exists(apiXmlFile))
@@ -43,6 +44,7 @@ namespace DtoSettings.Class.Internal.Api.Configuration
                     {
                         options.IncludeXmlComments(applicationXmlFile);
                     }
+                    options.SchemaFilter<TypeSchemaFilter>();
                 });
             return services;
         }
@@ -58,7 +60,7 @@ namespace DtoSettings.Class.Internal.Api.Configuration
                     options.EnableDeepLinking();
                     options.DisplayOperationId();
                     options.DefaultModelsExpandDepth(2);
-                    options.DefaultModelRendering(ModelRendering.Model);
+                    options.DefaultModelRendering(ModelRendering.Example);
                     options.DocExpansion(DocExpansion.List);
                     options.ShowExtensions();
                     options.EnableFilter(string.Empty);

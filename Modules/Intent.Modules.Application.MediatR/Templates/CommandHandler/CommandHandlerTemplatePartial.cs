@@ -39,11 +39,13 @@ namespace Intent.Modules.Application.MediatR.Templates.CommandHandler
 
         internal static void Configure(ICSharpFileBuilderTemplate template, CommandModel model)
         {
-            template.AddNugetDependency(NuGetPackages.MediatR);
-
-            template.AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
-            template.AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
-            template.AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Enum);
+            template.AddNugetDependency(NugetPackages.MediatR(template.OutputTarget));
+            template.AddTypeSource(TemplateRoles.Application.Command);
+            template.AddTypeSource(TemplateRoles.Domain.Enum);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Dto);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Enum);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Clients.Dto);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Clients.Enum);
 
             template.CSharpFile
                 .AddUsing("System")
@@ -54,19 +56,22 @@ namespace Intent.Modules.Application.MediatR.Templates.CommandHandler
                 {
                     @class.AddMetadata("handler", true);
                     @class.AddMetadata("model", model);
-                    @class.WithBaseType(GetRequestHandlerInterface(template, model));
+                    @class.ImplementsInterface(GetRequestHandlerInterface(template, model));
                     @class.AddAttribute("IntentManaged(Mode.Merge, Signature = Mode.Fully)");
                     @class.AddConstructor(ctor =>
                     {
-                        ctor.AddAttribute("IntentManaged(Mode.Merge)");
+                        ctor.AddAttribute(CSharpIntentManagedAttribute.Merge());
                     });
                     @class.AddMethod(GetReturnType(template, model), "Handle", method =>
                     {
+                        method.RegisterAsProcessingHandlerForModel(model);
                         method.TryAddXmlDocComments(model.InternalElement);
                         method.Async();
                         method.AddAttribute(CSharpIntentManagedAttribute.IgnoreBody());
-                        method.AddParameter(GetCommandModelName(template, model), "request");
+                        method.AddParameter(GetCommandModelName(template, model), "request", p => p.RepresentsModel(model));
                         method.AddParameter("CancellationToken", "cancellationToken");
+
+                        method.AddStatement($"// TODO: Implement {method.Name} ({@class.Name}) functionality");
                         method.AddStatement($@"throw new NotImplementedException(""Your implementation here..."");");
                     });
                 });

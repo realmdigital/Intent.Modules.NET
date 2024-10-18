@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Intent.Engine;
 using Intent.Modelers.Domain.Services.Api;
 using Intent.Modules.Common;
@@ -24,11 +26,11 @@ namespace Intent.Modules.DomainServices.Templates.DomainServiceImplementation
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public DomainServiceImplementationTemplate(IOutputTarget outputTarget, DomainServiceModel model) : base(TemplateId, outputTarget, model)
         {
-            AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Interface);
-            AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
-            AddTypeSource(TemplateFulfillingRoles.Domain.DataContract);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
-            AddTypeSource(TemplateFulfillingRoles.Domain.DomainServices.Interface);
+            AddTypeSource(TemplateRoles.Domain.Entity.Interface);
+            AddTypeSource(TemplateRoles.Domain.ValueObject);
+            AddTypeSource(TemplateRoles.Domain.DataContract);
+            AddTypeSource(TemplateRoles.Domain.Enum);
+            AddTypeSource(TemplateRoles.Domain.DomainServices.Interface);
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("System")
@@ -47,6 +49,14 @@ namespace Intent.Modules.DomainServices.Templates.DomainServiceImplementation
                     {
                         @class.AddMethod(GetTypeName(operation), operation.Name.ToPascalCase(), method =>
                         {
+                            if (operation.GenericTypes.Any())
+                            {
+                                foreach (var genericType in operation.GenericTypes)
+                                {
+                                    method.AddGenericParameter(genericType);
+                                }
+                            }
+
                             method.TryAddXmlDocComments(operation.InternalElement);
                             method.AddAttribute(CSharpIntentManagedAttribute.IgnoreBody());
 
@@ -64,6 +74,7 @@ namespace Intent.Modules.DomainServices.Templates.DomainServiceImplementation
                                     .AddParameter(UseType("System.Threading.CancellationToken"), "cancellationToken", p => p.WithDefaultValue("default"));
                             }
 
+                            method.AddStatement($"// TODO: Implement {method.Name} ({@class.Name}) functionality");
                             method.AddStatement("throw new NotImplementedException(\"Implement your domain service logic here...\");");
                         });
                     }

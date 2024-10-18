@@ -1,4 +1,40 @@
-﻿### Version 4.1.4
+### Version 4.2.8
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.2.7
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.2.6
+
+- Improvement: Improved `Authorized` modeling.
+
+### Version 4.2.5
+
+- Improvement: Added `TODO` comments on `NotImplementedException`.
+
+### Version 4.2.4
+
+- Improvement: Application Client Dto type using directives also to be resolved now in Command/Query handlers.
+
+### Version 4.2.3
+
+- Improvement: Updated Interoperable dependency versions.
+
+### Version 4.2.2
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
+### Version 4.2.0
+
+- Improvement: Added Support for `+` in roles, to describe `and` relationships between roles e.g. `Admin,Manager` (or) vs `Admin+Manager` (and)
+
+### Version 4.1.7
+
+- Fixed: `QueryHander` and `CommandHandler` where incorrectly using `WithBaseType` instead of `InmplementsInterface` for `IRequestHandler`.
+
+### Version 4.1.4
 
 - Improvement: Introduced new "Consolidate Command/Query associated files into single file" setting. When enabled, commands/queries are no longer generated into sub-folders and their respective handlers and validators (as applicable) are now embedded within them as opposed to being generated separately. See the [README](https://github.com/IntentArchitect/Intent.Modules.NET/blob/development/Modules/Intent.Modules.Application.MediatR/README.md#cqrs-settings) for more details.
 - Improvement: Internal model update for better identifying Command / Query Templates during Software Factory Execution.

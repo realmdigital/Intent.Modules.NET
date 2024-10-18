@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using Intent.Modelers.Services.Api;
+using Intent.Modules.AspNetCore.Controllers.Templates.BinaryContentAttribute;
+using Intent.Modules.AspNetCore.Controllers.Templates.BinaryContentFilter;
 using Intent.Modules.AspNetCore.Controllers.Templates.Controller;
 using Intent.Modules.AspNetCore.Controllers.Templates.ExceptionFilter;
 using Intent.Modules.AspNetCore.Controllers.Templates.JsonResponse;
@@ -12,12 +15,21 @@ namespace Intent.Modules.AspNetCore.Controllers.Templates
 {
     public static class TemplateExtensions
     {
-        public static string GetControllerName<T>(this IIntentTemplate<T> template) where T : Intent.Modelers.Services.Api.ServiceModel
+        public static string GetBinaryContentAttributeName(this IIntentTemplate template)
+        {
+            return template.GetTypeName(BinaryContentAttributeTemplate.TemplateId);
+        }
+
+        public static string GetBinaryContentFilterName(this IIntentTemplate template)
+        {
+            return template.GetTypeName(BinaryContentFilterTemplate.TemplateId);
+        }
+        public static string GetControllerName<T>(this IIntentTemplate<T> template) where T : ServiceModel
         {
             return template.GetTypeName(ControllerTemplate.TemplateId, template.Model);
         }
 
-        public static string GetControllerName(this IIntentTemplate template, Intent.Modelers.Services.Api.ServiceModel model)
+        public static string GetControllerName(this IIntentTemplate template, ServiceModel model)
         {
             return template.GetTypeName(ControllerTemplate.TemplateId, model);
         }

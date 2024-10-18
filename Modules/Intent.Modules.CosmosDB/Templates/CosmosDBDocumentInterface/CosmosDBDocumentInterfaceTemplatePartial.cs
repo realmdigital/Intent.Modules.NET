@@ -31,9 +31,9 @@ namespace Intent.Modules.CosmosDB.Templates.CosmosDBDocumentInterface
             SetDefaultCollectionFormatter(CSharpCollectionFormatter.Create("System.Collections.Generic.IReadOnlyList<{0}>"));
             AddTypeSource(TemplateId);
             AddTypeSource(CosmosDBValueObjectDocumentInterfaceTemplate.TemplateId);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Primary);
-            AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
+            AddTypeSource(TemplateRoles.Domain.Enum);
+            AddTypeSource(TemplateRoles.Domain.Entity.Primary);
+            AddTypeSource(TemplateRoles.Domain.ValueObject);
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddInterface($"I{Model.Name}Document", @interface =>
@@ -68,9 +68,21 @@ namespace Intent.Modules.CosmosDB.Templates.CosmosDBDocumentInterface
                         .Where(x => entityPropertyIds.Contains(x.Id) && x.IsNavigable)
                         .ToList();
 
+                    var pk = Model.GetPrimaryKeyAttribute();
+                    Model.TryGetPartitionAttribute(out var partitionAttribute);
+
                     foreach (var attribute in attributes)
                     {
-                        @interface.AddProperty(GetTypeName(attribute.TypeReference), attribute.Name.ToPascalCase(), p => p.WithoutSetter());
+                        string typeName = GetTypeName(attribute.TypeReference);
+                        if (Model.IsAggregateRoot() && pk != null && attribute.Id == pk.IdAttribute.Id)
+                        {
+                            typeName = Helpers.PrimaryKeyType;
+                        }
+                        else if (Model.IsAggregateRoot() && partitionAttribute != null && attribute.Id == partitionAttribute.Id)
+                        {
+                            typeName = "string";
+                        }
+                        @interface.AddProperty(typeName, attribute.Name.ToPascalCase(), p => p.WithoutSetter());
                     }
 
                     foreach (var associationEnd in associationEnds)
@@ -80,7 +92,7 @@ namespace Intent.Modules.CosmosDB.Templates.CosmosDBDocumentInterface
                 }, 1000);
         }
 
-        public ICSharpFileBuilderTemplate EntityStateFileBuilder => GetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Domain.Entity.Primary, Model);
+        public ICSharpFileBuilderTemplate EntityStateFileBuilder => GetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Domain.Entity.Primary, Model);
 
         [IntentManaged(Mode.Fully)]
         public CSharpFile CSharpFile { get; }

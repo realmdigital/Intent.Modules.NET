@@ -52,12 +52,13 @@ namespace CleanArchitecture.SingleFiles.Application.DaprInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class GetDaprInvoiceDaprLinesQueryValidator : AbstractValidator<GetDaprInvoiceDaprLinesQuery>
     {
         [IntentManaged(Mode.Merge)]
         public GetDaprInvoiceDaprLinesQueryValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

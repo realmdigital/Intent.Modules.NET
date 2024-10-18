@@ -1,3 +1,71 @@
+### Version 6.1.1
+
+- Fixed: `TypeSchemaFilterExtension` class moved from `Intent.AspNetCore.Controllers` to `Intent.AspNetCore.Swashbuckle` module where it belongs as other hosting infrastructure using Swashbuckle can also benefit from it.
+
+### Version 6.1.0
+
+- Fixed: Removed Legacy behaviour where `Services` without `Http Service Settings` stereotypes would result in interpreting the Operations with `Http Settings` to have a base route of `api/[controller]`.
+
+### Version 6.0.12
+
+- Improvement: Added support for customizing `Success Response Code`.
+- Fixed: Snag found in the code responsible for generating the AddControllers line in the Startup routine especially when `AddJsonOptions` were introduced.
+
+### Version 6.0.11
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 6.0.10
+
+- Improvement: The code responsible for generating the AddControllers line in the Startup routine has been enhanced to better identify that statement at runtime.
+
+### Version 6.0.9
+
+- Improvement: Controllers and their operations will now generate `[ApiExplorerSettings(IgnoreApi = <value>]` attributes based on the _OpenAPI Settings_ Stereotype's _Ignore_ property's value.
+- Fixed: Issue where Policies where not added to controllers.
+
+### Version 6.0.8
+
+- Fixed: Due to the nature of how GetTypeName resolves namespaces there are cases where ambiguous references still exist and causes compilation errors, this fix forces to re-evaluate a lot of types in this module.
+
+### Version 6.0.7
+
+- Improvement: Application Client Dto type using directives also to be resolved now in Service implementations.
+
+### Version 6.0.6
+
+- Fixed: `ExceptionFilter` will now return `UnauthorizedResult` when `UnauthorizedAccessException` is caught.
+
+### Version 6.0.5
+
+- Improvement: Swagger Schema Filter support, specifically for `DateOnly`.
+
+### Version 6.0.4
+
+- Improvement: Swagger Schema Filter support, specifically for `TimeSpan`.
+
+### Version 6.0.3
+
+- Improvement: File transfer ( upload / download ) support.
+- Improvement: Added Service Designer validation - `GET Operations do not support collections on complex objects`.
+
+### Version 6.0.2
+
+- Improvement: Dependent modules changed, version bumped.
+
+### Version 6.0.0
+
+- Improvement: Updated to support use of top-level statements and minimal hosting model improvements introduced in [`Intent.AspNetCore` version 6.0.0](https://github.com/IntentArchitect/Intent.Modules.NET/blob/development/Modules/Intent.Modules.AspNetCore/release-notes.md#version-600).
+- Improvement: Added setting for configuring controller JSON serialization options. (with thanks to [@shainegordon](https://github.com/shainegordon) for their [PR](https://github.com/IntentArchitect/Intent.Modules.NET/pull/11) for this).
+- Improvement: Added Support for `+` in roles, to describe `and` relationships between roles e.g. `Admin,Manager` (or) vs `Admin+Manager` (and)
+
+- Fixed: Roles and policies not being applied to individual endpoints when the `API Settings` have the `Default API Security` set to `Secured by default`
+ 
+
+### Version 5.4.4
+
+- Improvement: Added an `IControllerTemplate` interface for custom dispatch support.
+
 ### Version 5.4.3
 
 - Improvement: Will now respect query string parameter names as introduced in [`Intent.Metadata.WebApi` version `4.3.2`](https://github.com/IntentArchitect/Intent.Modules/blob/development/Modules/Intent.Modules.Metadata.WebApi/release-notes.md#version-432).

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Intent.Engine;
 using Intent.Modules.Common;
@@ -13,7 +14,7 @@ using Intent.Templates;
 namespace Intent.Modules.AspNetCore.Identity.AccountController.Templates.ApplicationIdentityUserConfiguration
 {
     [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-    partial class ApplicationIdentityUserConfigurationTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
+    public partial class ApplicationIdentityUserConfigurationTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
     {
         public const string TemplateId = "Intent.AspNetCore.Identity.AccountController.ApplicationIdentityUserConfiguration";
 
@@ -27,8 +28,8 @@ namespace Intent.Modules.AspNetCore.Identity.AccountController.Templates.Applica
                     @class.AddMethod("void", "Configure", method =>
                     {
                         method.AddParameter($"{UseType("Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder")}<{this.GetApplicationIdentityUserName()}>", "builder");
-                        method.AddStatement($"builder.Property<{UseType("string?")}>(x => x.RefreshToken);");
-                        method.AddStatement($"builder.Property<{UseType("System.DateTime?")}>(x => x.RefreshTokenExpired);");
+                        method.AddStatement($"builder.Property(x => x.RefreshToken);");
+                        method.AddStatement($"builder.Property(x => x.RefreshTokenExpired);");
                     });
                 });
         }

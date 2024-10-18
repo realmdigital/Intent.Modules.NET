@@ -1,13 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
+using Intent.Modelers.Services.Api;
+using Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.CrudMappingStrategies;
 using Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.MethodImplementationStrategies;
 using Intent.Modules.Application.ServiceImplementations.Templates.ServiceImplementation;
 using Intent.Modules.Common;
+using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Plugins;
 using Intent.Modules.Common.Templates;
 using Intent.Plugins.FactoryExtensions;
 using Intent.RoslynWeaver.Attributes;
+using Intent.Templates;
 using Intent.Utils;
 
 [assembly: DefaultIntentManaged(Mode.Fully)]
@@ -25,11 +29,19 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Fac
 
         protected override void OnAfterTemplateRegistrations(IApplication application)
         {
-            var templates = application.FindTemplateInstances<ServiceImplementationTemplate>(TemplateDependency.OnTemplate(ServiceImplementationTemplate.TemplateId));
+            var templates = application.FindTemplateInstances<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate("Application.Implementation.Custom")).ToList();
+            if (!templates.Any())
+            {
+                templates = application.FindTemplateInstances<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate(ServiceImplementationTemplate.TemplateId)).ToList();
+            }
+
             foreach (var template in templates)
             {
+                template.AddKnownType("System.Linq.Dynamic.Core.PagedResult");
+
                 var strategies = new List<IImplementationStrategy>
                 {
+                    new OperationMappingImplementationStrategy(template),
                     new GetAllImplementationStrategy(template, application),
                     new GetAllPaginationImplementationStrategy(template, application),
                     new GetByIdImplementationStrategy(template, application),
@@ -39,19 +51,24 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Fac
                     new LegacyDeleteImplementationStrategy(template, application)
                 };
 
-                foreach (var operation in template.Model.Operations)
+                template.CSharpFile.OnBuild(file =>
                 {
-                    var matchedStrategies = strategies.Where(strategy => strategy.IsMatch(operation)).ToArray();
-                    if (matchedStrategies.Length == 1)
+                    var serviceModel = file.Classes.First().GetMetadata<ServiceModel>("model");
+
+                    foreach (var operation in serviceModel.Operations)
                     {
-                        template.CSharpFile.AfterBuild(file => matchedStrategies[0].ApplyStrategy(operation));
+                        var matchedStrategies = strategies.Where(strategy => strategy.IsMatch(operation)).ToArray();
+                        if (matchedStrategies.Length == 1)
+                        {
+                            matchedStrategies[0].BindToTemplate(template, operation);
+                        }
+                        else if (matchedStrategies.Length > 1)
+                        {
+                            Logging.Log.Warning($@"Multiple CRUD implementation strategies were found that can implement this service operation [{serviceModel.Name}, {operation.Name}]");
+                            Logging.Log.Debug($@"Strategies: {string.Join(", ", matchedStrategies.Select(s => s.GetType().Name))}");
+                        }
                     }
-                    else if (matchedStrategies.Length > 1)
-                    {
-                        Logging.Log.Warning($@"Multiple CRUD implementation strategies were found that can implement this service operation [{template.Model.Name}, {operation.Name}]");
-                        Logging.Log.Debug($@"Strategies: {string.Join(", ", matchedStrategies.Select(s => s.GetType().Name))}");
-                    }
-                }
+                });
             }
         }
     }

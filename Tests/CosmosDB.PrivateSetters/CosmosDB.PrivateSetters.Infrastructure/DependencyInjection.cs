@@ -36,10 +36,14 @@ namespace CosmosDB.PrivateSetters.Infrastructure
                 options.ContainerBuilder
                     .Configure<BaseTypeDocument>(c => c
                         .WithContainer(defaultContainerId))
+                    .Configure<CategoryDocument>(c => c
+                        .WithContainer(defaultContainerId))
                     .Configure<ClassContainerDocument>(c => c
                         .WithContainer("Class")
                         .WithPartitionKey("/classPartitionKey"))
                     .Configure<ClientDocument>(c => c
+                        .WithContainer(defaultContainerId))
+                    .Configure<CustomerDocument>(c => c
                         .WithContainer(defaultContainerId))
                     .Configure<DerivedOfTDocument>(c => c
                         .WithContainer(defaultContainerId))
@@ -56,25 +60,41 @@ namespace CosmosDB.PrivateSetters.Infrastructure
                         .WithContainer(defaultContainerId))
                     .Configure<InvoiceDocument>(c => c
                         .WithContainer(defaultContainerId))
+                    .Configure<NonStringPartitionKeyDocument>(c => c
+                        .WithContainer("NonStringPartitionKey")
+                        .WithPartitionKey("/partInt"))
+                    .Configure<OrderDocument>(c => c
+                        .WithContainer("Order")
+                        .WithPartitionKey("/warehouseId"))
                     .Configure<PackageContainerDocument>(c => c
                         .WithContainer("PackageContainer")
                         .WithPartitionKey("/packagePartitionKey"))
+                    .Configure<ProductDocument>(c => c
+                        .WithContainer(defaultContainerId))
                     .Configure<RegionDocument>(c => c
+                        .WithContainer(defaultContainerId))
+                    .Configure<WithGuidIdDocument>(c => c
                         .WithContainer(defaultContainerId))
                     .Configure<WithoutPartitionKeyDocument>(c => c
                         .WithContainer("WithoutPartitionKey"));
             });
             services.AddScoped<IBaseTypeRepository, BaseTypeCosmosDBRepository>();
+            services.AddScoped<ICategoryRepository, CategoryCosmosDBRepository>();
             services.AddScoped<IClassContainerRepository, ClassContainerCosmosDBRepository>();
             services.AddScoped<IClientRepository, ClientCosmosDBRepository>();
+            services.AddScoped<ICustomerRepository, CustomerCosmosDBRepository>();
             services.AddScoped<IDerivedOfTRepository, DerivedOfTCosmosDBRepository>();
             services.AddScoped<IDerivedTypeRepository, DerivedTypeCosmosDBRepository>();
             services.AddScoped<IDerivedTypeAggregateRepository, DerivedTypeAggregateCosmosDBRepository>();
             //services.AddScoped<IEntityOfTRepository, EntityOfTCosmosDBRepository>();
             services.AddScoped<IIdTestingRepository, IdTestingCosmosDBRepository>();
             services.AddScoped<IInvoiceRepository, InvoiceCosmosDBRepository>();
+            services.AddScoped<INonStringPartitionKeyRepository, NonStringPartitionKeyCosmosDBRepository>();
+            services.AddScoped<IOrderRepository, OrderCosmosDBRepository>();
             services.AddScoped<IPackageContainerRepository, PackageContainerCosmosDBRepository>();
+            services.AddScoped<IProductRepository, ProductCosmosDBRepository>();
             services.AddScoped<IRegionRepository, RegionCosmosDBRepository>();
+            services.AddScoped<IWithGuidIdRepository, WithGuidIdCosmosDBRepository>();
             services.AddScoped<IWithoutPartitionKeyRepository, WithoutPartitionKeyCosmosDBRepository>();
             services.AddScoped<IFolderContainerRepository, FolderContainerCosmosDBRepository>();
             services.AddScoped<CosmosDBUnitOfWork>();

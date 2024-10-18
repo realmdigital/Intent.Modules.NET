@@ -1,4 +1,3 @@
-using System;
 using FluentValidation;
 using Intent.RoslynWeaver.Attributes;
 
@@ -7,6 +6,7 @@ using Intent.RoslynWeaver.Attributes;
 
 namespace Entities.PrivateSetters.TestApplication.Application.ManyToOneSources.DeleteManyToOneSource
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class DeleteManyToOneSourceCommandValidator : AbstractValidator<DeleteManyToOneSourceCommand>
     {
         [IntentManaged(Mode.Fully, Body = Mode.Merge, Signature = Mode.Merge)]

@@ -16,7 +16,6 @@ using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 using Intent.Utils;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.VisualBasic;
 
 [assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.ModuleBuilder.Templates.TemplateDecorator", Version = "1.0")]
@@ -50,7 +49,7 @@ namespace Intent.Modules.AzureFunctions.OpenApi.Decorators
                 Logging.Log.Warning($"Http Settings could not be found on Azure Function [{template.Model.Name}] that is Http triggered");
             }
 
-            _template.AddNugetDependency(NuGetPackages.MicrosoftAzureWebJobsExtensionsOpenApi);
+            _template.AddNugetDependency(NugetPackages.MicrosoftAzureWebJobsExtensionsOpenApi(_template.OutputTarget));
 
 
             template.CSharpFile.OnBuild(file =>
@@ -60,12 +59,16 @@ namespace Intent.Modules.AzureFunctions.OpenApi.Decorators
                 file.AddUsing("Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes");
                 var @class = file.Classes.First();
                 var runMethod = @class.FindMethod("Run");
+                var endpointElement = _template.Model.InternalElement;
+                var openApiSettings = endpointElement.GetStereotype("OpenAPI Settings");
+
                 runMethod.AddAttribute("OpenApiOperation", att =>
                 {
-                    var endpointElement = _template.Model.InternalElement;
                     var operationId = endpointElement.Name;
 
-                    var openApiSettingsOperationId = endpointElement.GetStereotype("OpenAPI Settings")?.GetProperty<string>("OperationId");
+                    var openApiSettingsOperationId = (openApiSettings?.GetProperty<string>("OperationId") ?? string.Empty)
+                        .Replace("{ServiceName}", string.Empty)
+                        .Replace("{MethodName}", endpointElement.Name);
                     if (!string.IsNullOrWhiteSpace(openApiSettingsOperationId))
                     {
                         operationId = openApiSettingsOperationId;
@@ -77,9 +80,13 @@ namespace Intent.Modules.AzureFunctions.OpenApi.Decorators
                     att.AddArgument($"Description = \"{GetDescription(endpointElement)}\"");
                 });
 
+                if (openApiSettings?.GetProperty<bool>("Ignore") == true)
+                {
+                    runMethod.AddAttribute("OpenApiIgnoreAttribute");
+                }
 
                 var requestDtoTypeName = template.Model.GetRequestDtoParameter() != null
-                    ? template.UseType(template.GetTypeInfo( template.Model.GetRequestDtoParameter().TypeReference).WithIsNullable(false))
+                    ? template.UseType(template.GetTypeInfo(template.Model.GetRequestDtoParameter().TypeReference).WithIsNullable(false))
                     : null;
                 if (!string.IsNullOrEmpty(requestDtoTypeName))
                 {
@@ -91,15 +98,16 @@ namespace Intent.Modules.AzureFunctions.OpenApi.Decorators
                     });
                 }
 
-                if (endpointModel.Inputs.Any())
+                if (endpointModel?.Inputs.Any() == true)
                 {
-                    foreach (var parameterModel in endpointModel.Inputs.Where(x => x.Source is HttpInputSource.FromRoute || x.Source is HttpInputSource.FromHeader || x.Source is HttpInputSource.FromQuery))
+                    foreach (var parameterModel in endpointModel.Inputs
+                                 .Where(x => x.Source is HttpInputSource.FromRoute or HttpInputSource.FromHeader or HttpInputSource.FromQuery))
                     {
                         runMethod.AddAttribute("OpenApiParameter", att =>
                         {
                             att.AddArgument($"name: \"{parameterModel.Name.ToParameterName()}\"");
                             att.AddArgument($"In = ParameterLocation.{GetParameterLocation(parameterModel.Source)}");
-                            att.AddArgument("Required = true");
+                            att.AddArgument($"Required = {(!parameterModel.TypeReference.IsNullable).ToString().ToLower()}");
                             att.AddArgument($"Type = typeof({_template.UseType(template.GetTypeInfo(parameterModel.TypeReference).WithIsNullable(false))})");
                         });
                     }

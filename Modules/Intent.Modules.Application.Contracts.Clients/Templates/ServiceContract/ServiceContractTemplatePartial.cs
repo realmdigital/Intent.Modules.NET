@@ -9,6 +9,8 @@ using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
+using Intent.Modules.Constants;
+using Intent.Modules.Contracts.Clients.Http.Shared;
 using Intent.Modules.Contracts.Clients.Shared.Templates.ServiceContract;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -31,8 +33,11 @@ namespace Intent.Modules.Application.Contracts.Clients.Templates.ServiceContract
                 model: model,
                 dtoContractTemplateId: DtoContractTemplate.TemplateId,
                 enumContractTemplateId: EnumContractTemplate.TemplateId,
-                pagedResultTemplateId: PagedResultTemplate.TemplateId)
+                pagedResultTemplateId: PagedResultTemplate.TemplateId,
+                serviceProxyMappedService: new HttpServiceProxyMappedService())
         {
+            // So that this service (which is an application layer interface) is discoverable
+            FulfillsRole(TemplateRoles.Application.Services.Interface);
         }
     }
 }

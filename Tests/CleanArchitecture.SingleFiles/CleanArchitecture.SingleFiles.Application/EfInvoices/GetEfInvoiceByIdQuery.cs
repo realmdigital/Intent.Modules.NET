@@ -50,12 +50,13 @@ namespace CleanArchitecture.SingleFiles.Application.EfInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class GetEfInvoiceByIdQueryValidator : AbstractValidator<GetEfInvoiceByIdQuery>
     {
         [IntentManaged(Mode.Merge)]
         public GetEfInvoiceByIdQueryValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

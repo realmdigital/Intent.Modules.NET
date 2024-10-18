@@ -5,6 +5,7 @@ using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.DependencyInjection;
 using Intent.Modules.Common.CSharp.Templates;
+using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Templates;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -22,8 +23,8 @@ public partial class ApiVersioningConfigurationTemplate : CSharpTemplateBase<obj
     [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
     public ApiVersioningConfigurationTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
     {
-        AddNugetDependency(NugetPackage.AspVersioningMvc(outputTarget));
-        AddNugetDependency(NugetPackage.AspVersioningMvcApiExplorer(outputTarget));
+        AddNugetDependency(NugetPackages.AspVersioningMvc(outputTarget));
+        AddNugetDependency(NugetPackages.AspVersioningMvcApiExplorer(outputTarget));
 
         CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
             .AddUsing("Asp.Versioning")
@@ -54,6 +55,9 @@ public partial class ApiVersioningConfigurationTemplate : CSharpTemplateBase<obj
 
     public override void BeforeTemplateExecution()
     {
+        ExecutionContext.EventDispatcher.Publish(new RemoveNugetPackageEvent("Microsoft.AspNetCore.Mvc.Versioning", OutputTarget));
+        ExecutionContext.EventDispatcher.Publish(new RemoveNugetPackageEvent("Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer", OutputTarget));
+
         ExecutionContext.EventDispatcher.Publish(ServiceConfigurationRequest
             .ToRegister("ConfigureApiVersioning")
             .HasDependency(this));

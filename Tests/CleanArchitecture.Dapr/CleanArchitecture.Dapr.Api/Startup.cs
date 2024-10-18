@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CleanArchitecture.Dapr.Api.Configuration;
 using CleanArchitecture.Dapr.Api.Filters;
@@ -38,14 +39,17 @@ namespace CleanArchitecture.Dapr.Api
                 {
                     opt.Filters.Add<ExceptionFilter>();
                 })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            })
             .AddDapr();
-            services.AddDaprSidekick(Configuration);
             services.AddApplication(Configuration);
             services.ConfigureApplicationSecurity(Configuration);
             services.ConfigureProblemDetails();
-            services.AddDaprServices();
             services.AddInfrastructure(Configuration);
             services.ConfigureSwagger(Configuration);
+            services.AddDaprSidekick(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

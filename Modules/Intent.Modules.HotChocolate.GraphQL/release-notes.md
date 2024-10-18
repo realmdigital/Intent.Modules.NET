@@ -1,4 +1,21 @@
+### Version 4.0.6
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.0.5
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.0.4
+
+- Improvement: Added some basic docs.
+
+### Version 4.0.3
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+ 
 ### Version 4.0.2
+
 - Update : Added `System.Linq` namespace to `MutationType` and `QueryType` templates.
 
 ### Version 4.0.0

@@ -1,3 +1,28 @@
+### Version 5.1.4
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.1.3
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 5.1.2
+
+- Improvement: Updated Interoperable dependency versions.
+
+### Version 5.1.1
+
+- Fixed: Various hosting registration issues for minimal hosting model.
+
+### Version 5.1.0
+
+- Improvement: Raises errors when EF model contain `Multi Tenant` stereotypes on composite/owned entities with advice on how to correct the model. 
+- Improvement: Updated to be compatible with .NET 8.
+
+### Version 5.0.0
+
+- Improvement: Updated to support use of top-level statements and minimal hosting model improvements introduced in [`Intent.AspNetCore` version 6.0.0](https://github.com/IntentArchitect/Intent.Modules.NET/blob/development/Modules/Intent.Modules.AspNetCore/release-notes.md#version-600).
+
 ### Version 4.1.8
 
 - Improvement: Removed code to inject a `null` parameter value when the `Intent.EntityFrameworkCore.DesignTimeDbContextFactory` is present. 

@@ -1,26 +1,43 @@
-﻿using Intent.Modules.Common.CSharp.VisualStudio;
+using System;
+using Intent.Engine;
+using Intent.Modules.Common.CSharp.Nuget;
 using Intent.Modules.Common.VisualStudio;
+using Intent.RoslynWeaver.Attributes;
 
-namespace Intent.Modules.AspNetCore.Identity;
+[assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.NugetPackages", Version = "1.0")]
 
-public static class NugetPackages
+namespace Intent.Modules.AspNetCore.Identity
 {
-    public static NugetPackageInfo MicrosoftAspNetCoreIdentityEntityFrameworkCore(ICSharpProject project) => new NugetPackageInfo("Microsoft.AspNetCore.Identity.EntityFrameworkCore", GetVersion(project));
-    public static NugetPackageInfo MicrosoftExtensionsIdentityStores(ICSharpProject project) => new NugetPackageInfo("Microsoft.Extensions.Identity.Stores", GetVersion(project));
-    
-    private static string GetVersion(ICSharpProject project)
+    public class NugetPackages : INugetPackages
     {
-        return project switch
+        public const string MicrosoftAspNetCoreIdentityEntityFrameworkCorePackageName = "Microsoft.AspNetCore.Identity.EntityFrameworkCore";
+        public const string MicrosoftExtensionsIdentityStoresPackageName = "Microsoft.Extensions.Identity.Stores";
+
+        public void RegisterPackages()
         {
-            _ when project.IsNetCore2App() => "2.1.14",
-            _ when project.IsNetCore3App() => "3.1.15",
-            _ when project.IsNetApp(5) => "5.0.17",
-            _ when project.IsNetApp(6) => "6.0.20",
-            _ when project.IsNetApp(7) => "7.0.9",
-            _ when project.IsNetApp(8) => "8.0.0-preview.6.23329.11",
-            _ => "6.0.20"
-        };
+            NugetRegistry.Register(MicrosoftAspNetCoreIdentityEntityFrameworkCorePackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.7"),
+                        ( >= 7, 0) => new PackageVersion("7.0.20"),
+                        ( >= 6, 0) => new PackageVersion("6.0.32"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftAspNetCoreIdentityEntityFrameworkCorePackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftExtensionsIdentityStoresPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.7"),
+                        ( >= 7, 0) => new PackageVersion("7.0.20"),
+                        ( >= 6, 0) => new PackageVersion("6.0.32"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsIdentityStoresPackageName}'"),
+                    }
+                );
+        }
+
+        public static NugetPackageInfo MicrosoftAspNetCoreIdentityEntityFrameworkCore(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftAspNetCoreIdentityEntityFrameworkCorePackageName, outputTarget.GetMaxNetAppVersion());
+
+        public static NugetPackageInfo MicrosoftExtensionsIdentityStores(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsIdentityStoresPackageName, outputTarget.GetMaxNetAppVersion());
     }
-    
-    
 }

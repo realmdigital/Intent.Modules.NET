@@ -91,6 +91,7 @@ public abstract class DomainEntityStateTemplateBase : CSharpTemplateBase<ClassMo
         {
             property.TryAddXmlDocComments(element);
             property.AddMetadata("model", model);
+            property.RepresentsModel(model);
             /*
             if (typeReference.Element.IsClassModel()) // not the most robust. Needed for lazy loading proxies (so should move to EF).
             {
@@ -231,7 +232,7 @@ public abstract class DomainEntityStateTemplateBase : CSharpTemplateBase<ClassMo
         {
             return o.IsAsync() ? "Task" : "void";
         }
-        return o.IsAsync() ? $"Task<{GetTypeName(o.TypeReference, "IEnumerable<{0}>")}>" : GetTypeName(o.TypeReference, "IEnumerable<{0}>");
+        return o.IsAsync() ? $"Task<{GetTypeName(o.TypeReference, "System.Collections.Generic.IEnumerable<{0}>")}>" : GetTypeName(o.TypeReference, "System.Collections.Generic.IEnumerable<{0}>");
     }
 
     protected string GetOperationTypeName(IHasTypeReference hasTypeReference)
@@ -241,7 +242,7 @@ public abstract class DomainEntityStateTemplateBase : CSharpTemplateBase<ClassMo
 
     protected string GetOperationTypeName(ITypeReference type)
     {
-        return GetTypeName(type, "IEnumerable<{0}>"); // fall back on normal type resolution.
+        return GetTypeName(type, "System.Collections.Generic.IEnumerable<{0}>"); // fall back on normal type resolution.
     }
 
     private string UseStaticMethod(string templateIdOrRole, string methodName)

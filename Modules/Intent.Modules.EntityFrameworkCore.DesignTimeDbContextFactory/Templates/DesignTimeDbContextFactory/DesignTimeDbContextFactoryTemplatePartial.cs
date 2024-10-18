@@ -27,6 +27,8 @@ public partial class DesignTimeDbContextFactoryTemplate : CSharpTemplateBase<obj
     {
         AddNugetDependency(NugetPackages.MicrosoftExtensionsConfigurationJson(OutputTarget));
         AddNugetDependency(NugetPackages.MicrosoftExtensionsConfigurationFileExtensions(OutputTarget));
+        AddNugetDependency(NugetPackages.MicrosoftExtensionsConfigurationUserSecrets(OutputTarget));
+        AddNugetDependency(NugetPackages.MicrosoftExtensionsConfigurationEnvironmentVariables(OutputTarget));
         CSharpFile = new CSharpFile($"{this.GetNamespace()}", $"{this.GetFolderPath()}")
             .AddUsing("System.IO")
             .AddUsing("System.Linq")
@@ -55,6 +57,8 @@ public partial class DesignTimeDbContextFactoryTemplate : CSharpTemplateBase<obj
                     method.AddMethodChainStatement("IConfigurationRoot configuration = new ConfigurationBuilder()", chain => chain
                         .AddChainStatement("SetBasePath(Directory.GetCurrentDirectory())")
                         .AddChainStatement(@"AddJsonFile(""appsettings.json"")")
+                        .AddChainStatement("AddEnvironmentVariables()")
+                        .AddChainStatement("AddUserSecrets(typeof(DesignTimeDbContextFactory).Assembly)")
                         .AddChainStatement("Build()"));
                     method.AddStatement("var connStringName = args.FirstOrDefault();");
                     method.AddIfStatement("string.IsNullOrEmpty(connStringName)", stmt => stmt
@@ -80,6 +84,10 @@ public partial class DesignTimeDbContextFactoryTemplate : CSharpTemplateBase<obj
                             method.AddStatement(connectionStringStatement);
                             method.AddStatement(@"optionsBuilder.UseMySql(connectionString, ServerVersion.Parse(""8.0""));");
                             break;
+                        case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Oracle:
+                            method.AddStatement(connectionStringStatement);
+                            method.AddStatement("optionsBuilder.UseOracle(connectionString);");
+                            break;
                         case DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos:
                         default:
                             // NO OP
@@ -95,7 +103,7 @@ public partial class DesignTimeDbContextFactoryTemplate : CSharpTemplateBase<obj
             })
             .AfterBuild(file =>
             {
-                if (!TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Infrastructure.Data.DbContext, out var dbContextTemplate))
+                if (!TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Infrastructure.Data.DbContext, out var dbContextTemplate))
                 {
                     return;
                 }
@@ -105,7 +113,7 @@ public partial class DesignTimeDbContextFactoryTemplate : CSharpTemplateBase<obj
                 {
                     return;
                 }
-                
+
                 var @class = file.Classes.First();
                 var method = @class.FindMethod("CreateDbContext");
                 var returnStatement = (CSharpInvocationStatement)method.Statements.LastOrDefault(p => p.HasMetadata("return-statement"));
@@ -131,6 +139,11 @@ public partial class DesignTimeDbContextFactoryTemplate : CSharpTemplateBase<obj
             className: $"DesignTimeDbContextFactory",
             @namespace: $"{this.GetNamespace()}",
             relativeLocation: $"{this.GetFolderPath()}");
+    }
+
+    public override bool CanRunTemplate()
+    {
+        return ExecutionContext.FindTemplateInstances(TemplateRoles.Infrastructure.Data.DbContext).Any();
     }
 
     [IntentManaged(Mode.Fully, Body = Mode.Ignore)]

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Intent.Engine;
+using Intent.Modelers.Services.GraphQL.Api;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
-using Intent.Modelers.Services.GraphQL.Api;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
@@ -23,10 +23,10 @@ namespace Intent.Modules.HotChocolate.GraphQL.Templates.SubscriptionType
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public SubscriptionTypeTemplate(IOutputTarget outputTarget, GraphQLSubscriptionTypeModel model) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NuGetPackages.HotChocolate);
-            AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Primary);
-            AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
+            AddNugetDependency(NugetPackages.HotChocolate(OutputTarget));
+            AddTypeSource(TemplateRoles.Application.Contracts.Dto);
+            AddTypeSource(TemplateRoles.Domain.Entity.Primary);
+            AddTypeSource(TemplateRoles.Domain.ValueObject);
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("System")
                 .AddUsing("System.Threading")

@@ -43,6 +43,14 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
+      <ProjectId>b44abef6-69da-4499-bb0a-5780afc79c3f</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Swashbuckle.TypeSchemaFilter</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Api/Filters/TypeSchemaFilter.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TypeSchemaFilter.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
       <ProjectId>8e85476e-2807-4261-a979-55f4f5accaaf</ProjectId>
       <CorrelationId>Intent.AspNetCore.Program</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
@@ -108,6 +116,14 @@
     </FileLog>
     <FileLog>
       <ProjectId>b7a25525-aedf-4a34-ba1c-8f62069cdada</ProjectId>
+      <CorrelationId>Intent.EntityFrameworkCore.PagedList</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/Common/Pagination/PagedList.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedList.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>b7a25525-aedf-4a34-ba1c-8f62069cdada</ProjectId>
       <CorrelationId>Intent.Application.Dtos.Pagination.PagedResult</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/Common/Pagination/PagedResult.cs</ApplicationRelativeFilePath>
@@ -152,6 +168,38 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/Implementation/UsersService.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>UsersService.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>2cb5195c-bce6-4d4d-b972-9e0eb5b77401</ProjectId>
+      <CorrelationId>Intent.Eventing.Contracts.IntegrationEventMessage#05cf2d60-11ec-4a3a-ad11-0c23ea9abb7a</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/IntegrationEvents/TestClassMappingVOEvent.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TestClassMappingVOEvent.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>2cb5195c-bce6-4d4d-b972-9e0eb5b77401</ProjectId>
+      <CorrelationId>Intent.Eventing.Contracts.DomainMapping.MessageExtensions#05cf2d60-11ec-4a3a-ad11-0c23ea9abb7a</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/IntegrationEvents/TestClassMappingVOEventExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TestClassMappingVOEventExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>2cb5195c-bce6-4d4d-b972-9e0eb5b77401</ProjectId>
+      <CorrelationId>Intent.Eventing.Contracts.IntegrationEventDto#72d52b5e-65f3-4de2-924f-9b46dd5948ed</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/IntegrationEvents/TestVODto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TestVODto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>2cb5195c-bce6-4d4d-b972-9e0eb5b77401</ProjectId>
+      <CorrelationId>Intent.Eventing.Contracts.DomainMapping.DtoExtensions#72d52b5e-65f3-4de2-924f-9b46dd5948ed</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/IntegrationEvents/TestVODtoExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TestVODtoExtensions.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -300,14 +348,6 @@
     </FileLog>
     <FileLog>
       <ProjectId>c0af0524-cd07-469a-ae19-b21a5d7e0aaf</ProjectId>
-      <CorrelationId>Intent.Application.FluentValidation.Dtos.DTOValidator#d64fa423-6444-4fc0-adc4-f08e3da9ec50</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/Users/UserDtoValidator.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>Users/UserDtoValidator.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>c0af0524-cd07-469a-ae19-b21a5d7e0aaf</ProjectId>
       <CorrelationId>Intent.Application.Dtos.DtoModel#ced362ed-87a0-4d7c-b118-821aafea5933</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Application/Users/UserUpdateDto.cs</ApplicationRelativeFilePath>
@@ -340,7 +380,7 @@
     </FileLog>
     <FileLog>
       <ProjectId>77856858-ebfd-47c2-b534-950c50e6c717</ProjectId>
-      <CorrelationId>Intent.Entities.Repositories.Api.NotFoundException</CorrelationId>
+      <CorrelationId>Intent.Entities.NotFoundException</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Common/Exceptions/NotFoundException.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>NotFoundException.cs</ProjectRelativeFilePath>
@@ -364,6 +404,14 @@
     </FileLog>
     <FileLog>
       <ProjectId>e8336fd4-d2ba-44f4-a75c-c1ca3b40ec22</ProjectId>
+      <CorrelationId>Intent.Entities.DomainEntity#5a494225-e06b-4ecd-a879-5f2622d91f16</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Entities/Mapping/ClassWithVO.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>Mapping/ClassWithVO.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>e8336fd4-d2ba-44f4-a75c-c1ca3b40ec22</ProjectId>
       <CorrelationId>Intent.Entities.DomainEntity#713dcb8b-fde1-48c7-9e67-eb43ba829bd0</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Entities/Preference.cs</ApplicationRelativeFilePath>
@@ -376,6 +424,14 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Entities/User.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>User.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>dcc601c4-10fa-4a16-a8dc-3239dbc6d082</ProjectId>
+      <CorrelationId>Intent.ValueObjects.ValueObject#aec628f1-dcb0-4754-9b01-5bfc451f12ce</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Mapping/TestVO.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>Mapping/TestVO.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -396,10 +452,10 @@
     </FileLog>
     <FileLog>
       <ProjectId>d00e4070-7760-4fdc-bbbb-6a32445640fd</ProjectId>
-      <CorrelationId>Intent.Entities.Repositories.Api.PagedResultInterface</CorrelationId>
+      <CorrelationId>Intent.Entities.Repositories.Api.PagedListInterface</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Repositories/IPagedResult.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>IPagedResult.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Repositories/IPagedList.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IPagedList.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -419,11 +475,27 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
+      <ProjectId>d00e4070-7760-4fdc-bbbb-6a32445640fd</ProjectId>
+      <CorrelationId>Intent.Entities.Repositories.Api.EntityRepositoryInterface#5a494225-e06b-4ecd-a879-5f2622d91f16</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/Repositories/Mapping/IClassWithVORepository.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>Mapping/IClassWithVORepository.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
       <ProjectId>dcc601c4-10fa-4a16-a8dc-3239dbc6d082</ProjectId>
       <CorrelationId>Intent.Entities.DomainEnum#50d15b2e-1f6a-4c6e-ae6b-b4f6fd7cf225</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/UserType.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>UserType.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>dcc601c4-10fa-4a16-a8dc-3239dbc6d082</ProjectId>
+      <CorrelationId>Intent.ValueObjects.ValueObjectBase</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain/ValueObject.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>ValueObject.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -444,6 +516,14 @@
     </FileLog>
     <FileLog>
       <ProjectId>c4e9b6bf-c6c2-4771-9d1c-f18f58e5b8fa</ProjectId>
+      <CorrelationId>Intent.Eventing.MassTransit.IntegrationEventConsumer</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Eventing/IntegrationEventConsumer.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IntegrationEventConsumer.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>c4e9b6bf-c6c2-4771-9d1c-f18f58e5b8fa</ProjectId>
       <CorrelationId>Intent.Eventing.MassTransit.MassTransitEventBus</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Eventing/MassTransitEventBus.cs</ApplicationRelativeFilePath>
@@ -451,19 +531,19 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>c4e9b6bf-c6c2-4771-9d1c-f18f58e5b8fa</ProjectId>
-      <CorrelationId>Intent.Eventing.MassTransit.WrapperConsumer</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Eventing/WrapperConsumer.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>WrapperConsumer.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
       <ProjectId>bdca82ed-daa6-479c-8f4d-6c5aa730ed85</ProjectId>
-      <CorrelationId>Intent.EntityFrameworkCore.DbContext</CorrelationId>
+      <CorrelationId>Intent.EntityFrameworkCore.DbContext#DefaultConnection</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Persistence/ApplicationDbContext.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>ApplicationDbContext.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>fce63dd5-0778-4ae4-8ac5-dc8618a1d31a</ProjectId>
+      <CorrelationId>Intent.EntityFrameworkCore.EntityTypeConfiguration#5a494225-e06b-4ecd-a879-5f2622d91f16</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Persistence/Configurations/Mapping/ClassWithVOConfiguration.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>Mapping/ClassWithVOConfiguration.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -492,10 +572,10 @@
     </FileLog>
     <FileLog>
       <ProjectId>095a789f-0be7-4a2c-a936-c54813387ac5</ProjectId>
-      <CorrelationId>Intent.EntityFrameworkCore.Repositories.PagedList</CorrelationId>
+      <CorrelationId>Intent.EntityFrameworkCore.Repositories.Repository#5a494225-e06b-4ecd-a879-5f2622d91f16</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Repositories/PagedList.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedList.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Infrastructure/Repositories/Mapping/ClassWithVORepository.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>Mapping/ClassWithVORepository.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -515,7 +595,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#3666517d-3a27-4747-8c60-5172ece34e91</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#3666517d-3a27-4747-8c60-5172ece34e91</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>

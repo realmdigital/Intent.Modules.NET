@@ -3,7 +3,7 @@
   <ApplicationId>b40bf9f0-3286-4fe7-8a7d-39df74c0e322</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#6a0ff029-32ce-4392-bbf4-ef85c9b380a6</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#6a0ff029-32ce-4392-bbf4-ef85c9b380a6</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
@@ -33,7 +33,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>2f154fbe-bd9a-47d5-b1df-287729fb872b</ProjectId>
+      <ProjectId>7e281926-96d3-4ed4-8677-601b34e88846</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.IModSpecFile</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Application.Dtos.Pagination.imodspec</ApplicationRelativeFilePath>
@@ -41,12 +41,12 @@
       <IsIgnored>true</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>2f154fbe-bd9a-47d5-b1df-287729fb872b</ProjectId>
-      <CorrelationId>Intent.VisualStudio.Projects.CoreLibrary.CSProject#2f154fbe-bd9a-47d5-b1df-287729fb872b</CorrelationId>
+      <ProjectId>7e281926-96d3-4ed4-8677-601b34e88846</ProjectId>
+      <CorrelationId>Intent.VisualStudio.Projects.CSharpProject#7e281926-96d3-4ed4-8677-601b34e88846</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Modules.Application.Dtos.Pagination.csproj</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Intent.Modules.Application.Dtos.Pagination.csproj</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
+      <IsIgnored>true</IsIgnored>
     </FileLog>
     <FileLog>
       <ProjectId>a9c2f904-8a2e-4226-92e5-fa2f469928f9</ProjectId>
@@ -54,14 +54,6 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>modelers/Pagination Extensions.designer.settings</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Pagination Extensions.designer.settings</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>2f154fbe-bd9a-47d5-b1df-287729fb872b</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>

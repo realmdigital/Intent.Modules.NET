@@ -3,25 +3,25 @@
   <ApplicationId>24057b1c-2a88-4c71-b21a-74baaa302412</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#227d4e76-cb57-44bc-a802-3ae35ccbcb12</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#227d4e76-cb57-44bc-a802-3ae35ccbcb12</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>101ffa98-09e4-456e-bbe3-8aa2a34123df</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.Templates.TemplateDecorator#ff189556-1a54-46dc-9cfb-e86ba6f4e67b</CorrelationId>
+      <ProjectId>0752149d-d931-47d9-896a-3f2a781fd09a</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#e763a07f-47e8-4ca3-924d-7c4efb567c38</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Decorators/SwashbuckleCoreWebStartupDecorator.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>SwashbuckleCoreWebStartupDecorator.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>FactoryExtensions/SwashbuckleStartupConfigurationExtension.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>SwashbuckleStartupConfigurationExtension.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>101ffa98-09e4-456e-bbe3-8aa2a34123df</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.Templates.TemplateDecoratorRegistration#ff189556-1a54-46dc-9cfb-e86ba6f4e67b</CorrelationId>
+      <ProjectId>0752149d-d931-47d9-896a-3f2a781fd09a</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#abdfb228-799e-426a-9c06-d2571abbfe64</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Decorators/SwashbuckleCoreWebStartupDecoratorRegistration.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>SwashbuckleCoreWebStartupDecoratorRegistration.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>FactoryExtensions/TypeSchemaFilterExtension.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TypeSchemaFilterExtension.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -42,10 +42,18 @@
     </FileLog>
     <FileLog>
       <ProjectId>30433701-b132-47a8-831d-7093a7d2a79b</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
+      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.NugetPackages</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>NugetPackages.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>NugetPackages.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>30433701-b132-47a8-831d-7093a7d2a79b</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.ReleaseNotes</CorrelationId>
+      <OverwriteBehaviour>once-off</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>release-notes.md</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>release-notes.md</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -78,6 +86,22 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Templates/TemplateExtensions.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>TemplateExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>3b906209-bc9c-45c7-a9ee-6625c789b789</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial#ffdf736a-39d9-4c16-998c-452da9cce2db</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Templates/TypeSchemaFilter/TypeSchemaFilterTemplatePartial.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TypeSchemaFilter/TypeSchemaFilterTemplatePartial.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>3b906209-bc9c-45c7-a9ee-6625c789b789</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.TemplateRegistration.SingleFileNoModel#ffdf736a-39d9-4c16-998c-452da9cce2db</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Templates/TypeSchemaFilter/TypeSchemaFilterTemplateRegistration.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TypeSchemaFilter/TypeSchemaFilterTemplateRegistration.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
   </FileLogs>

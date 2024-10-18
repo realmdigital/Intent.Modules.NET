@@ -6,11 +6,13 @@ using Intent.Metadata.Models;
 using Intent.Modelers.Services.Api;
 using Intent.Modelers.Services.CQRS.Api;
 using Intent.Modelers.Types.ServiceProxies.Api;
-using Intent.Modelers.WebClient.Api;
+using Intent.Modelers.UI.Api;
+using Intent.Modules.Blazor.HttpClients.Templates.PagedResult;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Registrations;
 using Intent.Modules.Contracts.Clients.Shared;
 using Intent.Modules.Contracts.Clients.Shared.Templates.DtoContract;
+using Intent.Modules.Contracts.Clients.Shared.Templates.PagedResult;
 using Intent.Modules.Metadata.WebApi.Models;
 using Intent.Modules.Modelers.Types.ServiceProxies;
 using Intent.RoslynWeaver.Attributes;
@@ -33,6 +35,7 @@ namespace Intent.Modules.Blazor.HttpClients.Templates.DtoContract
 
         public override string TemplateId => DtoContractTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, DTOModel model)
         {
             return new DtoContractTemplate(outputTarget, model);
@@ -42,17 +45,23 @@ namespace Intent.Modules.Blazor.HttpClients.Templates.DtoContract
         public override IEnumerable<DTOModel> GetModels(IApplication application)
         {
             DtoContractTemplateBase.SetOutboundDtoElementIds(_metadataManager
-                .WebClient(application)
+                .UserInterface(application)
                 .GetMappedServiceProxyInboundDTOModels()
                 .Select(x => x.Id)
                 .ToHashSet());
 
-            return _metadataManager.WebClient(application).GetMappedServiceProxyDTOModels()
+            return _metadataManager.UserInterface(application).GetMappedServiceProxyDTOModels()
                 .Where(x =>
                 {
                     if (x.InternalElement.IsCommandModel() || x.InternalElement.IsQueryModel())
                     {
+                        // Excludes Commands / Queries and aren't actually payloads:
                         return HttpEndpointModelFactory.GetEndpoint(x.InternalElement)?.Inputs.Any(i => i.Id == x.Id) == true;
+                    }
+
+                    if (x.Id == PagedResultTemplateBase.TypeDefinitionElementId)
+                    {
+                        return false;
                     }
 
                     return true;

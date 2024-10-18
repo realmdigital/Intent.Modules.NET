@@ -4,7 +4,6 @@
   <display>Repositories</display>
   <isAbstract>false</isAbstract>
   <sort-children>by-type-then-by-name</sort-children>
-  <order>3</order>
   <genericTypes />
   <isMapped>false</isMapped>
   <parentFolderId>0074d2b0-7ac9-42c4-9f32-6d181341a6db</parentFolderId>
@@ -25,22 +24,6 @@
     <childElement id="e416bfea-a5df-4056-b909-0f8bdf47210b" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
       <name>Intent.Entities.Repositories.Api.EntityRepositoryInterface</name>
       <display>Intent.Entities.Repositories.Api.EntityRepositoryInterface</display>
-      <externalReference>Intent.Entities.Repositories.Api</externalReference>
-      <isAbstract>false</isAbstract>
-      <genericTypes />
-      <isMapped>false</isMapped>
-      <parentFolderId>6eb3cb5e-ec2f-4487-bff3-36a22604448d</parentFolderId>
-      <packageId>0856bf34-b8ca-4b71-b85d-9f328d486e41</packageId>
-      <packageName>GraphQL.CQRS.TestApplication</packageName>
-      <stereotypes />
-      <metadata>
-        <entry key="status" value="assigned" />
-      </metadata>
-      <childElements />
-    </childElement>
-    <childElement id="51fadcf7-24b4-4d73-8a70-571086d54003" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
-      <name>Intent.Entities.Repositories.Api.PagedResultInterface</name>
-      <display>Intent.Entities.Repositories.Api.PagedResultInterface</display>
       <externalReference>Intent.Entities.Repositories.Api</externalReference>
       <isAbstract>false</isAbstract>
       <genericTypes />
@@ -96,6 +79,20 @@
       <parentFolderId>6eb3cb5e-ec2f-4487-bff3-36a22604448d</parentFolderId>
       <packageId>0856bf34-b8ca-4b71-b85d-9f328d486e41</packageId>
       <packageName>GraphQL.CQRS.TestApplication</packageName>
+      <stereotypes />
+      <metadata>
+        <entry key="status" value="assigned" />
+      </metadata>
+      <childElements />
+    </childElement>
+    <childElement id="9f26ea61-5fec-4c26-8cc9-bc971a5dfc5e" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Entities.Repositories.Api.PagedListInterface</name>
+      <display>Intent.Entities.Repositories.Api.PagedListInterface</display>
+      <externalReference>Intent.Entities.Repositories.Api</externalReference>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>6eb3cb5e-ec2f-4487-bff3-36a22604448d</parentFolderId>
       <stereotypes />
       <metadata>
         <entry key="status" value="assigned" />

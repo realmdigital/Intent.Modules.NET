@@ -4,6 +4,8 @@ using CleanArchitecture.OnlyModeledDomainEvents.Domain.Common;
 using CleanArchitecture.OnlyModeledDomainEvents.Domain.Events;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace CleanArchitecture.OnlyModeledDomainEvents.Domain.Entities
 {
     public class Customer : IHasDomainEvent

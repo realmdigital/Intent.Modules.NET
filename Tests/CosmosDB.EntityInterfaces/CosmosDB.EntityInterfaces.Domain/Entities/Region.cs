@@ -5,6 +5,8 @@ using CosmosDB.EntityInterfaces.Domain.Common;
 using CosmosDB.EntityInterfaces.Domain.Entities.Common;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace CosmosDB.EntityInterfaces.Domain.Entities
 {
     public class Region : IRegion, IHasDomainEvent

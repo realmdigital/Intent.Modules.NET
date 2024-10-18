@@ -13,8 +13,8 @@ using Intent.Modules.Entities.Repositories.Api.Templates.RepositoryInterface;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
-[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial", Version = "1.0")]
 [assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial", Version = "1.0")]
 
 namespace Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInterface
 {
@@ -42,7 +42,9 @@ namespace Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInt
                         @interface.AddGenericParameter(genericType);
                     }
 
-                    if (TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Domain.Entity.Primary, Model, out var entityTemplate))
+                    @interface.RepresentsModel(model);
+
+                    if (TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Domain.Entity.Primary, Model, out var entityTemplate))
                     {
                         entityTemplate.CSharpFile.AfterBuild(file =>
                         {
@@ -54,7 +56,10 @@ namespace Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInt
 
                             if (rootEntity.TryGetMetadata<CSharpProperty[]>("primary-keys", out var pks))
                             {
-                                @interface.AddMethod($"Task<{GetTypeName(TemplateFulfillingRoles.Domain.Entity.Interface, Model)}{(OutputTarget.GetProject().NullableEnabled ? "?" : "")}>", "FindByIdAsync", method =>
+                                var genericTypeParameters = model.GenericTypes.Any()
+                                    ? $"<{string.Join(", ", model.GenericTypes)}>"
+                                    : string.Empty;
+                                @interface.AddMethod($"Task<{GetTypeName(TemplateRoles.Domain.Entity.Interface, Model)}{genericTypeParameters}{(OutputTarget.GetProject().NullableEnabled ? "?" : "")}>", "FindByIdAsync", method =>
                                 {
                                     method.AddAttribute("[IntentManaged(Mode.Fully)]");
                                     if (pks.Length == 1)
@@ -70,7 +75,7 @@ namespace Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInt
                                 });
                                 if (pks.Length == 1)
                                 {
-                                    @interface.AddMethod($"Task<List<{GetTypeName(TemplateFulfillingRoles.Domain.Entity.Interface, Model)}>>", "FindByIdsAsync", method =>
+                                    @interface.AddMethod($"Task<List<{GetTypeName(TemplateRoles.Domain.Entity.Interface, Model)}{genericTypeParameters}>>", "FindByIdsAsync", method =>
                                     {
                                         method.AddAttribute("[IntentManaged(Mode.Fully)]");
                                         var pk = pks.First();

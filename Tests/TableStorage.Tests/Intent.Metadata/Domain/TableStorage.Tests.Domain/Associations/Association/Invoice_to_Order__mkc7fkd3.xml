@@ -21,7 +21,7 @@
   </sourceEnd>
   <targetEnd id="a12d2109-f540-4940-a3e7-4b36d7cc69ef" type="Association Target End" typeId="0a66489f-30aa-417b-a75d-b945863366fd">
     <name>Order</name>
-    <display>Order: Order   [0..1 --&gt; 1]</display>
+    <display>Order: Order</display>
     <order>5</order>
     <typeReference id="6f33ecbc-e9c3-48ba-83b9-f6ede4425728">
       <typeId>20e1d859-198e-4570-b6bb-565dd2986020</typeId>

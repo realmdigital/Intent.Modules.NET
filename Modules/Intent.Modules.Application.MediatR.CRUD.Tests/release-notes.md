@@ -1,3 +1,24 @@
+### Version 1.3.7
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 1.3.6
+
+- Improvement: Bumped `Microsoft.NET.Tests.Sdk` to 17.6.0
+
+### Version 1.3.5
+
+- Fixed: Correct handling of nullable values in generated tests.
+
+### Version 1.3.4
+
+- Fixed: Having Entity Interfaces enabled would cause code compilation errors.
+
+### Version 1.3.3
+
+- Improvement: Updated test for Query By Id cases where a nullable object is returned, it shouldn't check for a `NotFoundException` to be thrown but rather to assert that the result is `default`.
+- Fixed: In one case where a GetAll Query is unmapped, the unit tests threw an Exception around an Assertion class that wasn't found.
+
 ### Version 1.3.2
 
 - Fixed: All tests will now use the exact same logic to detect whether a given Command/Query has a CRUD Handler for it to have a Unit Test.

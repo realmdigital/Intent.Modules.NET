@@ -3,17 +3,9 @@
   <ApplicationId>20cc8969-8c41-4c7e-a7a8-f4f2a0bf7325</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#7b0d537a-77e8-4c17-8d8b-7cd7e11a62e4</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#7b0d537a-77e8-4c17-8d8b-7cd7e11a62e4</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>9e49fda5-2fcc-4809-87ad-43197760a0a7</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.Templates.Api.ApiElementExtensionModel#aa0a465b-3231-44d1-a7bc-05e26d84d9e8</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Api/DTOFieldExtensionModel.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>DTOFieldExtensionModel.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -33,7 +25,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>39362e67-e432-45bf-8901-84ae3a4dbf08</ProjectId>
+      <ProjectId>3942985b-5e6f-4104-8211-6c0e83c6f983</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.IModSpecFile</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Application.FluentValidation.imodspec</ApplicationRelativeFilePath>
@@ -41,8 +33,8 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>39362e67-e432-45bf-8901-84ae3a4dbf08</ProjectId>
-      <CorrelationId>Intent.VisualStudio.Projects.CoreLibrary.CSProject#39362e67-e432-45bf-8901-84ae3a4dbf08</CorrelationId>
+      <ProjectId>3942985b-5e6f-4104-8211-6c0e83c6f983</ProjectId>
+      <CorrelationId>Intent.VisualStudio.Projects.CSharpProject#3942985b-5e6f-4104-8211-6c0e83c6f983</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Modules.Application.FluentValidation.csproj</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Intent.Modules.Application.FluentValidation.csproj</ProjectRelativeFilePath>
@@ -57,11 +49,11 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>39362e67-e432-45bf-8901-84ae3a4dbf08</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
+      <ProjectId>3942985b-5e6f-4104-8211-6c0e83c6f983</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.NugetPackages</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>NugetPackages.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>NugetPackages.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>

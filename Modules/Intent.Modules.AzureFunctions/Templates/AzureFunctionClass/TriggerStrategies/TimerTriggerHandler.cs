@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using Intent.AzureFunctions.Api;
-using Intent.Modelers.Services.Api;
 using Intent.Modules.Common.CSharp.Builder;
-using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.VisualStudio;
 
@@ -49,7 +46,7 @@ internal class TimerTriggerHandler : IFunctionTriggerHandler
     {
         if (!_template.OutputTarget.GetProject().IsNetApp(6))
         {
-            yield return NuGetPackages.MicrosoftAzureFunctionsWorkerExtensionsTimer;
+            yield return NugetPackages.MicrosoftAzureFunctionsWorkerExtensionsTimer(_template.OutputTarget);
         }
     }
 }

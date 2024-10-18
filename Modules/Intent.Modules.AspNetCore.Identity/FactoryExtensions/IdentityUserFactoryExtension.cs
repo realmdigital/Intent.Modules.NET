@@ -28,7 +28,9 @@ namespace Intent.Modules.AspNetCore.Identity.FactoryExtensions
         [IntentManaged(Mode.Ignore)]
         public override int Order => 0;
     }
-    [IntentManaged(Mode.Merge)]
+
+#warning is this actually used and just lying around here - 16 Aug 2024
+    [IntentManaged(Mode.Ignore)]
     public class DbContextFactoryExtension : FactoryExtensionBase
     {
         public override string Id => "Intent.AspNetCore.Identity.DbContextFactoryExtension";
@@ -36,7 +38,7 @@ namespace Intent.Modules.AspNetCore.Identity.FactoryExtensions
         [IntentManaged(Mode.Ignore)]
         public override int Order => 0;
 
-        protected override void OnBeforeTemplateExecution(IApplication application)
+        protected override void OnAfterTemplateRegistrations(IApplication application)
         {
             var identityModel = application.MetadataManager.GetIdentityUserClass(application.GetApplicationConfig().Id);
 
@@ -106,12 +108,13 @@ namespace Intent.Modules.AspNetCore.Identity.FactoryExtensions
 
 
             var entityTemplate = application
-                .FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateDependency.OnModel(TemplateFulfillingRoles.Domain.Entity.Primary, identityModel));
+                .FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateDependency.OnModel(TemplateRoles.Domain.Entity.Primary, identityModel));
             if (entityTemplate == null)
             {
                 return;
             }
 
+            entityTemplate.FulfillsRole("Domain.IdentityUser");
             entityTemplate.AddNugetDependency(NugetPackages.MicrosoftExtensionsIdentityStores(entityTemplate.OutputTarget.GetProject()));
             entityTemplate.CSharpFile.AfterBuild(file =>
             {

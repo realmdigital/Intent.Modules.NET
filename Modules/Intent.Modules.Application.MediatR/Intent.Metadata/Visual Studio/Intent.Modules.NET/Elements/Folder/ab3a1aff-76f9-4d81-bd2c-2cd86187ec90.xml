@@ -3,10 +3,10 @@
   <name>FactoryExtentions</name>
   <display>FactoryExtentions</display>
   <isAbstract>false</isAbstract>
-  <order>2</order>
+  <sort-children>by-type-then-by-name</sort-children>
   <genericTypes />
   <isMapped>false</isMapped>
-  <parentFolderId>80081361-cc7d-430c-8861-8b2ac9d6e8a7</parentFolderId>
+  <parentFolderId>221043f0-7703-4326-909c-6689fd961f8a</parentFolderId>
   <packageId>48216838-90d1-457f-808b-70b206050800</packageId>
   <packageName>Intent.Modules.NET</packageName>
   <stereotypes>
@@ -26,7 +26,6 @@
       <display>Intent.ModuleBuilder.Templates.FactoryExtension</display>
       <externalReference>Intent.ModuleBuilder</externalReference>
       <isAbstract>false</isAbstract>
-      <order>0</order>
       <genericTypes />
       <isMapped>false</isMapped>
       <parentFolderId>ab3a1aff-76f9-4d81-bd2c-2cd86187ec90</parentFolderId>
@@ -42,7 +41,6 @@
       <name>ModuleBuilder.Templates.FactoryExtension</name>
       <display>ModuleBuilder.Templates.FactoryExtension</display>
       <isAbstract>false</isAbstract>
-      <order>1</order>
       <genericTypes />
       <isMapped>false</isMapped>
       <parentFolderId>ab3a1aff-76f9-4d81-bd2c-2cd86187ec90</parentFolderId>

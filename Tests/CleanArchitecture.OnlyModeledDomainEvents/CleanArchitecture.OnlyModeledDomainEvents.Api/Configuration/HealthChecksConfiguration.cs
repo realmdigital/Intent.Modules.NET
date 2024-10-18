@@ -3,13 +3,14 @@ using Intent.RoslynWeaver.Attributes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.AspNetCore.HealthChecks.HealthChecksConfiguration", Version = "1.0")]
 
-namespace CleanArchitecture.OnlyModeledDomainEvents.Api.Configuration
+namespace MyCustomNamespace.Configuration
 {
     public static class HealthChecksConfiguration
     {
@@ -18,7 +19,8 @@ namespace CleanArchitecture.OnlyModeledDomainEvents.Api.Configuration
             IConfiguration configuration)
         {
             var hcBuilder = services.AddHealthChecks();
-            hcBuilder.AddCosmosDb(configuration["RepositoryOptions:CosmosConnectionString"]!, name: "CosmosDb", tags: new[] { "database" });
+            hcBuilder.Services.AddSingleton(_ => new CosmosClient(configuration["RepositoryOptions:CosmosConnectionString"]!));
+            hcBuilder.AddAzureCosmosDB(name: "CosmosDb", tags: new[] { "database" });
 
             return services;
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Configuration;
+using Intent.Exceptions;
 using Intent.Metadata.Models;
 using Intent.Modules.Common;
 using Intent.RoslynWeaver.Attributes;
@@ -12,7 +13,7 @@ using Intent.RoslynWeaver.Attributes;
 namespace Intent.Modules.VisualStudio.Projects.Api
 {
     [IntentManaged(Mode.Merge)]
-    public class TemplateOutputModel : IHasStereotypes, IMetadataModel, IOutputTargetTemplate, IHasName
+    public class TemplateOutputModel : IHasStereotypes, IMetadataModel, IOutputTargetTemplate, IHasName, IElementWrapper
     {
         public const string SpecializationType = "Template Output";
         public const string SpecializationTypeId = "d421c322-7a51-4094-89fa-e5d8a0a97b27";
@@ -80,6 +81,21 @@ namespace Intent.Modules.VisualStudio.Projects.Api
         public static TemplateOutputModel AsTemplateOutputModel(this ICanBeReferencedType type)
         {
             return type.IsTemplateOutputModel() ? new TemplateOutputModel((IElement)type) : null;
+        }
+
+        [IntentManaged(Mode.Ignore)]
+        internal static IEnumerable<TemplateOutputModel> DetectDuplicates(this IEnumerable<TemplateOutputModel> sequence)
+        {
+            var templateNamesSet = new HashSet<string>();
+
+            foreach (var templateOutputModel in sequence)
+            {
+                if (!templateNamesSet.Add(templateOutputModel.Name))
+                {
+                    throw new ElementException(templateOutputModel.InternalElement, $"Duplicate Template Output found at same location.");
+                }
+                yield return templateOutputModel;
+            }
         }
     }
 }

@@ -1,4 +1,105 @@
-﻿### Version 4.4.14
+### Version 5.0.12
+
+- Improvement: Generated check constraints in type configurations for enums now use inline expressions to make the generated code neater.
+
+### Version 5.0.11
+
+- Fixed: SQL Check Constraints on Enums will now have distinct variable names for multiple domain Class attributes that are Enums.
+
+### Version 5.0.10
+
+- New Feature: [NetTopologySuite](https://nettopologysuite.github.io/NetTopologySuite/) introduced to store geospatial coordinates in [PostgreSQL](https://www.npgsql.org/efcore/mapping/nts.html?tabs=with-datasource), [MySQL](https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql.NetTopologySuite) and [SQL Server](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite).
+- Improvement: Updated module NuGet packages infrastructure.
+- Fixed: `HasComment()` will support multi-line strings.
+
+### Version 5.0.9
+
+- Improvement: Updated NuGet packages to latest stables.
+- Improvement: Added support for SQL Check Constraints on Enums when `Store enums as strings` is on.
+
+### Version 5.0.8
+
+- Fixed: Issue were modeling an Association end as both `IsCollection` and `IsNullable` caused problematic behaviour.
+
+### Version 5.0.7
+
+- Improved: Postgres enabled for having "Included" index columns.
+- Improved: Added `Maintain Column Ordering` setting, which configures SQL column ordering to reflect the model order. 
+
+### Version 5.0.6
+
+- Improved: Set your default schema name for your `ApplicationDbContext` and your HistoryTable.
+- Fixed: Checking for types with serialization will also include Record types.
+- Fixed: Index Filters were not escaping `"`s correctly.
+
+### Version 5.0.5
+
+- Improvement: Updated the `Database Settings` stereotype icon.
+
+### Version 5.0.4
+
+- New Feature: Introduce multiple Db Contexts by making use of the `Database Settings` stereotype on a Domain Package and giving a unique connection string name.
+
+> ⚠️ **NOTE**
+> 
+> The DbContext template signature has changed, if you are building your own modules while referencing this one you will need to update your code.
+
+### Version 5.0.3
+
+- Fixed: Enabled non-conventional ordinal types as primary keys.
+
+### Version 5.0.2
+
+- Fixed: Resolved several issues around TPC Inheritance hierarchies with ForeignKeys.
+- Improvement: For EF 6 & 7 the `ErikEJ.EntityFrameworkCore.SqlServer.DateOnlyTimeOnly` nuget package will be installed to introduce `DateOnly` support for SQL Server.
+- Improvement: Updated to .NET 8 for Module project.
+- Fixed: `Pomelo.EntityFrameworkCore.MySql` will now install its appropriate version compatible for EF 8.
+
+### Version 5.0.1
+
+- Improvement: Changed the way the DBMigations File works out the start up project.
+- Fixed: Resolved several issues where DbContext file would not generate correctly based on `Entity` names.
+
+### Version 5.0.0
+
+> ⚠️ **BREAKING CHANGES**
+>
+> This version removes generation of "implicit" primary and foreign keys (for cases where they weren't explicitly modelled in the Domain designer) which means that in rare cases minor changes will need to be manually applied in the Domain designer if you wish to avoid requiring any changes to your actual database schema.
+>
+> Before accepting changes by the Software Factory, carefully review any proposed changes to generated Entity Framework type configuration classes and use them to show you which changes may need to be applied in the Domain designer.
+>
+> A quick way to have the Domain designer apply "default" primary and foreign keys to a Class is to right-click it and select the "Auto Manage Keys" option.
+>
+> Should you have any questions or require any assistance, please do not hesitate to [reach out to Intent Architect support](https://github.com/IntentArchitect/Support).
+
+
+- Improvement: Removed support for implicit keys, allowing keyless entities to now be modelled.
+
+### Version 4.6.2
+
+- Fixed: Using CosmosDB on a one-to-one relationship will no longer generate an implicit PK field on the composite entity.
+
+### Version 4.6.1
+
+- Improvement: Added support for Oracle databases.
+
+### Version 4.6.0
+
+- Improvement: Moved `PagedList<T>` type into this module from the `Intent.EntityFrameworkCore.Repositories 4.5.0` module since pagination is an separate concert to the repository pattern.
+- Improvement: For Postgres, added ValueConverter for `DateTimeOffset` to ensure these are persisted as UTC.
+
+### Version 4.4.16
+
+- Improvement: Updated to be compatible with .NET 8.
+- Improvement: Added a setting for making `Enum`s persist as strings. (with thanks to [@shainegordon](https://github.com/shainegordon) for their [PR](https://github.com/IntentArchitect/Intent.Modules.NET/pull/12) for this).
+
+### Version 4.4.15
+
+- Improvement: It is now possible to [enable split queries globally](https://learn.microsoft.com/ef/core/querying/single-split-queries#enabling-split-queries-globally) by selecting the _Enable split queries globally_ application setting (with thanks to [@shainegordon](https://github.com/shainegordon) for their [PR](https://github.com/IntentArchitect/Intent.Modules.NET/pull/9) for this).
+- Fixed: Index Columns being generated in the Entity Type Configurations will now refer to the actual Attribute Name as opposed to the Column name.
+- Fixed: Adding base class attributes to Indexes was resulting in broken mapping code, this is now resolved.
+
+### Version 4.4.14
 
 - Improvement: Enabled option to enable generation of `IApplicationDbContext` for use in an application's "Application" layer. See the [README](https://github.com/IntentArchitect/Intent.Modules.NET/blob/development/Modules/Intent.Modules.EntityFrameworkCore/README.md#database-settings---generate-dbcontext-interface) for more information.
 

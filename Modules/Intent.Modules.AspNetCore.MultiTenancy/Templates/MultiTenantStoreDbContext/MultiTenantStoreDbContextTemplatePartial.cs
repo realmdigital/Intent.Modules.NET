@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Intent.Engine;
 using Intent.Modules.Common;
@@ -14,7 +15,7 @@ using Intent.Templates;
 namespace Intent.Modules.AspNetCore.MultiTenancy.Templates.MultiTenantStoreDbContext
 {
     [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-    partial class MultiTenantStoreDbContextTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
+    public partial class MultiTenantStoreDbContextTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
     {
         [IntentManaged(Mode.Fully)]
         public const string TemplateId = "Intent.Modules.AspNetCore.MultiTenancy.MultiTenantStoreDbContext";
@@ -22,9 +23,9 @@ namespace Intent.Modules.AspNetCore.MultiTenancy.Templates.MultiTenantStoreDbCon
         [IntentManaged(Mode.Ignore, Signature = Mode.Fully)]
         public MultiTenantStoreDbContextTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NugetPackages.FinbuckleMultiTenantEntityFrameworkCore);
-            AddNugetDependency(NugetPackages.EntityFrameworkCoreInMemory(OutputTarget.GetProject()));
-            AddNugetDependency(NugetPackages.FinbuckleMultiTenantAspNetCore);
+            AddNugetDependency(NugetPackages.FinbuckleMultiTenantEntityFrameworkCore(outputTarget));
+            AddNugetDependency(NugetPackages.MicrosoftEntityFrameworkCoreInMemory(OutputTarget));
+            AddNugetDependency(NugetPackages.FinbuckleMultiTenantAspNetCore(outputTarget));
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("Finbuckle.MultiTenant")

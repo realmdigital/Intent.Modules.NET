@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
+using Intent.EntityFrameworkCore.Api;
 using Intent.Metadata.RDBMS.Api;
 using Intent.Modelers.Domain.Api;
 using Intent.Modules.Common;
@@ -13,6 +14,7 @@ using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
 using Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInterface;
 using Intent.Modules.EntityFrameworkCore.Repositories.Settings;
+using Intent.Modules.EntityFrameworkCore.Templates;
 using Intent.Modules.EntityFrameworkCore.Templates.EntityTypeConfiguration;
 using Intent.Modules.Metadata.RDBMS.Settings;
 using Intent.RoslynWeaver.Attributes;
@@ -69,11 +71,10 @@ namespace Intent.Modules.EntityFrameworkCore.Repositories.Templates.Repository
                         @interface.ExtendsInterface($"{this.GetEFRepositoryInterfaceName()}<{EntityInterfaceName}, {EntityName}>");
                     });
 
-                    if (TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Domain.Entity.Primary, Model, out var entityTemplate))
+                    if (TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Domain.Entity.Primary, Model, out var entityTemplate))
                     {
                         entityTemplate.CSharpFile.AfterBuild(file =>
                         {
-                            bool addSyncVersions = ExecutionContext.Settings.GetDatabaseSettings().AddSynchronousMethodsToRepositories();
                             var rootEntity = file.Classes.First().GetRootEntity();
                             if (rootEntity.HasPrimaryKey())
                             {
@@ -83,15 +84,43 @@ namespace Intent.Modules.EntityFrameworkCore.Repositories.Templates.Repository
                                     AddMethods(@class, entityTemplate, rootEntity, makeAsync: false, makefully: true);
                                 }
                             }
+                            else
+                            {
+                                var parameter = @class.Constructors.First().Parameters.Single(x => x.Name == "dbContext");
+                                parameter.IntroduceReadonlyField();
+                                CSharpFile.AddUsing("Microsoft.EntityFrameworkCore");
+
+                                @class.AddMethod("void", "Add", method =>
+                                {
+                                    method.AddParameter(GetTypeName(TemplateRoles.Domain.Entity.Interface, Model), "entity");
+
+                                    var columns = Model.Attributes.Select(x => x.Name.ToPascalCase());
+                                    var values = Model.Attributes.Select(x => $"{{entity.{x.Name.ToPascalCase()}}}");
+
+                                    method.AddStatement($"_dbContext.Database.ExecuteSqlInterpolated($\"INSERT INTO {Model.Name.Pluralize()} ({string.Join(", ", columns)}) VALUES({string.Join(", ", values)})\");");
+                                });
+                            }
                         });
                     }
-                });
+                })
+                .AfterBuild(file =>
+                {
+                    var @class = file.Classes.First();
+                    foreach (var method in @class.Methods)
+                    {
+                        if (!method.Statements.Any())
+                        {
+                            method.AddStatement($"// TODO: Implement {method.Name} ({file.Classes.First().Name}) functionality");
+                            method.AddStatement($"""throw new {UseType("System.NotImplementedException")}("Your implementation here...");""");
+                        }
+                    }
+                }, 1000);
         }
 
         private void AddMethods(CSharpClass @class, ICSharpFileBuilderTemplate entityTemplate, CSharpClass rootEntity, bool makeAsync, bool makefully = false)
         {
             var pks = rootEntity.GetPropertiesWithPrimaryKey();
-            string returnType = $"{GetTypeName(TemplateFulfillingRoles.Domain.Entity.Interface, Model)}{(OutputTarget.GetProject().NullableEnabled ? "?" : "")}";
+            string returnType = $"{GetTypeName(TemplateRoles.Domain.Entity.Interface, Model)}{(OutputTarget.GetProject().NullableEnabled ? "?" : "")}";
             string methodName = makeAsync ? "FindByIdAsync" : "FindById";
             @class.AddMethod(makeAsync ? $"Task<{returnType}>" : returnType, methodName, method =>
             {
@@ -128,7 +157,7 @@ namespace Intent.Modules.EntityFrameworkCore.Repositories.Templates.Repository
 
             if (pks.Length == 1)
             {
-                returnType = $"List<{GetTypeName(TemplateFulfillingRoles.Domain.Entity.Interface, Model)}>";
+                returnType = $"List<{GetTypeName(TemplateRoles.Domain.Entity.Interface, Model)}>";
                 methodName = makeAsync ? "FindByIdsAsync" : "FindByIds";
                 @class.AddMethod(makeAsync ? $"Task<{returnType}>" : returnType, methodName, method =>
                 {
@@ -178,11 +207,18 @@ namespace Intent.Modules.EntityFrameworkCore.Repositories.Templates.Repository
 
         public string RepositoryContractName => TryGetTypeName(EntityRepositoryInterfaceTemplate.TemplateId, Model) ?? $"I{ClassName}";
 
-        public string DbContextName => TryGetTypeName("Infrastructure.Data.DbContext", out var dbContextName) ? dbContextName : $"{Model.Application.Name}DbContext";
-
         public string PrimaryKeyType => GetTemplate<ITemplate>("Domain.Entity", Model).GetMetadata().CustomMetadata.TryGetValue("Surrogate Key Type", out var type) ? UseType(type) : UseType("System.Guid");
 
         public string PrimaryKeyName => Model.Attributes.FirstOrDefault(x => x.HasPrimaryKey())?.Name.ToPascalCase() ?? "Id";
+
+        public string DbContextName
+        {
+            get
+            {
+                var dbContextInstance = DbContextManager.GetDbContext(Model);
+                return dbContextInstance.GetTypeName(this);
+            }
+        }
 
         public override void BeforeTemplateExecution()
         {

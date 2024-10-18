@@ -3,7 +3,7 @@
   <ApplicationId>7e643458-afc1-4a0b-ad59-87d9d682cbc0</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#97438eed-c4d2-4649-b9b0-e1287f0b5132</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#97438eed-c4d2-4649-b9b0-e1287f0b5132</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
@@ -41,14 +41,6 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>fe8d3d6d-df7f-4a17-a9f1-3afdb046844c</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
       <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial#0adbd5e8-63ad-4b34-b8cf-9b3febeedd99</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
@@ -66,50 +58,34 @@
     </FileLog>
     <FileLog>
       <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial#f10db7b9-dbed-4b23-8ba0-fab06ddb8115</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/NotFoundException/NotFoundExceptionTemplatePartial.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>NotFoundException/NotFoundExceptionTemplatePartial.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.TemplateRegistration.SingleFileNoModel#f10db7b9-dbed-4b23-8ba0-fab06ddb8115</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/NotFoundException/NotFoundExceptionTemplateRegistration.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>NotFoundException/NotFoundExceptionTemplateRegistration.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplate.T4Template.PreProcessed#97d051af-0bef-4bdd-ac68-ea8d27c6d5fb</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/PagedResultInterface/PagedResultInterfaceTemplate.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedResultInterface/PagedResultInterfaceTemplate.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>Templates/PagedListInterface/PagedListInterfaceTemplate.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedListInterface/PagedListInterfaceTemplate.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
       <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpT4Template#97d051af-0bef-4bdd-ac68-ea8d27c6d5fb</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/PagedResultInterface/PagedResultInterfaceTemplate.tt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedResultInterface/PagedResultInterfaceTemplate.tt</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>Templates/PagedListInterface/PagedListInterfaceTemplate.tt</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedListInterface/PagedListInterfaceTemplate.tt</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
       <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial#97d051af-0bef-4bdd-ac68-ea8d27c6d5fb</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/PagedResultInterface/PagedResultInterfaceTemplatePartial.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedResultInterface/PagedResultInterfaceTemplatePartial.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>Templates/PagedListInterface/PagedListInterfaceTemplatePartial.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedListInterface/PagedListInterfaceTemplatePartial.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
       <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.TemplateRegistration.SingleFileNoModel#97d051af-0bef-4bdd-ac68-ea8d27c6d5fb</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/PagedResultInterface/PagedResultInterfaceTemplateRegistration.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedResultInterface/PagedResultInterfaceTemplateRegistration.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>Templates/PagedListInterface/PagedListInterfaceTemplateRegistration.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedListInterface/PagedListInterfaceTemplateRegistration.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -135,22 +111,6 @@
       <ApplicationRelativeFilePath>Templates/TemplateExtensions.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>TemplateExtensions.cs</ProjectRelativeFilePath>
       <IsIgnored>true</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpTemplate.T4Template.PreProcessed#b7874537-f6f7-431c-91fc-e6beb0a58825</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/UnitOfWorkInterface/UnitOfWorkInterfaceTemplate.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>UnitOfWorkInterface/UnitOfWorkInterfaceTemplate.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.CSharpT4Template#b7874537-f6f7-431c-91fc-e6beb0a58825</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>Templates/UnitOfWorkInterface/UnitOfWorkInterfaceTemplate.tt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>UnitOfWorkInterface/UnitOfWorkInterfaceTemplate.tt</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
       <ProjectId>1c7c3a21-fac6-41e0-877d-d8750e229825</ProjectId>

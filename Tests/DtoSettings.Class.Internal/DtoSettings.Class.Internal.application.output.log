@@ -67,6 +67,14 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
+      <ProjectId>82f3cf04-3f5e-4010-a3f8-f30d2e2212a3</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Swashbuckle.TypeSchemaFilter</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Api/Filters/TypeSchemaFilter.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TypeSchemaFilter.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
       <ProjectId>6eb376e8-1793-4e64-9bd3-def0e26045d2</ProjectId>
       <CorrelationId>Intent.AspNetCore.Program</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
@@ -91,6 +99,22 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
+      <ProjectId>9b8f6f36-7128-4909-8a79-88581bfe7a2d</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandInterface</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/Common/Interfaces/ICommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>ICommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>9b8f6f36-7128-4909-8a79-88581bfe7a2d</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryInterface</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/Common/Interfaces/IQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
       <ProjectId>12060ed4-1820-4157-ba9c-699c9950710b</ProjectId>
       <CorrelationId>Intent.Application.AutoMapper.MapFromInterface</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
@@ -104,6 +128,30 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/Common/Mappings/MappingProfile.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>MappingProfile.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>5553e012-fa55-430a-8af5-6604970b4901</ProjectId>
+      <CorrelationId>Intent.EntityFrameworkCore.PagedList</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/Common/Pagination/PagedList.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedList.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>5553e012-fa55-430a-8af5-6604970b4901</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.Pagination.PagedResult</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/Common/Pagination/PagedResult.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedResult.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>5553e012-fa55-430a-8af5-6604970b4901</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.Pagination.PagedResultMappingExtensions</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/Common/Pagination/PagedResultMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedResultMappingExtensions.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -195,6 +243,110 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#f5a35859-2285-4f92-8db3-ec7b73d93169</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/CreateInvoice/CreateInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/CreateInvoice/CreateInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandHandler#f5a35859-2285-4f92-8db3-ec7b73d93169</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/CreateInvoice/CreateInvoiceCommandHandler.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/CreateInvoice/CreateInvoiceCommandHandler.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#52d62acf-81b8-4a21-9e82-c0e792ec5f57</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/CreateInvoiceCommandInvoiceLinesDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/CreateInvoiceCommandInvoiceLinesDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#6a2305bc-c907-454f-b626-a5a472452c17</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/DeleteInvoice/DeleteInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/DeleteInvoice/DeleteInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandHandler#6a2305bc-c907-454f-b626-a5a472452c17</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/DeleteInvoice/DeleteInvoiceCommandHandler.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/DeleteInvoice/DeleteInvoiceCommandHandler.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#b0213542-79d2-40c1-a390-758a1a9ff141</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/GetInvoiceById/GetInvoiceByIdQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/GetInvoiceById/GetInvoiceByIdQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryHandler#b0213542-79d2-40c1-a390-758a1a9ff141</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/GetInvoiceById/GetInvoiceByIdQueryHandler.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/GetInvoiceById/GetInvoiceByIdQueryHandler.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#c1e08dc1-7fa5-4ac5-8da5-70043aa31f8f</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/GetInvoices/GetInvoicesQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/GetInvoices/GetInvoicesQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryHandler#c1e08dc1-7fa5-4ac5-8da5-70043aa31f8f</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/GetInvoices/GetInvoicesQueryHandler.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/GetInvoices/GetInvoicesQueryHandler.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#6ba3cb9f-dbfb-43d9-9161-bf6a35b6bd66</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/InvoiceDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/InvoiceDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.AutoMapper.MappingExtensions#6ba3cb9f-dbfb-43d9-9161-bf6a35b6bd66</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/InvoiceDtoMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/InvoiceDtoMappingExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#65944888-c386-47bc-8053-515323d99c1f</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/UpdateInvoice/UpdateInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/UpdateInvoice/UpdateInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1af1e709-41f3-481a-bae4-96b4190516e4</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandHandler#65944888-c386-47bc-8053-515323d99c1f</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Application/InvoicesAdvanced/UpdateInvoice/UpdateInvoiceCommandHandler.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>InvoicesAdvanced/UpdateInvoice/UpdateInvoiceCommandHandler.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
       <ProjectId>f8b65cec-4889-4019-9bfc-3706bb9ad20e</ProjectId>
       <CorrelationId>Intent.Entities.CollectionExtensions</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
@@ -204,7 +356,7 @@
     </FileLog>
     <FileLog>
       <ProjectId>4e383430-9c6d-49a4-b59a-9a8be6dcfea4</ProjectId>
-      <CorrelationId>Intent.Entities.Repositories.Api.NotFoundException</CorrelationId>
+      <CorrelationId>Intent.Entities.NotFoundException</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Domain/Common/Exceptions/NotFoundException.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>NotFoundException.cs</ProjectRelativeFilePath>
@@ -268,10 +420,10 @@
     </FileLog>
     <FileLog>
       <ProjectId>10008be3-2f5a-43fb-9528-ddf8c2114b08</ProjectId>
-      <CorrelationId>Intent.Entities.Repositories.Api.PagedResultInterface</CorrelationId>
+      <CorrelationId>Intent.Entities.Repositories.Api.PagedListInterface</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Domain/Repositories/IPagedResult.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>IPagedResult.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Domain/Repositories/IPagedList.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IPagedList.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -300,7 +452,7 @@
     </FileLog>
     <FileLog>
       <ProjectId>0a85852c-a941-4de7-9a7c-79ebb1f3bb8a</ProjectId>
-      <CorrelationId>Intent.EntityFrameworkCore.DbContext</CorrelationId>
+      <CorrelationId>Intent.EntityFrameworkCore.DbContext#DefaultConnection</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Infrastructure/Persistence/ApplicationDbContext.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>ApplicationDbContext.cs</ProjectRelativeFilePath>
@@ -332,14 +484,6 @@
     </FileLog>
     <FileLog>
       <ProjectId>5e637978-ddc4-476d-a58f-a45c85807f11</ProjectId>
-      <CorrelationId>Intent.EntityFrameworkCore.Repositories.PagedList</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Infrastructure/Repositories/PagedList.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedList.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>5e637978-ddc4-476d-a58f-a45c85807f11</ProjectId>
       <CorrelationId>Intent.EntityFrameworkCore.Repositories.RepositoryBase</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>DtoSettings.Class.Internal.Infrastructure/Repositories/RepositoryBase.cs</ApplicationRelativeFilePath>
@@ -347,7 +491,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#3cbb50b0-c61f-4a0c-a224-0f39d2cffb3b</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#3cbb50b0-c61f-4a0c-a224-0f39d2cffb3b</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>DtoSettings.Class.Internal.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>

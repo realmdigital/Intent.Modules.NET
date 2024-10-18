@@ -3,7 +3,7 @@
   <ApplicationId>70ce79dc-5921-4872-8959-d1cb6f635a8c</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#20a40b4a-8785-4e1c-b52c-c1d49a8059a6</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#20a40b4a-8785-4e1c-b52c-c1d49a8059a6</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
@@ -14,6 +14,14 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Api/EventingDTOExtensionModel.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>EventingDTOExtensionModel.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>cf018a72-1728-4f58-95cb-8ccd0c4d6cf0</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.Api.ApiElementExtensionModel#c2f84da4-5875-4c72-b337-6e6be9b74ec0</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>Api/IntegrationCommandExtensionModel.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IntegrationCommandExtensionModel.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -54,14 +62,6 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>modelers/Eventing Designer Settings.designer.settings</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Eventing Designer Settings.designer.settings</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>749ac6d1-cc82-407c-b973-ae5de1178fcf</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>

@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <PackageVersion>5.4.3</PackageVersion>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageVersion>6.1.1</PackageVersion>
     <Authors>Intent Architect</Authors>
     <Copyright>Copyright 2020</Copyright>
     <PackageProjectUrl>https://intentarchitect.com</PackageProjectUrl>
@@ -39,20 +39,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Intent.Modules.Common" Version="3.4.1" />
-    <PackageReference Include="Intent.Modules.Common.CSharp" Version="3.3.42" />
-    <PackageReference Include="Intent.Modules.Metadata.WebApi" Version="4.3.2" />
-    <PackageReference Include="Intent.Modules.Modelers.Services" Version="3.4.4" />
-    <PackageReference Include="Intent.Packager" Version="3.4.0">
+    <PackageReference Include="Intent.Modules.Common" Version="3.6.0" />
+    <PackageReference Include="Intent.Modules.Common.CSharp" Version="3.7.6" />
+    <PackageReference Include="Intent.Modules.Metadata.WebApi" Version="4.5.5" />
+    <PackageReference Include="Intent.Modules.Modelers.Services" Version="3.7.3" />
+    <PackageReference Include="Intent.Packager" Version="3.4.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Intent.RoslynWeaver.Attributes" Version="2.0.1" />
-    <PackageReference Include="Intent.SoftwareFactory.SDK" Version="3.4.2" />
+    <PackageReference Include="Intent.RoslynWeaver.Attributes" Version="2.1.6" />
+    <PackageReference Include="Intent.SoftwareFactory.SDK" Version="3.6.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Intent.Modules.AspNetCore\Intent.Modules.AspNetCore.csproj" />
+    <ProjectReference Include="..\Intent.Modules.Constants\Intent.Modules.Constants.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +65,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="docs\images\" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Intent.Modules.Application.Identity" Version="3.4.0" />
+    <PackageReference Include="Intent.Modules.Common" Version="3.6.0" />
+    <PackageReference Include="Intent.Modules.Common.CSharp" Version="3.7.6" />
+    <PackageReference Include="Intent.Packager" Version="3.4.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Intent.RoslynWeaver.Attributes" Version="2.1.6" />
+    <PackageReference Include="Intent.SoftwareFactory.SDK" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Intent.Modules.Application.MediatR\Intent.Modules.Application.MediatR.csproj" />
+    <ProjectReference Include="..\Intent.Modules.Constants\Intent.Modules.Constants.csproj" PrivateAssets="All" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="Templates\AuthorizationBehaviour\AuthorizationBehaviourTemplate.tt">
@@ -17,13 +34,13 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>PerformanceBehaviourTemplate.cs</LastGenOutput>
     </None>
-    <None Update="Templates\UnhandledExceptionBehaviour\UnhandledExceptionBehaviourTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>UnhandledExceptionBehaviourTemplate.cs</LastGenOutput>
-    </None>
     <None Update="Templates\ValidationBehaviour\ValidationBehaviourTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ValidationBehaviourTemplate.cs</LastGenOutput>
+    </None>
+    <None Update="Templates\UnitOfWorkBehaviour\UnitOfWorkBehaviourTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>UnitOfWorkBehaviourTemplate.cs</LastGenOutput>
     </None>
     <None Update="Templates\MessageBusPublishBehaviour\MessageBusPublishBehaviourTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
@@ -51,15 +68,15 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>PerformanceBehaviourTemplate.tt</DependentUpon>
     </Compile>
-    <Compile Update="Templates\UnhandledExceptionBehaviour\UnhandledExceptionBehaviourTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>UnhandledExceptionBehaviourTemplate.tt</DependentUpon>
-    </Compile>
     <Compile Update="Templates\ValidationBehaviour\ValidationBehaviourTemplate.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ValidationBehaviourTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\UnitOfWorkBehaviour\UnitOfWorkBehaviourTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UnitOfWorkBehaviourTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\MessageBusPublishBehaviour\MessageBusPublishBehaviourTemplate.cs">
       <DesignTime>True</DesignTime>
@@ -74,26 +91,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Intent.Modules.Application.Identity" Version="3.4.0" />
-    <PackageReference Include="Intent.Modules.Common" Version="3.4.1" />
-    <PackageReference Include="Intent.Modules.Common.CSharp" Version="3.3.42" />
-    <PackageReference Include="Intent.Packager" Version="3.4.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Intent.RoslynWeaver.Attributes" Version="2.0.1" />
-    <PackageReference Include="Intent.SoftwareFactory.SDK" Version="3.4.2" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Intent.Modules.Application.MediatR\Intent.Modules.Application.MediatR.csproj" />
-    <ProjectReference Include="..\Intent.Modules.Constants\Intent.Modules.Constants.csproj" PrivateAssets="All" />
+    <Folder Include="Templates\UnhandledExceptionBehaviour\" />
   </ItemGroup>
 
   <Import Project="..\Intent.Modules.UnitOfWork.Persistence.Shared\Intent.Modules.UnitOfWork.Persistence.Shared.projitems" Label="Shared" />
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
 
 </Project>

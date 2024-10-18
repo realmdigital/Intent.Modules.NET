@@ -1,5 +1,6 @@
 using Intent.Engine;
 using Intent.Modelers.Services.CQRS.Api;
+using Intent.Modules.Application.MediatR.CRUD.CrudMappingStrategies;
 using Intent.Modules.Application.MediatR.CRUD.CrudStrategies;
 using Intent.Modules.Application.MediatR.Settings;
 using Intent.Modules.Application.MediatR.Templates.CommandHandler;
@@ -37,8 +38,9 @@ namespace Intent.Modules.Application.MediatR.CRUD.Decorators
             var matchedStrategy = StrategyFactory.GetMatchedCommandStrategy(targetTemplate);
             if (matchedStrategy is not null)
             {
+                targetTemplate.AddKnownType("System.Linq.Dynamic.Core.PagedResult");
                 ((ICSharpFileBuilderTemplate)targetTemplate).CSharpFile.AfterBuild(_ => matchedStrategy.ApplyStrategy());
-            }
+            };
         }
     }
 }

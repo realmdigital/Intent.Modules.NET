@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Intent.Engine;
+using Intent.Exceptions;
 using Intent.Metadata.Models;
 using Intent.Modelers.Domain.Api;
 using Intent.Modules.AspNetCore.MultiTenancy.Api;
@@ -11,6 +12,7 @@ using Intent.Modules.AspNetCore.MultiTenancy.Templates.MultiTenancyConfiguration
 using Intent.Modules.AspNetCore.MultiTenancy.Templates.MultiTenantStoreDbContext;
 using Intent.Modules.AspNetCore.MultiTenancy.Templates.TenantExtendedInfo;
 using Intent.Modules.Common;
+using Intent.Modules.Common.CSharp.AppStartup;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Plugins;
@@ -30,6 +32,12 @@ namespace Intent.Modules.AspNetCore.MultiTenancy.FactoryExtensions;
 public class AspNetCoreIntegrationExtension : FactoryExtensionBase
 {
     public override string Id => "Intent.Modules.AspNetCore.MultiTenancy.AspNetCoreIntegrationExtension";
+    private readonly IMetadataManager _metadataManager;
+
+    public AspNetCoreIntegrationExtension(IMetadataManager metadataManager)
+    {
+        _metadataManager = metadataManager;
+    }
 
     [IntentManaged(Mode.Ignore)] public override int Order => 0;
 
@@ -37,26 +45,30 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
 
     protected override void OnAfterTemplateRegistrations(IApplication application)
     {
-        application.FindTemplateInstance<ICSharpFileBuilderTemplate>("App.Startup")
-            ?.CSharpFile.AfterBuild(file =>
+        var template = application.FindTemplateInstance<IAppStartupTemplate>(IAppStartupTemplate.RoleName);
+        template?.CSharpFile.OnBuild(_ =>
+        {
+            template.StartupFile.AddServiceConfiguration(ctx => $"{ctx.Services}.ConfigureMultiTenancy({ctx.Configuration});");
+        }, 100);
+
+        template?.CSharpFile.AfterBuild(_ =>
+        {
+            template.StartupFile.ConfigureApp((statements, ctx) =>
             {
-                file.Classes.First().FindMethod("ConfigureServices")
-                    ?.AddStatement("services.ConfigureMultiTenancy(Configuration);");
-
-                var statement = file.Classes.First().FindMethod("Configure")
-                    .FindStatement(s => s.GetText(string.Empty).Contains("app.UseRouting()"))
-                    ?.InsertBelow("app.UseMultiTenancy();");
-
-                if (statement == null)
+                var useRoutingStatement = statements.FindStatement(x => x.ToString()!.Contains(".UseRouting()"));
+                if (useRoutingStatement == null)
                 {
                     throw new("app.UseRouting() was not configured");
                 }
+
+                useRoutingStatement.InsertBelow($"{ctx.App}.UseMultiTenancy();");
             });
+        }, 10);
 
         var configurations = new List<(string ConnectionStringName, ApplyConfiguration ApplyConfiguration)>();
         foreach (var tryGetConfiguration in new[] { TryGetEfCoreConfiguration, TryGetMongoDbConfiguration })
         {
-            if (!tryGetConfiguration(application, out var connectionStringName, out var applyConfiguration))
+            if (!tryGetConfiguration(application, _metadataManager, out var connectionStringName, out var applyConfiguration))
             {
                 continue;
             }
@@ -80,7 +92,7 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
         }
     }
 
-    private static bool TryGetEfCoreConfiguration(IApplication application, out string connectionStringName, out ApplyConfiguration applyConfiguration)
+    private static bool TryGetEfCoreConfiguration(IApplication application, IMetadataManager metadataManager, out string connectionStringName, out ApplyConfiguration applyConfiguration)
     {
         var efDbContext = application.FindTemplateInstance<ICSharpFileBuilderTemplate>("Infrastructure.Data.DbContext");
         if (efDbContext == null)
@@ -99,7 +111,7 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
                 MultitenancySettings.DataIsolationOptionsEnum.SeparateDatabase =>
                     hasMultiConnStr => GetSeparateDatabaseDataIsolationConfiguration(hasMultiConnStr, application, connectionStringNameInternal),
                 MultitenancySettings.DataIsolationOptionsEnum.SharedDatabase =>
-                    _ => GetSharedDatabaseDataIsolationConfiguration(application, efDbContext),
+                    _ => GetSharedDatabaseDataIsolationConfiguration(application, efDbContext, metadataManager),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
@@ -108,21 +120,22 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
 
     private static void GetSharedDatabaseDataIsolationConfiguration(
         IApplication application,
-        ICSharpFileBuilderTemplate dbContextTemplate)
+        ICSharpFileBuilderTemplate dbContextTemplate,
+        IMetadataManager metadataManager)
     {
         if (!application.Settings.GetMultitenancySettings().DataIsolation().IsSharedDatabase())
         {
             return;
         }
 
-        var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Infrastructure.DependencyInjection);
+        var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateRoles.Infrastructure.DependencyInjection);
         if (template == null)
         {
             return;
         }
 
-        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenant);
-        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenantEntityFrameworkCore);
+        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenant(template.OutputTarget));
+        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenantEntityFrameworkCore(template.OutputTarget));
 
         dbContextTemplate.CSharpFile.AfterBuild(file =>
         {
@@ -152,6 +165,7 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
                 .InsertAbove("this.EnforceMultiTenant();");
         });
 
+
         var entityTypeConfigTemplates = application.FindTemplateInstances<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate("Infrastructure.Data.EntityTypeConfiguration"));
         foreach (var entityTypeTemplate in entityTypeConfigTemplates)
         {
@@ -172,6 +186,19 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
                 }
             });
         }
+        if (entityTypeConfigTemplates.Any())//We are dealing with EF
+        {
+            var problem = metadataManager.Domain(application).GetClassModels()
+                .Where(x => x.InternalElement.Package.AsDomainPackageModel()?.HasStereotype("Relational Database") == true &&
+                    !x.InternalElement.AsClassModel().IsAggregateRoot() &&
+                    x.HasMultiTenant() &&
+                    !x.HasStereotype("Table") // has Table stereotype
+                    ).FirstOrDefault();
+            if (problem != null)
+            {
+                throw new ElementException(problem.InternalElement, "Composite/Owned entities cannot be have the  `Multi Tenant` stereotype. Either remove the stereotype or apply the `Table` stereotype it.");
+            }
+        }
     }
 
     private static void GetSeparateDatabaseDataIsolationConfiguration(bool hasMultipleConnectionStrings, IApplication application, string connectionStringNameInternal)
@@ -181,14 +208,14 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
             return;
         }
 
-        var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Infrastructure.DependencyInjection);
+        var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateRoles.Infrastructure.DependencyInjection);
         if (template == null)
         {
             return;
         }
 
-        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenant);
-        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenantEntityFrameworkCore);
+        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenant(template.OutputTarget));
+        template.AddNugetDependency(NugetPackages.FinbuckleMultiTenantEntityFrameworkCore(template.OutputTarget));
 
         template.CSharpFile.AfterBuild(file =>
         {
@@ -210,7 +237,7 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
         });
     }
 
-    private static bool TryGetMongoDbConfiguration(IApplication application, out string connectionStringName, out ApplyConfiguration applyConfiguration)
+    private static bool TryGetMongoDbConfiguration(IApplication application, IMetadataManager metadataManager, out string connectionStringName, out ApplyConfiguration applyConfiguration)
     {
         var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>("Infrastructure.Configuration.MongoDb.MultiTenancy");
         if (template == null)
@@ -314,7 +341,7 @@ public class AspNetCoreIntegrationExtension : FactoryExtensionBase
                 var method = file.Classes.First().FindMethod("SetupInMemoryStore");
                 if (method != null)
                 {
-                    method.Parameters[0] = new($"InMemoryStoreOptions<{extendedInfoTypeName}>", "options");
+                    method.Parameters[0] = new($"InMemoryStoreOptions<{extendedInfoTypeName}>", "options", file);
                 }
             }
 

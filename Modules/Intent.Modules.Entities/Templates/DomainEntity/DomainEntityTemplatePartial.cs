@@ -1,29 +1,25 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Domain.Api;
 using Intent.Modules.Common;
-using Intent.Modules.Common.CSharp;
 using Intent.Modules.Common.CSharp.Builder;
+using Intent.Modules.Common.CSharp.Mapping;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.CSharp.TypeResolvers;
 using Intent.Modules.Common.Templates;
-using Intent.Modules.Common.TypeResolution;
 using Intent.Modules.Constants;
 using Intent.Modules.Entities.Settings;
-using Intent.Modules.Entities.Templates.DomainEntityInterface;
-using Intent.Modules.Entities.Templates.DomainEntityState;
 using Intent.Modules.Entities.Templates.DomainEnum;
 using Intent.Modules.Modelers.Domain.Settings;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
-using Intent.Modules.Common.Types.Api;
-using System;
 using Intent.Utils;
 
-[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial", Version = "1.0")]
 [assembly: DefaultIntentManaged(Mode.Merge)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial", Version = "1.0")]
 
 namespace Intent.Modules.Entities.Templates.DomainEntity
 {
@@ -38,23 +34,32 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
         {
             if (!ExecutionContext.Settings.GetDomainSettings().SeparateStateFromBehaviour())
             {
-                FulfillsRole(TemplateFulfillingRoles.Domain.Entity.Primary);
+                FulfillsRole(TemplateRoles.Domain.Entity.Primary);
                 if (!ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces())
                 {
-                    FulfillsRole(TemplateFulfillingRoles.Domain.Entity.Interface);
+                    FulfillsRole(TemplateRoles.Domain.Entity.Interface);
                 }
             }
+            else
+            {
+                FulfillsRole(TemplateRoles.Domain.Entity.Behaviour);
+            }
 
-            AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Interface);
-            AddTypeSource(TemplateFulfillingRoles.Domain.DomainServices.Interface);
-            AddTypeSource(TemplateFulfillingRoles.Domain.DataContract);
+            if (Model.Operations.Any(x => x.IsAsync()))
+            {
+                AddUsing("System.Threading.Tasks");
+            }
+
+            AddTypeSource(TemplateRoles.Domain.ValueObject);
+            AddTypeSource(TemplateRoles.Domain.Entity.Interface);
+            AddTypeSource(TemplateRoles.Domain.DomainServices.Interface);
+            AddTypeSource(TemplateRoles.Domain.DataContract);
             AddTypeSource(DomainEnumTemplate.TemplateId);
 
-            CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
-                .AddAssemblyAttribute(CSharpIntentTagModeAttribute.Implicit())
-                .AddClass(Model.Name, (Action<CSharpClass>)(@class =>
+            CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath(), this)
+                .AddClass(Model.Name, @class =>
                 {
+                    @class.RepresentsModel(Model);
                     foreach (var genericType in Model.GenericTypes)
                     {
                         @class.AddGenericParameter(genericType);
@@ -100,7 +105,7 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
 
                     @class.AddAttribute(CSharpIntentManagedAttribute.Merge().WithSignatureFully())
                         .AddAttribute("DefaultIntentManaged(Mode.Fully, Targets = Targets.Properties)")
-                        .AddAttribute("DefaultIntentManaged(Mode.Fully, Targets = Targets.Methods | Targets.Constructors, Body = Mode.Ignore, AccessModifiers = AccessModifiers.Public)");
+                        .AddAttribute("DefaultIntentManaged(Mode.Fully, Targets = Targets.Methods | Targets.Constructors, Body = Mode.Merge, AccessModifiers = AccessModifiers.Public)");
 
                     if (!ExecutionContext.Settings.GetDomainSettings().SeparateStateFromBehaviour())
                     {
@@ -112,34 +117,46 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
                         @class.AddConstructor(ctor =>
                         {
                             ctor.AddMetadata("model", ctorModel);
+                            ctor.RepresentsModel(ctorModel);
                             ctor.TryAddXmlDocComments(ctorModel.InternalElement);
+
                             foreach (var parameter in ctorModel.Parameters)
                             {
-                                ctor.AddParameter(GetOperationTypeName(parameter), parameter.Name.ToCamelCase(), parm => parm.WithDefaultValue(parameter.Value));
-                                if (!parameter.InternalElement.IsMapped)
+                                ctor.AddParameter(GetOperationTypeName(parameter), parameter.Name.ToCamelCase(), param =>
                                 {
-                                    continue;
-                                }
-
-                                var assignmentTarget = parameter.InternalElement.MappedElement.Element.Name.ToPascalCase();
-                                if (!parameter.TypeReference.IsCollection)
-                                {
-                                    ctor.AddStatement($"{assignmentTarget} = {parameter.Name.ToCamelCase()};");
-                                    continue;
-                                }
-
-                                if (ExecutionContext.Settings.GetDomainSettings().EnsurePrivatePropertySetters())
-                                {
-                                    assignmentTarget = assignmentTarget.ToPrivateMemberName();
-                                }
-
-                                var mappedTypeAsList = GetTypeName(
-                                        typeReference: parameter.InternalElement.MappedElement.Element.TypeReference,
-                                        collectionFormat: UseType("System.Collections.Generic.List<{0}>"))
-                                    .Replace("?", string.Empty);
-
-                                ctor.AddStatement($"{assignmentTarget} = new {mappedTypeAsList}({parameter.Name.ToCamelCase()});");
+                                    param.WithDefaultValue(parameter.Value).RepresentsModel(parameter);
+                                });
                             }
+                            if (ctorModel.InternalElement.Mappings.Any())
+                            {
+                                ctor.AddStatements(GetMappingImplementation(ctorModel.InternalElement.Mappings.Single(), ctor));
+                            }
+                            else
+                            {
+                                // LEGACY MAPPING:
+                                foreach (var parameter in ctorModel.Parameters.Where(x => x.InternalElement.IsMapped))
+                                {
+                                    var assignmentTarget = parameter.InternalElement.MappedElement.Element.Name.ToPascalCase();
+                                    if (!parameter.TypeReference.IsCollection)
+                                    {
+                                        ctor.AddStatement($"{assignmentTarget} = {parameter.Name.ToCamelCase()};");
+                                        continue;
+                                    }
+
+                                    if (ExecutionContext.Settings.GetDomainSettings().EnsurePrivatePropertySetters())
+                                    {
+                                        assignmentTarget = assignmentTarget.ToPrivateMemberName();
+                                    }
+
+                                    var mappedTypeAsList = GetTypeName(
+                                            typeReference: parameter.InternalElement.MappedElement.Element.TypeReference,
+                                            collectionFormat: UseType("System.Collections.Generic.List<{0}>"))
+                                        .Replace("?", string.Empty);
+
+                                    ctor.AddStatement($"{assignmentTarget} = new {mappedTypeAsList}({parameter.Name.ToCamelCase()});");
+                                }
+                            }
+
 
                             if (ctor.Statements.Any())
                             {
@@ -153,10 +170,10 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
                     }
                     if (!Model.IsAbstract && Model.ParentClass != null)
                     {
-                        GetTemplate<ICSharpFileBuilderTemplate>(TemplateId, Model.ParentClass.Id).CSharpFile.OnBuild(file => 
+                        GetTemplate<ICSharpFileBuilderTemplate>(TemplateId, Model.ParentClass.Id).CSharpFile.OnBuild(file =>
                         {
                             var baseType = file.Classes.First();
-                            var abstractMethods = baseType.Methods.Where(m => m.IsAbstract);
+                            var abstractMethods = baseType.Methods.Where(m => m.IsAbstract).ToArray();
                             if (abstractMethods.Any())
                             {
                                 foreach (var abstractMethod in abstractMethods)
@@ -167,32 +184,33 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
                             }
                         }, 100);
                     }
-                }))
+                })
                 .AfterBuild(file =>
                 {
                     foreach (var method in file.Classes.First().Methods)
                     {
                         if (method.IsAbstract)
                             continue;
+
                         if (!method.Statements.Any())
                         {
+                            method.AddAttribute(CSharpIntentManagedAttribute.IgnoreBody());
+                            method.AddStatement("// [IntentFully]");
+                            method.AddStatement($"// TODO: Implement {method.Name} ({file.Classes.First().Name}) functionality");
                             method.AddStatement(@$"throw new {UseType("System.NotImplementedException")}(""Replace with your implementation..."");");
-                        }
-                        else
-                        {
-                            method.AddAttribute(CSharpIntentManagedAttribute.Fully().WithBodyMerge());
                         }
                     }
                 });
-            if (Model.Operations.Any(x => x.IsAsync()))
+
+            if (ExecutionContext.Settings.GetDomainSettings().UseImplicitTagModeForEntities())
             {
-                AddUsing("System.Threading.Tasks");
+                CSharpFile.IntentTagModeImplicit();
             }
         }
 
         private void AddOperation(CSharpClass @class, OperationModel operation, bool isOverride)
         {
-            @class.AddMethod(GetOperationReturnType(operation), operation.Name, method =>
+            @class.AddMethod(GetOperationReturnType(operation), operation, method =>
             {
                 method.AddMetadata("model", operation);
                 method.TryAddXmlDocComments(operation.InternalElement);
@@ -202,53 +220,64 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
                     method.Override();
                 }
                 else if (operation.IsAbstract)
-                {                    
+                {
                     method.Abstract();
                     if (!@class.IsAbstract) { @class.Abstract(); }
                 }
-
-                var hasImplementation = false;
+                else if (operation.IsStatic)
+                {
+                    method.Static();
+                }
 
                 foreach (var parameter in operation.Parameters)
                 {
-                    var parameterName = parameter.Name.ToCamelCase();
-                    method.AddParameter(GetOperationTypeName(parameter), parameterName,
-                        parm => parm.WithDefaultValue(parameter.Value));
-                    if (!parameter.InternalElement.IsMapped)
-                    {
-                        continue;
-                    }
+                    method.AddParameter(GetOperationTypeName(parameter), parameter,
+                        param => param.WithDefaultValue(parameter.Value));
+                }
 
+                if (operation.InternalElement.Mappings.Any())
+                {
                     if (method.IsAbstract)
                     {
                         Logging.Log.Warning($"Operation {operation.Name} - On {@class.Name} marked as abstract, ignoring mapping implementation.");
-                        continue;
                     }
-
-                    var assignmentTarget = parameter.InternalElement.MappedElement.Element.Name.ToPascalCase();
-                    if (!parameter.TypeReference.IsCollection)
+                    method.AddStatements(GetMappingImplementation(operation.InternalElement.Mappings.Single(), method));
+                }
+                else
+                {
+                    // LEGACY MAPPING:
+                    foreach (var parameter in operation.Parameters.Where(x => x.InternalElement.IsMapped))
                     {
-                        method.AddStatement($"{assignmentTarget} = {parameterName};");
-                        hasImplementation = true;
-                        continue;
-                    }
+                        var parameterName = parameter.Name.ToParameterName();
 
-                    if (ExecutionContext.Settings.GetDomainSettings().EnsurePrivatePropertySetters())
-                    {
-                        assignmentTarget = assignmentTarget.ToPrivateMemberName();
+                        if (method.IsAbstract)
+                        {
+                            Logging.Log.Warning($"Operation {operation.Name} - On {@class.Name} marked as abstract, ignoring mapping implementation.");
+                            continue;
+                        }
+
+                        var assignmentTarget = parameter.InternalElement.MappedElement.Element.Name.ToPascalCase();
+                        if (!parameter.TypeReference.IsCollection)
+                        {
+                            method.AddStatement($"{assignmentTarget} = {method.GetReferenceForModel(parameter).Name};");
+                            continue;
+                        }
+
+                        if (ExecutionContext.Settings.GetDomainSettings().EnsurePrivatePropertySetters())
+                        {
+                            assignmentTarget = assignmentTarget.ToPrivateMemberName();
+                            method.AddStatement($"{assignmentTarget}.Clear();");
+                            method.AddStatement($"{assignmentTarget}.AddRange({parameterName});");
+                            continue;
+                        }
+
                         method.AddStatement($"{assignmentTarget}.Clear();");
-                        method.AddStatement($"{assignmentTarget}.AddRange({parameterName});");
-                        hasImplementation = true;
-                        continue;
+
+                        method.AddStatementBlock($"foreach (var item in {parameterName})", sb => sb
+                            .AddStatement($"{assignmentTarget}.Add(item);")
+                            .SeparatedFromPrevious());
+
                     }
-
-                    method.AddStatement($"{assignmentTarget}.Clear();");
-
-                    method.AddStatementBlock($"foreach (var item in {parameterName})", sb => sb
-                        .AddStatement($"{assignmentTarget}.Add(item);")
-                        .SeparatedFromPrevious());
-
-                    hasImplementation = true;
                 }
 
                 if (operation.IsAsync())
@@ -260,29 +289,42 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
 
             if (ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces() &&
                 !ExecutionContext.Settings.GetDomainSettings().SeparateStateFromBehaviour() &&
-                (!InterfaceTemplate.GetOperationTypeName(operation).Equals(this.GetOperationTypeName(operation)) ||
-                 !operation.Parameters.Select(InterfaceTemplate.GetOperationTypeName).SequenceEqual(operation.Parameters.Select(this.GetOperationTypeName))))
+                (!InterfaceTemplate.GetOperationTypeName(operation).Equals(GetOperationTypeName(operation)) ||
+                 !operation.Parameters.Select(InterfaceTemplate.GetOperationTypeName).SequenceEqual(operation.Parameters.Select(GetOperationTypeName))))
             {
                 AddInterfaceQualifiedMethod(@class, operation);
             }
         }
 
-        private static bool NeedsNullabilityAssignment(IResolvedTypeInfo typeInfo)
+        private IEnumerable<CSharpStatement> GetMappingImplementation(IElementToElementMapping mapping, ICSharpCodeContext codeContext)
         {
-            return !(typeInfo.IsPrimitive
-                || typeInfo.IsNullable
-                || typeInfo.IsCollection
-                || (typeInfo.TypeReference != null && typeInfo.TypeReference.Element.IsEnumModel())
-                || (typeInfo.TypeReference != null && typeInfo.TypeReference.Element.SpecializationType == "Generic Type"));
+            var mappingManager = new CSharpClassMappingManager(this);
+            mappingManager.SetFromReplacement(mapping.SourceElement, null);
+            mappingManager.SetToReplacement(mapping.TargetElement, null);
+            var generalization = mapping.TargetElement.AsClassModel()?.Generalizations().SingleOrDefault();
+            if (generalization != null)
+            {
+                mappingManager.SetFromReplacement(generalization, null);
+                mappingManager.SetToReplacement(generalization, null);
+            }
+            mappingManager.AddMappingResolver(new CollectionPropertyResolver(this));
+
+            return mappingManager.GenerateUpdateStatements(mapping, codeContext)
+                .Select(s =>
+                {
+                    if (s is CSharpAssignmentStatement assignment)
+                    {
+                        assignment.WithSemicolon();
+                    }
+                    return s;
+                })
+                .ToList();
         }
 
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         protected override CSharpFileConfig DefineFileConfig()
         {
-            return new CSharpFileConfig(
-                className: $"{Model.Name}",
-                @namespace: $"{this.GetNamespace()}",
-                relativeLocation: $"{this.GetFolderPath()}");
+            return CSharpFile.GetConfig();
         }
 
         [IntentManaged(Mode.Ignore, Body = Mode.Ignore)]
@@ -305,42 +347,86 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
             return o.IsAsync() ? $"async Task<{GetTypeName(o.ReturnType)}>" : GetTypeName(o.ReturnType);
         }
 
-        public string GetOperationReturnType(OperationModel o)
+        public override RoslynMergeConfig ConfigureRoslynMerger()
         {
-            if (o.TypeReference.Element == null)
+            return new RoslynMergeConfig(
+                new TemplateMetadata(Id, "2.0"),
+                new V00ToV02Migration(),
+                new V01ToV02Migration());
+        }
+
+        private class V00ToV02Migration : ITemplateMigration
+        {
+            public string Execute(string currentText)
             {
-                return o.IsAsync() ? "Task" : "void";
-            }
-            return o.IsAsync() ? $"Task<{GetTypeName(o.TypeReference, "IEnumerable<{0}>")}>" : GetTypeName(o.TypeReference, "IEnumerable<{0}>");
-        }
-
-        private string GetOperationTypeName(IHasTypeReference hasTypeReference)
-        {
-            return GetOperationTypeName(hasTypeReference.TypeReference);
-        }
-
-        private string GetOperationTypeName(ITypeReference type)
-        {
-            return GetTypeName(type, "IEnumerable<{0}>"); // fall back on normal type resolution.
-        }
-
-        private DomainEntityInterfaceTemplate _interfaceTemplate;
-        private DomainEntityInterfaceTemplate InterfaceTemplate => _interfaceTemplate ?? GetTemplate<DomainEntityInterfaceTemplate>(DomainEntityInterfaceTemplate.TemplateId, Model);
-
-
-        private string CastArgumentIfNecessary(ITypeReference typeReference, string argument)
-        {
-            var interfaceType = InterfaceTemplate.GetTypeInfo(typeReference);
-            if (!interfaceType.Equals(GetTypeInfo(typeReference)))
-            {
-                if (interfaceType.IsCollection)
-                {
-                    return $"{argument}.{UseType("System.Linq.Cast")}<{GetTypeName((IElement)typeReference.Element)}>().ToList()";
-                }
-                return $"({GetTypeName((IElement)typeReference.Element)}) {argument}";
+                return currentText
+                    .ReplaceLineEndings()
+                    .Replace($"[assembly: IntentTagModeImplicit]{Environment.NewLine}", string.Empty);
             }
 
-            return string.Empty;
+            public TemplateMigrationCriteria Criteria => TemplateMigrationCriteria.UnversionedUpgrade(2);
+        }
+
+        private class V01ToV02Migration : ITemplateMigration
+        {
+            public string Execute(string currentText)
+            {
+                return currentText
+                    .ReplaceLineEndings()
+                    .Replace($"[assembly: IntentTagModeImplicit]{Environment.NewLine}", string.Empty);
+            }
+
+            public TemplateMigrationCriteria Criteria => TemplateMigrationCriteria.Upgrade(1, 2);
+        }
+    }
+
+    internal class CollectionPropertyResolver : IMappingTypeResolver
+    {
+        private readonly ICSharpFileBuilderTemplate _template;
+
+        public CollectionPropertyResolver(ICSharpFileBuilderTemplate template)
+        {
+            _template = template;
+        }
+
+        public ICSharpMapping ResolveMappings(MappingModel mappingModel)
+        {
+            if (mappingModel.Model.IsAssociationEndModel() && mappingModel.Model.TypeReference.IsCollection)
+            {
+                return new CollectionPropertyMapper(mappingModel, _template);
+            }
+            return null;
+        }
+    }
+
+    internal class CollectionPropertyMapper : CSharpMappingBase
+    {
+        public CollectionPropertyMapper(MappingModel mappingModel, ICSharpFileBuilderTemplate template) : base(mappingModel, template) { }
+
+        public override IEnumerable<CSharpStatement> GetMappingStatements()
+        {
+
+            if (Template.ExecutionContext.Settings.GetDomainSettings().EnsurePrivatePropertySetters())
+            {
+                yield return new CSharpInvocationStatement(GetTargetStatement(), "Clear");
+                yield return new CSharpInvocationStatement(GetTargetStatement(), "AddRange").AddArgument(GetSourceStatement());
+                yield break;
+            }
+
+            yield return new CSharpInvocationStatement(GetTargetStatement(), "Clear");
+            yield return new CSharpForEachStatement("item", GetSourceStatement().ToString())
+                .AddStatement(new CSharpInvocationStatement(GetTargetStatement(), "Add").AddArgument("item"))
+                .SeparatedFromPrevious();
+        }
+
+        public override CSharpStatement GetTargetStatement()
+        {
+            if (Template.ExecutionContext.Settings.GetDomainSettings().EnsurePrivatePropertySetters())
+            {
+                return GetTargetPathText().ToPrivateMemberName();
+            }
+
+            return base.GetTargetStatement();
         }
     }
 }

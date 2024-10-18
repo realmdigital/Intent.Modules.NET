@@ -10,15 +10,36 @@ For more information on MassTransit, check out their [official docs](https://mas
 
 ## What's in this module?
 
-This module consumes your `Eventing Model`, which you build in the `Eventing Designer` and generates the corresponding MassTransit implementation:
-
-* MassTransit Message Broker implimentation.
+* Modeling Integration Events and Commands.
+* MassTransit Message Broker Implementation.
 * Message Publishing.
 * Message Consumption.
-* Multitenancy Finbuckle integration.
+* Multi-tenancy Finbuckle integration.
 * `app.settings` configuration.
 * Dependency Injection wiring.
 * Telemetry support.
+
+## Modeling Integration Events and Commands
+
+From version `6.0.0` of this Module, modeling Integration Events can be achieved from within the Services designer.
+
+This module automatically installs the `Intent.Modelers.Eventing` module which provides designer modeling capabilities for integration events and commands. For details on modeling integration events and commands, refer to its [README](https://github.com/IntentArchitect/Intent.Modules/blob/development/Modules/Intent.Modules.Modelers.Eventing/README.md).
+
+> ⚠️ **IMPORTANT**
+>
+> MassTransit requires that both the Publisher and Subscriber have Messages with the exact same Names and Namespaces.
+
+### Integration Command Queues
+
+By default a Command will be sent to a Queue directly with a name that uses the Integration Command name as the convention. If you need to change this name (especially if you want different kinds of Commands to be sent to the same queue since order is important) there is a `Command Distribution` stereotype found on the association line.
+
+When updating this on the Sending side: left-click on the line between the element and the Integration Command and you will see this in your properties panel:
+
+![Queue Name on Sending Command](docs/images/send-integration-command-queue-name.png)
+
+When updating this on the Subscription side: left-click on the handles method located on the Integration Event Handler that is set to subscribe to the Integration Command. You will see this in the properties panel:
+
+![Queue Name on Subscribing to Command](docs/images/subscribe-integration-command-queue-name.png)
 
 ## Modules Settings
 
@@ -32,6 +53,7 @@ Configure what your underlying message broker is, the supported options are:
 * Amazon SQS
 
 > ⚠️ **NOTE**
+>
 > The in-memory transport is a great tool for testing, as it doesn't require a message broker to be installed or running. It's also very fast. But it isn't durable, and messages are gone if the bus is stopped or the process terminates. So, it's generally not a smart option for a production system
 
 ### Outbox Pattern Setting
@@ -43,6 +65,7 @@ Configure your Outbox pattern implementation, the supported options are:
 * [Entity Framework](https://masstransit.io/documentation/patterns/transactional-outbox)
 
 > ⚠️ **NOTE**
+>
 > Using an Outbox pattern for Consumers will also introduce idempotency to ensure that the same messages doesn't get processed more than once.
 
 ### Retry Policy Setting
@@ -57,17 +80,9 @@ Configure the messaging retry strategy. Once the retry strategy is exhausted, th
 
 For more information on these options check out the MassTransit [documentation](https://masstransit.io/documentation/concepts/exceptions#retry).
 
-## Designer Support - Eventing Designer
+## MassTransit Message Broker Implementation
 
-The eventing desinger can be used to describe messaging from an Applications perspective. This really boils down to the following:
-
-* The message contracts, i.e. the message content.
-* Which messages the application publishes.
-* Which messages the application subscribes to.
-
-## MassTransit ESB Implimentation
-
-Provider a MassTranist specific implementation of the `IEventBus` interface.
+Provider a MassTransit specific implementation of the `IEventBus` interface.
 
 ## Message Publishing
 
@@ -75,9 +90,9 @@ Message publishing can be done through the `IEventBus` interface using the `Publ
 
 ## Message Consumption
 
-For every message subscribed to in the `Eventing Designer`, this module will register up an Infrasrtuctual handler (`WrapperConsumer`)  which will deal with all the technical concerns around how the message is processed and delegate the business logic processing to an Application layer inegration message handler, which implements `IIntegrationEventHandler`.
+For every message subscribed to in the `Eventing Designer`, this module will register up an Infrastructural handler (`WrapperConsumer`)  which will deal with all the technical concerns around how the message is processed and delegate the business logic processing to an Application layer integration message handler, which implements `IIntegrationEventHandler`.
 
-An example of the technical message handler registeration:
+An example of the technical message handler registration:
 
 ```csharp
 
@@ -114,17 +129,17 @@ The is what the Business logic Integration Event handler looks like:
 
 ```
 
-## Multitenancy Finbuckle Integration
+## Multi-tenancy Finbuckle Integration
 
-If you have the `Intent.Modules.AspNetCore.MultiTenancy` module install, this module will add Multitenancy support to your MassTransit implementation. All outbound messages published will automatically include a tenant identifier in the header and all message consumers which encounter messages with a tenant identifier will set up the Finbuckle tenancy for the processing of the message.
+If you have the `Intent.Modules.AspNetCore.MultiTenancy` module install, this module will add Multi-tenancy support to your MassTransit implementation. All outbound messages published will automatically include a tenant identifier in the header and all message consumers which encounter messages with a tenant identifier will set up the Finbuckle tenancy for the processing of the message.
 
 Notable details of the implementation:
 
-* Tenancy Publishing Filter, this filter add's the current Tenant Identity to outbound messages.
+* Tenancy Publishing Filter, this filter adds the current Tenant Identity to outbound messages.
 * Tenancy Consuming Filter, reads the Tenant Identity in inbound messages and configures Finbuckle accordingly.
 * Finbuckle Message Header Tenancy Strategy, Finbuckle integration with setting up Tenancy through Message headers.
 
-You can configure the name of the header in your `appsettings.json`, by default the header will be "Tenant-Identifier". If you re-configure these make sure the configuration is done across publishers and consuimers.
+You can configure the name of the header in your `appsettings.json`, by default the header will be "Tenant-Identifier". If you re-configure these make sure the configuration is done across publishers and consumers.
 
 ```json
 {
@@ -159,7 +174,7 @@ You `app.settings.json` will have 2 sections populated, one for MassTransit itse
 
 ### Dependency Injection wiring
 
-Registers up the MassTransit dependency injection in the Infrastructual layer.
+Registers up the MassTransit dependency injection in the Infrastructure layer.
 
 ```csharp
     public static class DependencyInjection
@@ -173,7 +188,7 @@ Registers up the MassTransit dependency injection in the Infrastructual layer.
     }
 ```
 
-Adds a MassTransit Configuration file, which look similar to this depnding on your configuration.
+Adds a MassTransit Configuration file, which look similar to this depending on your configuration.
 
 ```csharp
     public static class MassTransitConfiguration
@@ -214,7 +229,7 @@ If you have the `Intent.OpenTelemetry` module installed, this module will regist
 
 ### Intent.Eventing.MassTransit.EntityFrameworkCore
 
-This modules provides patterns around using Entity Framework Core as the technology provider for the OutBox pattern.
+This module provides patterns around using Entity Framework Core as the technology provider for the OutBox pattern.
 
 ### Intent.Eventing.MassTransit.Scheduling
 
@@ -228,4 +243,4 @@ If you are running docker you can get RabbitMQ upo and running using a command l
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
 ```
 
-You should be able to access the admin console through `http://localhost:15672/`.  
+You should be able to access the admin console through `http://localhost:15672/`.

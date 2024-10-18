@@ -49,7 +49,6 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure
             });
             services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ApplicationDbContext>());
             services.AddTransient<IExplicitKeyClassRepository, ExplicitKeyClassRepository>();
-            services.AddTransient<IImplicitKeyClassRepository, ImplicitKeyClassRepository>();
             services.AddTransient<INormalEntityRepository, NormalEntityRepository>();
             services.AddTransient<ISelfContainedEntityRepository, SelfContainedEntityRepository>();
             services.AddTransient<IA_RequiredCompositeRepository, A_RequiredCompositeRepository>();
@@ -73,6 +72,8 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Infrastructure
             services.AddTransient<IP_SourceNameDiffRepository, P_SourceNameDiffRepository>();
             services.AddTransient<IQ_DestNameDiffRepository, Q_DestNameDiffRepository>();
             services.AddTransient<IR_SourceNameDiffRepository, R_SourceNameDiffRepository>();
+            services.AddTransient<IS_NoPkInCompositeRepository, S_NoPkInCompositeRepository>();
+            services.AddTransient<IT_NoPkInCompositeRepository, T_NoPkInCompositeRepository>();
             services.AddTransient<IAudit_DerivedClassRepository, Audit_DerivedClassRepository>();
             services.AddTransient<IAudit_SoloClassRepository, Audit_SoloClassRepository>();
             services.AddTransient<IFolderEntityRepository, FolderEntityRepository>();

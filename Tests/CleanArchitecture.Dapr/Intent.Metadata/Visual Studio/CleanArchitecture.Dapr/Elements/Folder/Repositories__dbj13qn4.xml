@@ -4,7 +4,6 @@
   <display>Repositories</display>
   <isAbstract>false</isAbstract>
   <sort-children>by-type-then-by-name</sort-children>
-  <order>4</order>
   <genericTypes />
   <isMapped>false</isMapped>
   <parentFolderId>4450620a-a704-4a68-9c0c-a8f804162b82</parentFolderId>
@@ -70,9 +69,9 @@
       </metadata>
       <childElements />
     </childElement>
-    <childElement id="803c38b2-9217-4b69-ac35-2ffe6b931846" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
-      <name>Intent.Entities.Repositories.Api.PagedResultInterface</name>
-      <display>Intent.Entities.Repositories.Api.PagedResultInterface</display>
+    <childElement id="13f7bca2-d533-4eda-a6e1-82ab8414f01f" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Entities.Repositories.Api.PagedListInterface</name>
+      <display>Intent.Entities.Repositories.Api.PagedListInterface</display>
       <externalReference>Intent.Entities.Repositories.Api</externalReference>
       <isAbstract>false</isAbstract>
       <genericTypes />

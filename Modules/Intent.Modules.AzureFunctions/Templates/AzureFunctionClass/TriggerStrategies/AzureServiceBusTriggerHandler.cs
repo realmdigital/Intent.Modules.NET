@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.AzureFunctions.Api;
-using Intent.Modelers.Services.Api;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.VisualStudio;
@@ -55,7 +54,7 @@ internal class AzureServiceBusTriggerHandler : IFunctionTriggerHandler
 
     public IEnumerable<INugetPackageInfo> GetNugetDependencies()
     {
-        yield return NuGetPackages.MicrosoftAzureServiceBus;
-        yield return NuGetPackages.MicrosoftAzureWebJobsExtensionsServiceBus;
+        yield return NugetPackages.MicrosoftAzureServiceBus(_template.OutputTarget);
+        yield return NugetPackages.MicrosoftAzureWebJobsExtensionsServiceBus(_template.OutputTarget);
     }
 }

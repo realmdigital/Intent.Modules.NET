@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using Intent.Engine;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
+using Intent.Modules.Constants;
 using Intent.Modules.Entities.Repositories.Api.Templates;
+using Intent.Modules.Modelers.Domain.Settings;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
@@ -14,7 +17,7 @@ using Intent.Templates;
 namespace Intent.Modules.MongoDb.Repositories.Templates.MongoRepositoryInterface
 {
     [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-    partial class MongoRepositoryInterfaceTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
+    public partial class MongoRepositoryInterfaceTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
     {
         public const string TemplateId = "Intent.MongoDb.Repositories.MongoRepositoryInterface";
 
@@ -30,10 +33,19 @@ namespace Intent.Modules.MongoDb.Repositories.Templates.MongoRepositoryInterface
                 .AddUsing("System.Threading.Tasks")
                 .AddInterface($"IMongoRepository", @interface =>
                 {
+                    var createEntityInterfaces = ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces();
+
+                    var pagedListInterface = TryGetTypeName(TemplateRoles.Repository.Interface.PagedList, out var name)
+                        ? name : GetTypeName(TemplateRoles.Repository.Interface.PagedResult); // for backward compatibility
                     @interface
-                        .AddGenericParameter("TDomain", out var tDomain)
-                        .AddGenericParameter("TPersistence", out var tPersistence)
-                        .ExtendsInterface($"{this.GetRepositoryInterfaceName()}<{tDomain}>")
+                        .AddGenericParameter("TDomain", out var tDomain);
+                    CSharpInterfaceGenericParameter tPersistence = tDomain;
+                    if (createEntityInterfaces)
+                    {
+                        @interface
+                            .AddGenericParameter("TPersistence", out tPersistence);
+                    }
+                    @interface.ExtendsInterface($"{this.GetRepositoryInterfaceName()}<{tDomain}>")
                         .AddMethod($"Task<{tDomain}?>", "FindAsync", method => method
                             .AddParameter($"Expression<Func<{tPersistence}, bool>>", "filterExpression")
                             .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
@@ -55,18 +67,18 @@ namespace Intent.Modules.MongoDb.Repositories.Templates.MongoRepositoryInterface
                             .AddParameter($"Func<IQueryable<{tPersistence}>, IQueryable<{tPersistence}>>", "linq")
                             .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
                         )
-                        .AddMethod($"Task<IPagedResult<{tDomain}>>", "FindAllAsync", method => method
+                        .AddMethod($"Task<{pagedListInterface}<{tDomain}>>", "FindAllAsync", method => method
                             .AddParameter("int", "pageNo")
                             .AddParameter("int", "pageSize")
                             .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
                         )
-                        .AddMethod($"Task<IPagedResult<{tDomain}>>", "FindAllAsync", method => method
+                        .AddMethod($"Task<{pagedListInterface}<{tDomain}>>", "FindAllAsync", method => method
                             .AddParameter($"Expression<Func<{tPersistence}, bool>>", "filterExpression")
                             .AddParameter("int", "pageNo")
                             .AddParameter("int", "pageSize")
                             .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
                         )
-                        .AddMethod($"Task<IPagedResult<{tDomain}>>", "FindAllAsync", method => method
+                        .AddMethod($"Task<{pagedListInterface}<{tDomain}>>", "FindAllAsync", method => method
                             .AddParameter($"Expression<Func<{tPersistence}, bool>>", "filterExpression")
                             .AddParameter("int", "pageNo")
                             .AddParameter("int", "pageSize")
@@ -79,6 +91,28 @@ namespace Intent.Modules.MongoDb.Repositories.Templates.MongoRepositoryInterface
                         )
                         .AddMethod("Task<bool>", "AnyAsync", method => method
                             .AddParameter($"Expression<Func<{tPersistence}, bool>>", "filterExpression")
+                            .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
+                        )
+                        .AddMethod($"Task<{tDomain}?>", "FindAsync", method => method
+                            .AddParameter($"Func<IQueryable<{tPersistence}>, IQueryable<{tPersistence}>>", "queryOptions")
+                            .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
+                        )
+                        .AddMethod($"Task<List<{tDomain}>>", "FindAllAsync", method => method
+                            .AddParameter($"Func<IQueryable<{tPersistence}>, IQueryable<{tPersistence}>>", "queryOptions")
+                            .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
+                        )
+                        .AddMethod($"Task<{pagedListInterface}<{tDomain}>>", "FindAllAsync", method => method
+                            .AddParameter("int", "pageNo")
+                            .AddParameter("int", "pageSize")
+                            .AddParameter($"Func<IQueryable<{tPersistence}>, IQueryable<{tPersistence}>>", "queryOptions")
+                            .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
+                        )
+                        .AddMethod("Task<int>", "CountAsync", method => method
+                            .AddParameter($"Func<IQueryable<{tPersistence}>, IQueryable<{tPersistence}>>?", "queryOptions", param => param.WithDefaultValue("default"))
+                            .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
+                        )
+                        .AddMethod("Task<bool>", "AnyAsync", method => method
+                            .AddParameter($"Func<IQueryable<{tPersistence}>, IQueryable<{tPersistence}>>?", "queryOptions", param => param.WithDefaultValue("default"))
                             .AddParameter("CancellationToken", "cancellationToken", x => x.WithDefaultValue("default"))
                         )
                         .AddProperty(this.GetUnitOfWorkInterfaceName(), "UnitOfWork", prop => prop

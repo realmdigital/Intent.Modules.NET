@@ -1,4 +1,3 @@
-using System;
 using FluentValidation;
 using Intent.RoslynWeaver.Attributes;
 
@@ -7,6 +6,7 @@ using Intent.RoslynWeaver.Attributes;
 
 namespace Entities.PrivateSetters.TestApplication.Application.OneToManySources.CreateOneToManySource
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class CreateOneToManySourceCommandValidator : AbstractValidator<CreateOneToManySourceCommand>
     {
         [IntentManaged(Mode.Fully, Body = Mode.Merge, Signature = Mode.Merge)]

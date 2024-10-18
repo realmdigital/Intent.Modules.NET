@@ -4,6 +4,8 @@ using System.Linq;
 using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Eventing.Api;
+using Intent.Modelers.Services.Api;
+using Intent.Modelers.Services.EventInteractions;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Registrations;
 using Intent.Modules.Modelers.Eventing;
@@ -27,6 +29,7 @@ namespace Intent.Modules.Eventing.Contracts.Templates.IntegrationEventMessage
 
         public override string TemplateId => IntegrationEventMessageTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, MessageModel model)
         {
             return new IntegrationEventMessageTemplate(outputTarget, model);
@@ -35,7 +38,12 @@ namespace Intent.Modules.Eventing.Contracts.Templates.IntegrationEventMessage
         [IntentManaged(Mode.Merge, Body = Mode.Ignore, Signature = Mode.Fully)]
         public override IEnumerable<MessageModel> GetModels(IApplication application)
         {
-            return _metadataManager.GetSubscribedToMessageModels(application).Union(_metadataManager.GetPublishedMessageModels(application));
+            var result = Enumerable.Empty<MessageModel>()
+                .Union(_metadataManager.GetSubscribedToMessageModels(application))
+                .Union(_metadataManager.GetPublishedMessageModels(application))
+                .Union(_metadataManager.GetAssociatedMessageModels(application));
+
+            return result;
         }
     }
 }

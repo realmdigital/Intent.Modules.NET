@@ -6,7 +6,7 @@
   <sort-children>by-type-then-by-name</sort-children>
   <genericTypes />
   <isMapped>false</isMapped>
-  <parentFolderId>2660d263-1e60-4aaf-ae9b-6d9c2d60cacc</parentFolderId>
+  <parentFolderId>931f0fb9-48da-478e-a955-fcfcbe6afc93</parentFolderId>
   <packageId>07842d4d-0659-4f4f-8e98-4c3ed802d4b0</packageId>
   <packageName>Standard.AspNetCore.TestApplication</packageName>
   <stereotypes>
@@ -47,6 +47,48 @@
       <parentFolderId>69880d7a-1db3-4fb8-b222-92442bb62907</parentFolderId>
       <packageId>07842d4d-0659-4f4f-8e98-4c3ed802d4b0</packageId>
       <packageName>Standard.AspNetCore.TestApplication</packageName>
+      <stereotypes />
+      <metadata>
+        <entry key="status" value="assigned" />
+      </metadata>
+      <childElements />
+    </childElement>
+    <childElement id="ecb41f57-c2a3-4a94-86ee-ef97241d81be" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Integration.HttpClients.HttpClientHeaderHandlerTemplate</name>
+      <display>Intent.Integration.HttpClients.HttpClientHeaderHandlerTemplate</display>
+      <externalReference>Intent.Integration.HttpClients</externalReference>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>69880d7a-1db3-4fb8-b222-92442bb62907</parentFolderId>
+      <stereotypes />
+      <metadata>
+        <entry key="status" value="assigned" />
+      </metadata>
+      <childElements />
+    </childElement>
+    <childElement id="32870fbb-b7b2-4d1c-b2c0-fb5607f325b0" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Integration.HttpClients.AuthorizationHeaderProviderInterface</name>
+      <display>Intent.Integration.HttpClients.AuthorizationHeaderProviderInterface</display>
+      <externalReference>Intent.Integration.HttpClients</externalReference>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>69880d7a-1db3-4fb8-b222-92442bb62907</parentFolderId>
+      <stereotypes />
+      <metadata>
+        <entry key="status" value="assigned" />
+      </metadata>
+      <childElements />
+    </childElement>
+    <childElement id="7c810515-ccaa-411b-a843-7de492c0c239" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Integration.HttpClients.HttpClientAuthorizationHeaderHandler</name>
+      <display>Intent.Integration.HttpClients.HttpClientAuthorizationHeaderHandler</display>
+      <externalReference>Intent.Integration.HttpClients</externalReference>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>69880d7a-1db3-4fb8-b222-92442bb62907</parentFolderId>
       <stereotypes />
       <metadata>
         <entry key="status" value="assigned" />

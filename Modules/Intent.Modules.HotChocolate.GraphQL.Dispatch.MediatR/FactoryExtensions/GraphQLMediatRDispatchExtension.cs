@@ -6,6 +6,7 @@ using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Services.Api;
 using Intent.Modelers.Services.CQRS.Api;
+using Intent.Modelers.Services.GraphQL.Api;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
@@ -15,10 +16,9 @@ using Intent.Modules.Common.TypeResolution;
 using Intent.Modules.Constants;
 using Intent.Modules.HotChocolate.GraphQL.FactoryExtensions;
 using Intent.Modules.HotChocolate.GraphQL.Models;
+using Intent.Modules.HotChocolate.GraphQL.Templates;
 using Intent.Modules.HotChocolate.GraphQL.Templates.MutationType;
 using Intent.Modules.HotChocolate.GraphQL.Templates.QueryType;
-using Intent.Modelers.Services.GraphQL.Api;
-using Intent.Modules.HotChocolate.GraphQL.Templates;
 using Intent.Plugins.FactoryExtensions;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -43,9 +43,9 @@ namespace Intent.Modules.HotChocolate.GraphQL.Dispatch.MediatR.FactoryExtensions
             var mutationTypeTemplates = application.FindTemplateInstances<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate(MutationTypeTemplate.TemplateId));
             foreach (var template in queryTypeTemplates.Concat(mutationTypeTemplates))
             {
-                template.AddTypeSource(TemplateFulfillingRoles.Application.Query);
-                template.AddTypeSource(TemplateFulfillingRoles.Application.Command);
-                template.AddNugetDependency(NuGetPackages.HotChocolate);
+                template.AddTypeSource(TemplateRoles.Application.Query);
+                template.AddTypeSource(TemplateRoles.Application.Command);
+                template.AddNugetDependency(NugetPackages.HotChocolate(template.OutputTarget));
                 template.CSharpFile.OnBuild(file =>
                 {
                     var @class = file.Classes.First();
@@ -62,12 +62,12 @@ namespace Intent.Modules.HotChocolate.GraphQL.Dispatch.MediatR.FactoryExtensions
                 }, 200);
             }
 
-            var dtoTemplates = application.FindTemplateInstances<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate(TemplateFulfillingRoles.Application.Contracts.Dto));
+            var dtoTemplates = application.FindTemplateInstances<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate(TemplateRoles.Application.Contracts.Dto));
             foreach (var template in dtoTemplates)
             {
-                template.AddTypeSource(TemplateFulfillingRoles.Application.Query);
-                template.AddTypeSource(TemplateFulfillingRoles.Application.Command);
-                template.AddNugetDependency(NuGetPackages.HotChocolate);
+                template.AddTypeSource(TemplateRoles.Application.Query);
+                template.AddTypeSource(TemplateRoles.Application.Command);
+                template.AddNugetDependency(NugetPackages.HotChocolate(template.OutputTarget));
                 template.CSharpFile.OnBuild(file =>
                 {
                     var @class = file.Classes.First();

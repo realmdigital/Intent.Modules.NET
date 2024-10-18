@@ -21,7 +21,7 @@ namespace Intent.Modules.HotChocolate.GraphQL.AzureFunctions.Templates.GraphQLFu
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public GraphQLFunctionTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NuGetPackages.HotChocolateAzureFunctions);
+            AddNugetDependency(NugetPackages.HotChocolateAzureFunctions(OutputTarget));
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("System.Threading.Tasks")
                 .AddClass($"GraphQLFunction", @class =>
@@ -33,7 +33,7 @@ namespace Intent.Modules.HotChocolate.GraphQL.AzureFunctions.Templates.GraphQLFu
                             param.IntroduceReadonlyField();
                         });
                     });
-                    @class.AddMethod($"Task<{UseType("Microsoft.AspNetCore.Mvc.IActionResult")}>", "Run", method => 
+                    @class.AddMethod($"Task<{UseType("Microsoft.AspNetCore.Mvc.IActionResult")}>", "Run", method =>
                     {
                         method.AddAttribute(UseType("Microsoft.Azure.WebJobs.FunctionName"), attr => attr.AddArgument("\"GraphQLHttpFunction\""));
 

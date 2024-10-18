@@ -1,3 +1,16 @@
+### Version 4.2.1
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.2.0
+
+- Improvement: Module project updated to .NET 8.
+- Fixed: Enums can now be supplied as route parameters and parsed correctly.
+
+### Version 4.1.7
+
+- Improvement: Updated icon to SVG format.
+
 ### Version 4.1.3
 
 - Update: Improved Queue Trigger support, including receiving messages as `QueueMessage`.

@@ -60,12 +60,12 @@ namespace Intent.Modules.Application.DependencyInjection.MediatR.FactoryExtentio
 
         private void RegisterServices(IApplication application)
         {
-            var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Application.DependencyInjection);
+            var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateRoles.Application.DependencyInjection);
             if (template == null)
             {
                 return;
             }
-            template.AddNugetDependency(NuGetPackages.MediatR);
+            template.AddNugetDependency(NugetPackages.MediatR(template.OutputTarget));
             application.EventDispatcher.Publish(new RemoveNugetPackageEvent("MediatR.Extensions.Microsoft.DependencyInjection", template.OutputTarget));
 
             template.CSharpFile.AfterBuild(file =>

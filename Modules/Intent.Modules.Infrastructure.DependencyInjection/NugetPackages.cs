@@ -1,55 +1,55 @@
-﻿using System;
+using System;
 using Intent.Engine;
-using Intent.Modules.Common.CSharp.VisualStudio;
+using Intent.Modules.Common.CSharp.Nuget;
 using Intent.Modules.Common.VisualStudio;
+using Intent.RoslynWeaver.Attributes;
+
+[assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.NugetPackages", Version = "1.0")]
 
 namespace Intent.Modules.Infrastructure.DependencyInjection
 {
-    public static class NugetPackages
+    public class NugetPackages : INugetPackages
     {
-        public static INugetPackageInfo MicrosoftExtensionsConfigurationAbstractions(IOutputTarget outputTarget)
-        {
-            var project = outputTarget.GetProject();
-            var version = project switch
-            {
-                _ when project.IsNetApp(5) => "5.0.0",
-                _ when project.IsNetApp(6) => "6.0.0",
-                _ when project.IsNetApp(7) => "7.0.0",
-                _ when project.IsNetApp(8) => "8.0.0-preview.7.23375.6",
-                _ => "6.0.0"
-            };
+        public const string MicrosoftExtensionsConfigurationAbstractionsPackageName = "Microsoft.Extensions.Configuration.Abstractions";
+        public const string MicrosoftExtensionsConfigurationBinderPackageName = "Microsoft.Extensions.Configuration.Binder";
+        public const string MicrosoftExtensionsDependencyInjectionPackageName = "Microsoft.Extensions.DependencyInjection";
 
-            return new NugetPackageInfo("Microsoft.Extensions.Configuration.Abstractions", version);
+        public void RegisterPackages()
+        {
+            NugetRegistry.Register(MicrosoftExtensionsConfigurationAbstractionsPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("6.0.0", locked: true),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsConfigurationAbstractionsPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftExtensionsConfigurationBinderPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.2"),
+                        ( >= 7, 0) => new PackageVersion("8.0.2"),
+                        ( >= 6, 0) => new PackageVersion("6.0.0", locked: true),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsConfigurationBinderPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftExtensionsDependencyInjectionPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("6.0.1", locked: true),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsDependencyInjectionPackageName}'"),
+                    }
+                );
         }
 
-        public static NugetPackageInfo MicrosoftExtensionsDependencyInjection(IOutputTarget outputTarget)
-        {
-            var project = outputTarget.GetProject();
-            var version = project switch
-            {
-                _ when project.IsNetApp(5) => "5.0.2",
-                _ when project.IsNetApp(6) => "6.0.1",
-                _ when project.IsNetApp(7) => "7.0.0",
-                _ when project.IsNetApp(8) => "8.0.0-preview.7.23375.6",
-                _ => "6.0.1"
-            };
+        public static NugetPackageInfo MicrosoftExtensionsConfigurationAbstractions(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsConfigurationAbstractionsPackageName, outputTarget.GetMaxNetAppVersion());
 
-            return new NugetPackageInfo("Microsoft.Extensions.DependencyInjection", version);
-        }
-        
-        public static NugetPackageInfo MicrosoftExtensionsConfigurationBinder(IOutputTarget outputTarget)
-        {
-            var project = outputTarget.GetProject();
-            var version = project switch
-            {
-                _ when project.IsNetApp(5) => "5.0.0",
-                _ when project.IsNetApp(6) => "6.0.0",
-                _ when project.IsNetApp(7) => "7.0.0",
-                _ when project.IsNetApp(8) => "8.0.0-preview.7.23375.6",
-                _ => "6.0.0"
-            };
+        public static NugetPackageInfo MicrosoftExtensionsDependencyInjection(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsDependencyInjectionPackageName, outputTarget.GetMaxNetAppVersion());
 
-            return new NugetPackageInfo("Microsoft.Extensions.Configuration.Binder", version);
-        }
+        public static NugetPackageInfo MicrosoftExtensionsConfigurationBinder(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsConfigurationBinderPackageName, outputTarget.GetMaxNetAppVersion());
     }
 }

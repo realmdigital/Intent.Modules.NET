@@ -1,3 +1,87 @@
+### Version 3.8.1
+
+- Feature: It is now possible to model custom implicit usings for a project in the Visual Studio designer. Right-click a project and select the `Add Custom Implicit Usings` option, then right-click on that and add as many `Implicit Using`s as desired.
+- Improvement: Added support for external project references on CSharpProject.
+- Improvement: `.csproj` templates for .NET Core / 5+ Projects now implement `ICanContainGlobalUsings`.
+
+### Version 3.8.0
+
+- Improvement: 4.3 upgrade
+
+### Version 3.7.8
+
+- Improvement: Added support for modeled Implicit NuGet package dependencies.
+
+### Version 3.7.7
+
+- Improvement: When generating CSProj file, the template now not install direct NuGet package dependencies if there is a transitive dependency on the package through a dependent CSProj file.
+
+### Version 3.7.6
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 3.7.5
+
+- Fixed: A `Could not load file or assembly 'NuGet.Versioning...` exception would occur when using this module with Intent Architect version 4.3.0-beta.4 or higher.
+
+### Version 3.7.4
+
+- Improvement: Added `launchSettings.json` for `Microsoft.NET.Sdk.Worker` projects.
+
+### Version 3.7.3
+
+- Improvement: Added support for appsettings.json respecting `.editorconfig` files.
+
+### Version 3.7.2
+
+- Improvement: Support added for `AddUserSecretsEvent` and `AddProjectPropertyEvent`.
+
+### Version 3.7.1
+
+- Fixed: Nuget version consolidation would break under certain circumstances.
+
+### Version 3.7.0
+
+- Improvement: Aligned VS Solution Project Type Ids to the new project system ids (https://github.com/dotnet/project-system/blob/main/docs/opening-with-new-project-system.md).
+- Improvement: Updated generated VS `Sln` file versioning Info
+
+### Version 3.6.2
+
+- Improvement: `appsettings.json` added for `CSProject` using the `Microsoft.NET.Sdk.Worker` SDK e.g. Windows Services.
+- Improvement: Added the `Microsoft.AspNetCore`  logging level to be `Warning` in-line with VS Templates for Asp.Net projects.
+- Fixed: Modified default logging behavior from Warning to Information to align with Serilog's default behavior.
+ 
+### Version 3.6.1
+
+- Improvement: Modernized the Visual Studio icon to the 2022 version.
+
+### Version 3.6.0
+
+- Feature: Added support for [JavaScript Projects](https://learn.microsoft.com/visualstudio/javascript/javascript-project-system-msbuild-reference).
+- Improvement: Deprecated ".NET Core" project types are no longer visible on the context menu, use `C# Project (.NET)` instead and change the `SDK` and other options on it to create equivalent projects.
+- Improvement: Options to create ".NET Framework" projects are now hidden by default, to have these options show use toggle the `Enable .NET Framework project creation` application setting.
+- Improvement: `Add .NET Core Version` and `Add .NET Framework Version` options are now hidden unless you have the `Intent.ModuleBuilder` module installed.
+- Improvement: Solution Folders will now be generated in `.sln` files for templates with a relative output location when their output is in the package root or a Solution Folder.
+- Fixed: NuGet package removals weren't being processed.
+- Fixed: Certain `.sln` files could cause exceptions to be thrown during Software Factory execution.
+
+### Version 3.5.1
+
+- Fixed: Fix an issue where `Root Namespace` project setting was not working.
+
+### Version 3.5.0
+
+- New Feature: It is now possible to specify `Use minimal hosting model` and `Use top-level statements` on `.NET Project`s with their `SDK` set to `Microsoft.NET.Sdk.Web`.
+- New Feature: Added support for working with program and startup files with combination of "use minimal host model" and "use top-level-statements".
+- Improvement: Final .NET 8 support.
+- Improvement: Sending multiple `AppSettingRegistrationRequest` and `ConnectionStringRegistrationRequest` requests will only log a warning if the key and values are **not** the same.
+- Fixed: Environment Variables, originating from other modules, targeting specific Launch Setting Profiles will now populate correctly in the launchsettings.json
+- Fixed: Validation checks added to ensure no duplicate Template Outputs and no duplicate Folder names exist within the same folder. Error message takes you straight to the Visual Studio designer where the violation occurs.
+
+### Version 3.4.2
+
+- Fixed: Target Framework for `.NET 8` will output correct version number in `csproj` file. 
+
 ### Version 3.4.1
 
 - Improvement: Removed `Could not determine framework element for project "<project path>". If you're using a "Directory.Build.props" file, change the project's Target Framework to "(unspecified)"` warning.

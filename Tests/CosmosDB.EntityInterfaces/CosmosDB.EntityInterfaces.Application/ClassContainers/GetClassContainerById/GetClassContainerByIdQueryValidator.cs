@@ -6,6 +6,7 @@ using Intent.RoslynWeaver.Attributes;
 
 namespace CosmosDB.EntityInterfaces.Application.ClassContainers.GetClassContainerById
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class GetClassContainerByIdQueryValidator : AbstractValidator<GetClassContainerByIdQuery>
     {
         [IntentManaged(Mode.Merge)]
@@ -17,6 +18,9 @@ namespace CosmosDB.EntityInterfaces.Application.ClassContainers.GetClassContaine
         private void ConfigureValidationRules()
         {
             RuleFor(v => v.Id)
+                .NotNull();
+
+            RuleFor(v => v.ClassPartitionKey)
                 .NotNull();
         }
     }

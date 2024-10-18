@@ -34,15 +34,14 @@ namespace Intent.Modules.CosmosDB.FactoryExtensions
             EntityFactoryExtensionHelper.Execute(
                 application: application,
                 dbProviderApplies: CosmosDbProvider.FilterDbProvider,
-                initializePrimaryKeyOnAggregateRoots: true,
+                primaryKeyInitStrategy: new CosmosDbPrimaryKeyInitStrategy(),
                 makeNonPersistentPropertiesVirtual: false);
             RegisterServices(application);
-
         }
 
         private static void RegisterServices(IApplication application)
         {
-            var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Infrastructure.DependencyInjection);
+            var template = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateRoles.Infrastructure.DependencyInjection);
             if (template is null)
             {
                 return;

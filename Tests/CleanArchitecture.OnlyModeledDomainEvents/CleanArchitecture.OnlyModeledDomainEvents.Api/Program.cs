@@ -8,7 +8,7 @@ using Serilog.Events;
 [assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.AspNetCore.Program", Version = "1.0")]
 
-namespace CleanArchitecture.OnlyModeledDomainEvents.Api
+namespace MyCustomNamespace
 {
     public class Program
     {
@@ -39,9 +39,7 @@ namespace CleanArchitecture.OnlyModeledDomainEvents.Api
             Host.CreateDefaultBuilder(args)
                 .UseSerilog((context, services, configuration) => configuration
                     .ReadFrom.Configuration(context.Configuration)
-                    .ReadFrom.Services(services)
-                    .Enrich.FromLogContext()
-                    .WriteTo.Console())
+                    .ReadFrom.Services(services))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

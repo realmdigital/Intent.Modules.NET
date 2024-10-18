@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Intent.Engine;
 using Intent.Modelers.Domain.Services.Api;
 using Intent.Modules.Common;
@@ -22,36 +24,41 @@ namespace Intent.Modules.DomainServices.Templates.DomainServiceInterface
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public DomainServiceInterfaceTemplate(IOutputTarget outputTarget, DomainServiceModel model) : base(TemplateId, outputTarget, model)
         {
-            AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Interface);
-            AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
-            AddTypeSource(TemplateFulfillingRoles.Domain.DataContract);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
-            AddTypeSource(TemplateFulfillingRoles.Domain.DomainServices.Interface);
+            AddTypeSource(TemplateRoles.Domain.Entity.Interface);
+            AddTypeSource(TemplateRoles.Domain.ValueObject);
+            AddTypeSource(TemplateRoles.Domain.DataContract);
+            AddTypeSource(TemplateRoles.Domain.Enum);
+            AddTypeSource(TemplateRoles.Domain.DomainServices.Interface);
 
-            CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
+            CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath(), this)
                 .AddInterface($"I{Model.Name}", @interface =>
                 {
                     @interface.TryAddXmlDocComments(Model.InternalElement);
+                    @interface.RepresentsModel(Model);
                     foreach (var operation in Model.Operations)
                     {
                         var isAsync = operation.Name.EndsWith("Async", System.StringComparison.OrdinalIgnoreCase);
-                        var returnType = GetTypeName(operation);
 
-                        if (isAsync)
+                        @interface.AddMethod(operation, method =>
                         {
-                            returnType = operation.ReturnType?.Element == null
-                                ? UseType("System.Threading.Tasks.Task")
-                                : $"{UseType("System.Threading.Tasks.Task")}<{returnType}>";
-                        }
-
-                        @interface.AddMethod(returnType, operation.Name.ToPascalCase(), method =>
-                        {
+                            if (operation.GenericTypes.Any())
+                            {
+                                foreach (var genericType in operation.GenericTypes)
+                                {
+                                    method.AddGenericParameter(genericType);
+                                }
+                            }
                             method.TryAddXmlDocComments(operation.InternalElement);
+
+                            if (isAsync)
+                            {
+                                method.Async();
+                            }
 
                             foreach (var parameter in operation.Parameters)
                             {
                                 method.AddParameter(GetTypeName(parameter), parameter.Name.ToParameterName(),
-                                    parm => parm.WithDefaultValue(parameter.Value));
+                                    param => param.WithDefaultValue(parameter.Value));
                             }
 
                             if (isAsync)

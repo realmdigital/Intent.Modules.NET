@@ -45,7 +45,7 @@ For more info on decimal types check out [SQL Server decimal](https://learn.micr
 
 ### Database Settings - `Lazy loading with proxies`
 
-This setting allows you to configure whether or not you would like like to use Entity Frameworks, Lazy loading with proxies feature.
+This setting allows you to configure whether you would like to use Entity Frameworks, Lazy loading with proxies feature.
 This setting is on by default, but can be turned off if you don't want this behaviour.
 
 For more info on lazy loading with proxies check out [the official documentation](https://learn.microsoft.com/ef/core/querying/related-data/lazy#lazy-loading-with-proxies).
@@ -56,6 +56,48 @@ When enabled, an `IApplicationDbContext` will be generated in the "Application" 
 
 > [!NOTE]
 > A NuGet package reference to `Microsoft.EntityFrameworkCore` is added to the "Application" layer project's `.csproj` as this is the assembly containing the `DbSet<TEntity>` type. This should be considered if you're adhering to the Clean Architecture principle of keeping your "application" layer as clean as possible of references.
+
+### Database Settings - `Enable split queries globally`
+
+When enabled, configures the DbContext to have [split queries enabled globally](https://learn.microsoft.com/ef/core/querying/single-split-queries#enabling-split-queries-globally).
+
+### Database Settings - `Maintain column ordering`
+
+When enabled, the EF configuration will be set up to preserve the column ordering as per your Domain model ordering. Base classes will be ordered because inherited classes.
+The ordering is achieved using EF Core's `HasColumnOrder` functionality.
+
+```csharp
+    builder.Property(x => x.Id)
+        .HasColumnOrder(0);
+
+    builder.Property(x => x.Name)
+        .IsRequired()
+        .HasColumnOrder(1);
+```
+
+### Database Settings - `Enum check constraints`
+
+When enabled, the EF configuration will set up a SQL table check constraints to ensure the data stored in the underlying column adheres to the `Enum`.
+
+```csharp
+    var customerTypeEnumValues = Enum.GetValuesAsUnderlyingType<CustomerType>()
+        .Cast<object>()
+        .Select(value => value.ToString());
+
+    builder.ToTable(tb => tb.HasCheckConstraint("customer_customer_type_check", $"\"CustomerType\" IN ({string.Join(",", customerTypeEnumValues)})"));
+```
+
+If you are using the `Store enums as strings` setting you will get the following
+
+```csharp
+    var customerTypeEnumValues = Enum.GetNames<CustomerType>()
+        .Select(e => $"'{e}'");
+
+    builder.ToTable(tb => tb.HasCheckConstraint("customer_customer_type_check", $"\"CustomerType\" IN ({string.Join(",", customerTypeEnumValues)})"));
+```
+
+Intent will automatically do the Column ordering but if you want to get very specific you can use the `DataColumn` stereotype to explicitly set the ordering. 
+This can also be using for forcing columns in base class to go to the end by assigning them a arbitrary large number.
 
 ## Domain Designer modeling
 
@@ -79,7 +121,7 @@ The `Foreign Key` stereotype indicates an `Attribute` has been introduced to a `
 
 In this diagram you can see the `CustomerId` attribute has been introduced, with the `Foreign Key` stereotype, as a result of the many-to-one relationship between `Basket` and `Customer`.
 
-The `Foreign Key` stereotype's are automatically managed when modeling associations. This stereotype is visualized as a silver key icon.
+The `Foreign Key` stereotypes are automatically managed when modeling associations. This stereotype is visualized as a silver key icon.
 
 ### Text Constraint - Attribute Stereotype
 
@@ -217,6 +259,8 @@ Resulting database structure:
 
 ![Table per hierarchy database tables](./docs/images/tph-db.png)
 
+If you wish to make the base class abstract, while still maintaining TPH, simply add a `Table` stereotype to the base class.
+
 #### Table per type
 
 Modeling:
@@ -241,7 +285,24 @@ Resulting database structure:
 
 ![Table per concrete type database tables](./docs/images/tpc-db.png)
 
-## Code Generation Artifacts (Templates, Decorators, Factory Extensions)
+## Database Settings
+
+### Multiple Database support
+
+Applying the `Database Settings` stereotype on a Domain package will allow you to specify a Connection String Name as well as a Database Provider that will make a DbContext type that will contain all the Classes in that Domain package as DbSets.
+
+![Database Settings Stereotype](docs/images/database-settings-stereotype.png)
+
+Having a `(default)` Connection String Name will make use of the connection string `DefaultConnection` and will generate the `ApplicationDbContext` type. The `Default` Database Provider will defer to the Module Database setting to determine which Database Provider to use.
+
+Changing the Connection String name will allow you to specify a connection string for connecting to another database and you may alter the Database Provider by choose the specific one in the dropdown menu. This will also generate a DbContext type specifically for that Connection String.
+
+> [!NOTE]
+>
+> For this release, the unit of work pattern still only applies to the main `ApplicationDbContext`, for the additional `DbContext`s the `SaveChanges` methods will need to be called manually. Should you have a project which requires the unit of work pattern to apply to additional `DbContext`s, please each out to us at [Intent Architect Support](https://github.com/IntentArchitect/Support).
+
+
+## Code Generation Artifacts (Templates, Factory Extensions)
 
 ### Template : Database context
 
@@ -425,7 +486,7 @@ namespace {{Application Name}}.Infrastructure
 
 ### Intent.Metadata.RDBMS
 
-This modules provides RDBMS related stereotypes for extending the Domain Designer with RDBMS technology specific data.
+This module provides RDBMS related stereotypes for extending the Domain Designer with RDBMS technology specific data.
 
 ### Intent.Entities
 
