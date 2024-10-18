@@ -11,20 +11,24 @@ using Intent.Modules.Common.Templates;
 using Intent.Modules.Common.Types.Api;
 using Intent.Modules.Common.VisualStudio;
 using Intent.Modules.Constants;
+using Intent.Modules.EntityFrameworkCore.Helpers;
 using Intent.Modules.EntityFrameworkCore.Settings;
+using Intent.Modules.EntityFrameworkCore.Templates;
 using Intent.Modules.EntityFrameworkCore.Templates.DbContextInterface;
 using Intent.Modules.EntityFrameworkCore.Templates.EntityTypeConfiguration;
 using Intent.Modules.Metadata.RDBMS.Settings;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
+#nullable enable
+
 [assembly: DefaultIntentManaged(Mode.Merge)]
 [assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.CSharpTemplatePartial", Version = "1.0")]
 
 namespace Intent.Modules.EntityFrameworkCore.Templates.DbContext
 {
-    [IntentManaged(Mode.Merge, Signature = Mode.Merge)]
-    public partial class DbContextTemplate : CSharpTemplateBase<IList<ClassModel>, ITemplateDecorator>, ICSharpFileBuilderTemplate
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
+    public partial class DbContextTemplate : CSharpTemplateBase<DbContextInstance>, ICSharpFileBuilderTemplate
     {
         [IntentManaged(Mode.Fully)] public const string TemplateId = "Intent.EntityFrameworkCore.DbContext";
 
@@ -32,30 +36,32 @@ namespace Intent.Modules.EntityFrameworkCore.Templates.DbContext
         private readonly List<CapturedEntityTypeConfiguration> _capturedEntityTypeConfigurations = new();
         private bool _addedPostTypeConfigProcess;
 
-        [IntentManaged(Mode.Merge, Signature = Mode.Fully)]
-        public DbContextTemplate(IOutputTarget outputTarget, IList<ClassModel> model) : base(TemplateId, outputTarget, model)
+        [IntentManaged(Mode.Merge, Signature = Mode.Fully, Body = Mode.Ignore)]
+        public DbContextTemplate(IOutputTarget outputTarget, DbContextInstance model) : base(TemplateId, outputTarget, model)
         {
             _interfaceTemplate = new Lazy<DbContextInterfaceTemplate>(() => GetTemplate<DbContextInterfaceTemplate>(
                 templateId: DbContextInterfaceTemplate.TemplateId,
+                model: model,
                 options: new TemplateDiscoveryOptions
                 {
                     TrackDependency = false
                 }));
 
-            FulfillsRole("Infrastructure.Data.DbContext");
+            if (Model.IsApplicationDbContext)
+            {
+                FulfillsRole(TemplateRoles.Infrastructure.Data.DbContext);
+            }
+
+            FulfillsRole(TemplateRoles.Infrastructure.Data.ConnectionStringDbContext);
+
+            var currentDatabaseProvider = DbContextManager.GetDatabaseProviderForDbContext(Model.DbProvider, ExecutionContext);
 
             CSharpFile = new CSharpFile(OutputTarget.GetNamespace(), "")
-                .AddClass("ApplicationDbContext", @class =>
+                .AddClass(Model.DbContextName, @class =>
                 {
                     @class.WithBaseType(UseType("Microsoft.EntityFrameworkCore.DbContext"));
                     @class.ImplementsInterfaces(GetInterfaces());
-                    @class.AddConstructor(ctor =>
-                    {
-                        ctor.AddParameter(GetDbContextOptionsType(), "options", param =>
-                        {
-                            ctor.CallsBase(call => call.AddArgument(param.Name));
-                        });
-                    });
+                    @class.AddConstructor(ctor => { ctor.AddParameter(GetDbContextOptionsType(), "options", param => { ctor.CallsBase(call => call.AddArgument(param.Name)); }); });
 
                     @class.AddMethod("void", "OnModelCreating", method =>
                     {
@@ -63,9 +69,17 @@ namespace Intent.Modules.EntityFrameworkCore.Templates.DbContext
                             .AddParameter("ModelBuilder", "modelBuilder");
 
                         method.AddStatement("base.OnModelCreating(modelBuilder);");
-                        method.AddStatement("ConfigureModel(modelBuilder);", s => s.SeparatedFromPrevious());
+                        if (Model.IsApplicationDbContext && !string.IsNullOrWhiteSpace(ExecutionContext.Settings.GetDatabaseSettings().DefaultSchemaName()))
+                        {
+                            method.AddStatement($@"modelBuilder.HasDefaultSchema(""{ExecutionContext.Settings.GetDatabaseSettings().DefaultSchemaName()}"");");
+                        }
 
-                        //method.AddStatements(GetOnModelCreatingStatements());
+                        if (currentDatabaseProvider == DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Postgresql && NetTopologySuiteHelper.IsInstalled(ExecutionContext))
+                        {
+                            method.AddStatement(@"modelBuilder.HasPostgresExtension(""postgis"");");
+                        }
+
+                        method.AddStatement("ConfigureModel(modelBuilder);", s => s.SeparatedFromPrevious());
                     });
 
                     @class.AddMethod("void", "ConfigureModel", method =>
@@ -85,16 +99,17 @@ modelBuilder.Entity<Car>().HasData(
 */");
                     });
 
-                    if (ExecutionContext.Settings.GetDatabaseSettings().DatabaseProvider().IsCosmos())
+                    if (currentDatabaseProvider == DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos)
                     {
                         @class.AddMethod(UseType("System.Threading.Tasks.Task"), "EnsureDbCreatedAsync", method =>
                         {
                             method.Async();
-                            method.WithComments(@"
-/// <summary>
-/// Calling EnsureCreatedAsync is necessary to create the required containers and insert the seed data if present in the model. 
-/// However EnsureCreatedAsync should only be called during deployment, not normal operation, as it may cause performance issues.
-/// </summary>");
+                            method.WithComments("""
+                                                /// <summary>
+                                                /// Calling EnsureCreatedAsync is necessary to create the required containers and insert the seed data if present in the model.
+                                                /// However EnsureCreatedAsync should only be called during deployment, not normal operation, as it may cause performance issues.
+                                                /// </summary>
+                                                """);
                             method.AddStatement("await Database.EnsureCreatedAsync();");
                         });
                     }
@@ -102,6 +117,11 @@ modelBuilder.Entity<Car>().HasData(
 
             ExecutionContext.EventDispatcher.Subscribe<EntityTypeConfigurationCreatedEvent>(typeConfiguration =>
             {
+                if (!Model.Equals(DbContextManager.GetDbContext(typeConfiguration.Template.Model)))
+                {
+                    return;
+                }
+
                 _capturedEntityTypeConfigurations.Add(new CapturedEntityTypeConfiguration
                 {
                     Event = typeConfiguration,
@@ -124,6 +144,25 @@ modelBuilder.Entity<Car>().HasData(
             });
         }
 
+        private static void MakeDbSetNameUnique(CapturedEntityTypeConfiguration lhs, CapturedEntityTypeConfiguration rhs)
+        {
+            if (lhs.Prefix != rhs.Prefix)
+            {
+                lhs.DbSetName = lhs.Prefix + lhs.DbSetName;
+                rhs.DbSetName = rhs.Prefix + rhs.DbSetName;
+                return;
+            }
+
+            if (lhs.DbSetElementType != rhs.DbSetElementType)
+            {
+                lhs.DbSetName = lhs.DbSetElementType;
+                rhs.DbSetName = rhs.DbSetElementType;
+                return;
+            }
+
+            throw new Exception($"Different Entities resolving to same DB Set name `{lhs.DbSetName}` for {lhs.DbSetElementType} and {rhs.DbSetName}");
+        }
+
         // This is the cleanest (and foolproof way) I can get to ensure that DbSet name and types are unique since
         // all the EntityTypeConfigurations are made known via events so a buffer of sorts is
         // required to keep track of all the registered ones and then check if there are any duplicates.
@@ -140,8 +179,7 @@ modelBuilder.Entity<Car>().HasData(
                 var collisionEntry = dbSetNameLookup[entry.DbSetName];
                 dbSetNameLookup.Remove(entry.DbSetName);
 
-                entry.DbSetName = entry.Prefix + entry.DbSetName;
-                collisionEntry.DbSetName = collisionEntry.Prefix + collisionEntry.DbSetName;
+                MakeDbSetNameUnique(entry, collisionEntry);
 
                 dbSetNameLookup.Add(entry.DbSetName, entry);
                 dbSetNameLookup.Add(collisionEntry.DbSetName, collisionEntry);
@@ -197,6 +235,7 @@ modelBuilder.Entity<Car>().HasData(
             }
         }
 
+        [IntentManaged(Mode.Fully)]
         public CSharpFile CSharpFile { get; }
 
         public override void BeforeTemplateExecution()
@@ -216,15 +255,13 @@ modelBuilder.Entity<Car>().HasData(
             base.BeforeTemplateExecution();
         }
 
-        [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
+        [IntentManaged(Mode.Fully)]
         protected override CSharpFileConfig DefineFileConfig()
         {
-            return new CSharpFileConfig(
-                className: $"ApplicationDbContext",
-                @namespace: $"{OutputTarget.GetNamespace()}");
+            return CSharpFile.GetConfig();
         }
 
-        [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
+        [IntentManaged(Mode.Fully)]
         public override string TransformText()
         {
             return CSharpFile.ToString();
@@ -246,12 +283,12 @@ modelBuilder.Entity<Car>().HasData(
             return (UseLazyLoadingProxies
                     ? new[]
                     {
-                        NugetPackages.EntityFrameworkCore(Project),
-                        NugetPackages.EntityFrameworkCoreProxies(Project),
+                        NugetPackages.MicrosoftEntityFrameworkCore(Project),
+                        NugetPackages.MicrosoftEntityFrameworkCoreProxies(Project),
                     }
                     : new[]
                     {
-                        NugetPackages.EntityFrameworkCore(Project),
+                        NugetPackages.MicrosoftEntityFrameworkCore(Project),
                     })
                 .Union(base.GetNugetDependencies())
                 .ToArray();
@@ -267,7 +304,7 @@ modelBuilder.Entity<Car>().HasData(
                 var interfaces = new List<string>();
                 if (_interfaceTemplate.Value.IsEnabled)
                 {
-                    interfaces.Add(this.GetDbContextInterfaceName());
+                    interfaces.Add(GetTypeName(TemplateRoles.Application.Common.ConnectionStringDbContextInterface, Model));
                 }
 
                 return interfaces;
@@ -294,7 +331,7 @@ modelBuilder.Entity<Car>().HasData(
             public string DbSetElementType { get; set; }
             public string DbSetName { get; set; }
             public string Prefix { get; set; }
-            public string InterfaceDbSetElementType { get; set; }
+            public string? InterfaceDbSetElementType { get; set; }
         }
     }
 }

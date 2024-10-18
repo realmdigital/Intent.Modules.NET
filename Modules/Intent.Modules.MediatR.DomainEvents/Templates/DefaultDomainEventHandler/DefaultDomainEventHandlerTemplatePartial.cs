@@ -24,7 +24,7 @@ namespace Intent.Modules.MediatR.DomainEvents.Templates.DefaultDomainEventHandle
         [IntentManaged(Mode.Fully)]
         public const string TemplateId = "Intent.MediatR.DomainEvents.DefaultDomainEventHandler";
 
-        [IntentManaged(Mode.Merge, Signature = Mode.Fully)]
+        [IntentManaged(Mode.Ignore, Signature = Mode.Fully)]
         public DefaultDomainEventHandlerTemplate(IOutputTarget outputTarget, DomainEventModel model) : base(TemplateId, outputTarget, model)
         {
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
@@ -53,6 +53,7 @@ namespace Intent.Modules.MediatR.DomainEvents.Templates.DefaultDomainEventHandle
                     var handleMethod = file.Classes.First().FindMethod("Handle");
                     if (handleMethod?.Statements.Count == 0)
                     {
+                        handleMethod.AddStatement($"// TODO: Implement {handleMethod.Name} {file.Classes.First().Name}) functionality");
                         handleMethod.AddStatement("throw new NotImplementedException(\"Implement your handler logic here...\");");
                     }
                 }, 1000);
@@ -80,7 +81,6 @@ namespace Intent.Modules.MediatR.DomainEvents.Templates.DefaultDomainEventHandle
         {
             return GetTypeName(DomainEventNotificationTemplate.TemplateId);
         }
-
 
         private string GetDomainEventType()
         {

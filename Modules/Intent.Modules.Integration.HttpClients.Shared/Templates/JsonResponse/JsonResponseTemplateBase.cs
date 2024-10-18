@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
 using Intent.Metadata.Models;
@@ -5,6 +7,7 @@ using Intent.Modelers.Types.ServiceProxies.Api;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
+using Intent.Modules.Contracts.Clients.Http.Shared;
 using Intent.Modules.Contracts.Clients.Shared;
 using Intent.Modules.Metadata.WebApi.Models;
 
@@ -37,12 +40,12 @@ namespace Intent.Modules.Integration.HttpClients.Shared.Templates.JsonResponse
 
         public override string TransformText() => CSharpFile.ToString();
 
-        protected abstract IDesigner GetSourceDesigner(IMetadataManager metadataManager, string applicationId);
+        protected abstract IEnumerable<IDesigner> GetSourceDesigners(IMetadataManager metadataManager, string applicationId);
 
         public override bool CanRunTemplate()
         {
-            return GetSourceDesigner(ExecutionContext.MetadataManager, ExecutionContext.GetApplicationConfig().Id)
-                .GetServiceProxyModels()
+            return GetSourceDesigners(ExecutionContext.MetadataManager, ExecutionContext.GetApplicationConfig().Id)
+                .SelectMany(s => s.GetServiceProxyModels())
                 .SelectMany(s => s.GetMappedEndpoints())
                 .Any(x => x.MediaType == HttpMediaType.ApplicationJson);
         }

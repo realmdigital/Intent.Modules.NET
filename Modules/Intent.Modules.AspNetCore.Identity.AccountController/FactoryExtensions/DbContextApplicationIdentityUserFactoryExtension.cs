@@ -31,7 +31,7 @@ namespace Intent.Modules.AspNetCore.Identity.AccountController.FactoryExtensions
                 return;
             }
 
-            var dbContext = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate(TemplateFulfillingRoles.Infrastructure.Data.DbContext));
+            var dbContext = application.FindTemplateInstance<ICSharpFileBuilderTemplate>(TemplateDependency.OnTemplate(TemplateRoles.Infrastructure.Data.DbContext));
             if (dbContext == null)
             {
                 return;
@@ -40,7 +40,7 @@ namespace Intent.Modules.AspNetCore.Identity.AccountController.FactoryExtensions
             dbContext.CSharpFile.OnBuild(file =>
             {
                 var priClass = file.Classes.First();
-            
+
                 priClass.AddProperty($"{dbContext.UseType("Microsoft.EntityFrameworkCore.DbSet")}<{dbContext.GetTypeName("Domain.IdentityUser")}>", "ApplicationIdentityUsers");
 
                 priClass.FindMethod("OnModelCreating")

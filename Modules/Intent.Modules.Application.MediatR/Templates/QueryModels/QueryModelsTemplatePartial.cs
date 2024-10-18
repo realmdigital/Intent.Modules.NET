@@ -30,12 +30,16 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryModels
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public QueryModelsTemplate(IOutputTarget outputTarget, QueryModel model) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NuGetPackages.MediatR);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
-            AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Enum);
-            SetDefaultCollectionFormatter(CSharpCollectionFormatter.CreateList());
+            AddNugetDependency(NugetPackages.MediatR(outputTarget));
+
             FulfillsRole("Application.Contract.Query");
-            AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
+
+            AddTypeSource(TemplateRoles.Domain.Enum);
+            AddTypeSource(TemplateRoles.Application.Contracts.Enum);
+            SetDefaultCollectionFormatter(CSharpCollectionFormatter.CreateList());
+            AddTypeSource(TemplateRoles.Application.Contracts.Dto);
+            AddTypeSource(TemplateRoles.Application.Contracts.Clients.Dto);
+            AddTypeSource(TemplateRoles.Application.Contracts.Clients.Enum);
 
             CSharpFile = new CSharpFile($"{this.GetQueryNamespace()}", $"{this.GetQueryFolderPath()}")
                 .AddUsing("MediatR")
@@ -45,7 +49,7 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryModels
                     AddAuthorization(@class);
                     @class.ImplementsInterface($"IRequest<{GetTypeName(Model.TypeReference)}>");
                     @class.ImplementsInterface(this.GetQueryInterfaceName());
-                    
+
                     @class.AddConstructor();
                     var ctor = @class.Constructors.First();
                     foreach (var property in Model.Properties)
@@ -53,7 +57,7 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryModels
                         ctor.AddParameter(GetTypeName(property), property.Name.ToParameterName(), param =>
                         {
                             param.AddMetadata("model", property);
-                            param.IntroduceProperty();
+                            param.IntroduceProperty(prop => prop.RepresentsModel(property));
                         });
                     }
                 });
@@ -61,7 +65,7 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryModels
             if (ExecutionContext.Settings.GetCQRSSettings().ConsolidateCommandQueryAssociatedFilesIntoSingleFile())
             {
                 FulfillsRole("Application.Query.Handler");
-                FulfillsRole(TemplateFulfillingRoles.Application.Validation.Query);
+                FulfillsRole(TemplateRoles.Application.Validation.Query);
                 QueryHandlerTemplate.Configure(this, model);
             }
         }
@@ -85,22 +89,44 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryModels
         {
             if (Model.HasAuthorize())
             {
-                var rolesPolicies = new List<string>();
-                if (!string.IsNullOrWhiteSpace(Model.GetAuthorize().Roles()))
+                if (!string.IsNullOrWhiteSpace(Model.GetAuthorize().Roles()) && Model.GetAuthorize().Roles().Contains('+'))
                 {
-                    rolesPolicies.Add($"Roles = \"{Model.GetAuthorize().Roles()}\"");
-                }
-                if (!string.IsNullOrWhiteSpace(Model.GetAuthorize().Policy()))
-                {
-                    rolesPolicies.Add($"Policy = \"{Model.GetAuthorize().Policy()}\"");
-                }
-                @class.AddAttribute(TryGetTypeName("Application.Identity.AuthorizeAttribute")?.RemoveSuffix("Attribute") ?? "Authorize", att =>
-                {
-                    foreach (var arg in rolesPolicies)
+                    var roleGroups = Model.GetAuthorize().Roles().Split('+');
+                    foreach (var group in roleGroups)
                     {
-                        att.AddArgument(arg);
+                        @class.AddAttribute(TryGetTypeName("Application.Identity.AuthorizeAttribute")?.RemoveSuffix("Attribute") ?? "Authorize", att =>
+                        {
+                            att.AddArgument($"Roles = \"{group}\"");
+                        });
                     }
-                });
+                }
+                else
+                {
+                    var rolesPolicies = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(Model.GetAuthorize().Roles()))
+                    {
+                        rolesPolicies.Add($"Roles = \"{Model.GetAuthorize().Roles()}\"");
+                    }
+                    else if (Model.GetAuthorize().SecurityRoles().Any())
+                    {
+                        rolesPolicies.Add($"Roles = \"{string.Join(",", Model.GetAuthorize().SecurityRoles().Select(e => e.Name))}\"");
+                    }
+                    if (!string.IsNullOrWhiteSpace(Model.GetAuthorize().Policy()))
+                    {
+                        rolesPolicies.Add($"Policy = \"{Model.GetAuthorize().Policy()}\"");
+                    }
+                    else if (Model.GetAuthorize().SecurityPolicies().Any())
+                    {
+                        rolesPolicies.Add($"Policy = \"{string.Join(",", Model.GetAuthorize().SecurityPolicies().Select(e => e.Name))}\"");
+                    }
+                    @class.AddAttribute(TryGetTypeName("Application.Identity.AuthorizeAttribute")?.RemoveSuffix("Attribute") ?? "Authorize", att =>
+                    {
+                        foreach (var arg in rolesPolicies)
+                        {
+                            att.AddArgument(arg);
+                        }
+                    });
+                }
             }
         }
     }

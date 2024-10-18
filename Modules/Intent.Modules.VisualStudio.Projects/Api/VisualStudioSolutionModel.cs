@@ -44,6 +44,11 @@ namespace Intent.Modules.VisualStudio.Projects.Api
             .Select(x => new ASPNETWebApplicationNETFrameworkModel(x))
             .ToList();
 
+        public IList<WCFServiceApplicationModel> WCFServiceApplicationNETFrameworks => UnderlyingPackage.ChildElements
+            .GetElementsOfType(WCFServiceApplicationModel.SpecializationTypeId)
+            .Select(x => new WCFServiceApplicationModel(x))
+            .ToList();
+
         public IList<ClassLibraryNETCoreModel> ClassLibraryNETCores => UnderlyingPackage.ChildElements
             .GetElementsOfType(ClassLibraryNETCoreModel.SpecializationTypeId)
             .Select(x => new ClassLibraryNETCoreModel(x))
@@ -102,6 +107,11 @@ namespace Intent.Modules.VisualStudio.Projects.Api
         public IList<CSharpProjectNETModel> CSharpProjectNETs => UnderlyingPackage.ChildElements
             .GetElementsOfType(CSharpProjectNETModel.SpecializationTypeId)
             .Select(x => new CSharpProjectNETModel(x))
+            .ToList();
+
+        public IList<JavaScriptProjectModel> JavaScriptProjects => UnderlyingPackage.ChildElements
+            .GetElementsOfType(JavaScriptProjectModel.SpecializationTypeId)
+            .Select(x => new JavaScriptProjectModel(x))
             .ToList();
 
         public IList<ConsoleAppNETCoreModel> ConsoleAppNETCores => UnderlyingPackage.ChildElements

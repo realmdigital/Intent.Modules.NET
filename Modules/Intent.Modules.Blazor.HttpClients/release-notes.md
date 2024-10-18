@@ -1,4 +1,50 @@
-﻿### Version 3.0.2
+### Version 4.0.0
+
+TODO
+
+### Version 3.1.8
+
+- Fixed: HttpClients are able to generate into `netstandard2.*` projects.
+
+### Version 3.1.7
+
+- Improvement: Improved content type filter int the `HttpClientRequestException`.
+
+### Version 3.1.6
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 3.1.5
+
+- Improvement: Proxies now respecting Applications Services `Serialize Enums as Strings` setting.
+
+### Version 3.1.4
+
+- Improvement: Added shared template infrastructure to support service proxies being able to respect `Serialize Enum as String` setting.
+
+### Version 3.1.3
+
+- Improvement: Updated the logic which converts types to query parameters to be more standard in how it coverts types to string.
+
+### Version 3.1.2
+
+- Improvement: Added support for deserializing ProblemDetails for client HTTP calls.
+
+### Version 3.1.1
+
+- Improvement: File transfer ( upload / download ) support.
+- Improvement: Improved internal processes for working with Service Proxies.
+
+### Version 3.1.0
+
+- Improvement: Underlying proxy templates updated to support alternate Metadata models.
+- Improvement: Upgraded Microsoft.Extensions.Http NuGet package to version 8.0.0
+
+### Version 3.0.3
+
+- Fixed: Bug in HttpClient where the query string was not correctly handling a collection type.
+
+### Version 3.0.2
 
 - Improvement: Will now respect query string parameter names as introduced in [`Intent.Metadata.WebApi` version `4.3.2`](https://github.com/IntentArchitect/Intent.Modules/blob/development/Modules/Intent.Modules.Metadata.WebApi/release-notes.md#version-432).
 - Fixed: Removed unnecessary dependency on the `Intent.Application.FluentValidation` module.

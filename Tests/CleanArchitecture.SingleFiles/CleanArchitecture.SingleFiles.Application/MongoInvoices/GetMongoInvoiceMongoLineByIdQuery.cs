@@ -62,12 +62,13 @@ namespace CleanArchitecture.SingleFiles.Application.MongoInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class GetMongoInvoiceMongoLineByIdQueryValidator : AbstractValidator<GetMongoInvoiceMongoLineByIdQuery>
     {
         [IntentManaged(Mode.Merge)]
         public GetMongoInvoiceMongoLineByIdQueryValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

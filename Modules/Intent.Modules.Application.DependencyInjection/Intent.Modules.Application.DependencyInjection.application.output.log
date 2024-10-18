@@ -3,13 +3,13 @@
   <ApplicationId>9221b11f-796f-4bb6-bf71-87adc4d61cfb</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#56fa5612-2842-435a-8164-d67a464e3a33</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#56fa5612-2842-435a-8164-d67a464e3a33</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.Net.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>1d15d8ba-269b-4a31-8855-602cddaa651b</ProjectId>
+      <ProjectId>29e10135-470f-4aca-b10d-235f7b3cf2f2</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.IModSpecFile</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Application.DependencyInjection.imodspec</ApplicationRelativeFilePath>
@@ -17,19 +17,19 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>1d15d8ba-269b-4a31-8855-602cddaa651b</ProjectId>
-      <CorrelationId>Intent.VisualStudio.Projects.CoreLibrary.CSProject#1d15d8ba-269b-4a31-8855-602cddaa651b</CorrelationId>
+      <ProjectId>29e10135-470f-4aca-b10d-235f7b3cf2f2</ProjectId>
+      <CorrelationId>Intent.VisualStudio.Projects.CSharpProject#29e10135-470f-4aca-b10d-235f7b3cf2f2</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Modules.Application.DependencyInjection.csproj</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Intent.Modules.Application.DependencyInjection.csproj</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>1d15d8ba-269b-4a31-8855-602cddaa651b</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
+      <ProjectId>29e10135-470f-4aca-b10d-235f7b3cf2f2</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.NugetPackages</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>NugetPackages.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>NugetPackages.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>

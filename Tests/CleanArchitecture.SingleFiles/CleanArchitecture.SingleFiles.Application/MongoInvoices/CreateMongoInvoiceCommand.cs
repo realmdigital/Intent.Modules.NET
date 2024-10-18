@@ -54,12 +54,13 @@ namespace CleanArchitecture.SingleFiles.Application.MongoInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class CreateMongoInvoiceCommandValidator : AbstractValidator<CreateMongoInvoiceCommand>
     {
         [IntentManaged(Mode.Merge)]
         public CreateMongoInvoiceCommandValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

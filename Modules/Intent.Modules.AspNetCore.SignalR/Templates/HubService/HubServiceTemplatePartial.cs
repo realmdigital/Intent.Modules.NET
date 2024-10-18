@@ -23,7 +23,7 @@ namespace Intent.Modules.AspNetCore.SignalR.Templates.HubService
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public HubServiceTemplate(IOutputTarget outputTarget, SignalRHubModel model) : base(TemplateId, outputTarget, model)
         {
-            AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
+            AddTypeSource(TemplateRoles.Application.Contracts.Dto);
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddClass($"{Model.Name.RemoveSuffix("Hub")}HubService", @class =>
@@ -62,12 +62,16 @@ namespace Intent.Modules.AspNetCore.SignalR.Templates.HubService
                             method.AddParameter(UseType("System.Collections.Generic.IReadOnlyList<string>"), "userIds");
                             break;
                         case SendMessageModelStereotypeExtensions.HubSendMessageSettings.TargetClientsOptionsEnum.Group:
-                            clientTarget = "Group(groupId)";
-                            method.AddParameter("string", "groupId");
+                            clientTarget = "Group(groupName)";
+                            method.AddParameter("string", "groupName");
                             break;
                         case SendMessageModelStereotypeExtensions.HubSendMessageSettings.TargetClientsOptionsEnum.Groups:
-                            clientTarget = "Groups(groupIds)";
-                            method.AddParameter(UseType("System.Collections.Generic.IReadOnlyList<string>"), "groupIds");
+                            clientTarget = "Groups(groupNames)";
+                            method.AddParameter(UseType("System.Collections.Generic.IReadOnlyList<string>"), "groupNames");
+                            break;
+                        case SendMessageModelStereotypeExtensions.HubSendMessageSettings.TargetClientsOptionsEnum.Client:
+                            clientTarget = "Client(connectionId)";
+                            method.AddParameter("string", "connectionId");
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -76,6 +80,20 @@ namespace Intent.Modules.AspNetCore.SignalR.Templates.HubService
                     method.AddStatement($@"await _hub.Clients.{clientTarget}.SendAsync(""{messageType}"", model);");
                 });
             }
+            @class.AddMethod(UseType("System.Threading.Tasks.Task"), "AddToGroupAsync", method =>
+            {
+                method.Async();
+                method.AddParameter("string", "connectionId");
+                method.AddParameter("string", "groupName");
+                method.AddStatement("await _hub.Groups.AddToGroupAsync(connectionId, groupName);");
+            });
+            @class.AddMethod(UseType("System.Threading.Tasks.Task"), "RemoveFromGroupAsync", method =>
+            {
+                method.Async();
+                method.AddParameter("string", "connectionId");
+                method.AddParameter("string", "groupName");
+                method.AddStatement("await _hub.Groups.RemoveFromGroupAsync(connectionId, groupName);");
+            });
         }
 
         [IntentManaged(Mode.Fully)]

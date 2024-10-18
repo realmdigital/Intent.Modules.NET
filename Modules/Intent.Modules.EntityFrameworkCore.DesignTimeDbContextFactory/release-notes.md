@@ -1,3 +1,26 @@
+### Version 4.2.2
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.2.1
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.2.0
+
+- Improvement: Added support for Oracle db configurations.
+- Improvement: Only installs when ApplicationDbContext is present.
+
+### Version 4.1.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
+### Version 4.0.7
+
+- Improvement: Updated to be compatible with .NET 8.
+- Improvement: Extended ConfigurationBuilder to additionally load settings from environment variables, or user secrets. (with thanks to [@shainegordon](https://github.com/shainegordon) for their [PR](https://github.com/IntentArchitect/Intent.Modules.NET/pull/13) for this).
+
+
 ### Version 4.0.6
 
 - Improvement: Now listens for `DbMigrationsReadMeCreatedEvent` and mutates the MIGRATION_README file instead of generating its own DESIGN_TIME_MIGRATION_README.

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Intent.Engine;
+using Intent.Modules.Application.MediatR.CRUD.CrudMappingStrategies;
 using Intent.Modelers.Services.CQRS.Api;
 using Intent.Modules.Application.MediatR.CRUD.Decorators;
 using Intent.Modules.Application.MediatR.Templates.CommandHandler;
@@ -15,6 +16,8 @@ internal static class StrategyFactory
     {
         var strategies = new ICrudImplementationStrategy[]
         {
+            new CommandMappingImplementationStrategy(template),
+
             new CreateImplementationStrategy(template),
             new UpdateImplementationStrategy(template),
             new DeleteImplementationStrategy(template),
@@ -23,16 +26,15 @@ internal static class StrategyFactory
         };
 
         var matchedStrategies = strategies.Where(strategy => strategy.IsMatch()).ToArray();
-        if (matchedStrategies.Length == 1)
-        {
-            return matchedStrategies[0];
-        }
-        else if (matchedStrategies.Length > 1)
-        {
-            Logging.Log.Warning($@"Multiple CRUD implementation strategies were found that can implement this Command [{template.Model.Name}]");
-            Logging.Log.Debug($@"Strategies: {string.Join(", ", matchedStrategies.Select(s => s.GetType().Name))}");
-        }
 
+        if (matchedStrategies.Any())
+        {
+            if (matchedStrategies.Length > 1)
+            {
+                Logging.Log.Info($@"Multiple CRUD implementation Strategies Found, using {matchedStrategies.First().GetType().Name} ({string.Join(", ", matchedStrategies.Skip(1).Select(s => s.GetType().Name))})");
+            }
+            return matchedStrategies.First();
+        }
         return null;
     }
 
@@ -40,22 +42,23 @@ internal static class StrategyFactory
     {
         var strategies = new ICrudImplementationStrategy[]
         {
+            new ODataGetAllImplementationStrategy(template, application),
+            new QueryMappingImplementationStrategy(template),
+
             new GetAllImplementationStrategy(template, application),
             new GetByIdImplementationStrategy(template, application),
             new GetAllPaginationImplementationStrategy(template)
         };
 
         var matchedStrategies = strategies.Where(strategy => strategy.IsMatch()).ToArray();
-        if (matchedStrategies.Length == 1)
+        if (matchedStrategies.Any())
         {
-            return matchedStrategies[0];
+            if (matchedStrategies.Length > 1)
+            {
+                Logging.Log.Info($@"Multiple Query Strategies Found, using {matchedStrategies.First().GetType().Name} ({string.Join(", ", matchedStrategies.Skip(1).Select(s => s.GetType().Name))})");
+            }
+            return matchedStrategies.First();
         }
-        else if (matchedStrategies.Length > 1)
-        {
-            Logging.Log.Warning($@"Multiple CRUD implementation strategies were found that can implement this Query [{template.Model.Name}]");
-            Logging.Log.Debug($@"Strategies: {string.Join(", ", matchedStrategies.Select(s => s.GetType().Name))}");
-        }
-
         return null;
     }
 }

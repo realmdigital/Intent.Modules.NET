@@ -1,9 +1,43 @@
-﻿using Intent.Modules.Common.VisualStudio;
+using System;
+using Intent.Engine;
+using Intent.Modules.Common.CSharp.Nuget;
+using Intent.Modules.Common.VisualStudio;
+using Intent.RoslynWeaver.Attributes;
 
-namespace Intent.Modules.Ardalis.Repositories;
+[assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.NugetPackages", Version = "1.0")]
 
-public static class NugetPackages
+namespace Intent.Modules.Ardalis.Repositories
 {
-    public static readonly INugetPackageInfo ArdalisSpecification = new NugetPackageInfo("Ardalis.Specification", "6.1.0");
-    public static readonly INugetPackageInfo ArdalisSpecificationEntityFrameworkCore = new NugetPackageInfo("Ardalis.Specification.EntityFrameworkCore", "6.1.0");
+    public class NugetPackages : INugetPackages
+    {
+        public const string ArdalisSpecificationPackageName = "Ardalis.Specification";
+        public const string ArdalisSpecificationEntityFrameworkCorePackageName = "Ardalis.Specification.EntityFrameworkCore";
+
+        public void RegisterPackages()
+        {
+            NugetRegistry.Register(ArdalisSpecificationPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("8.0.0"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{ArdalisSpecificationPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(ArdalisSpecificationEntityFrameworkCorePackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("8.0.0"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{ArdalisSpecificationEntityFrameworkCorePackageName}'"),
+                    }
+                );
+        }
+
+        public static NugetPackageInfo ArdalisSpecification(IOutputTarget outputTarget) => NugetRegistry.GetVersion(ArdalisSpecificationPackageName, outputTarget.GetMaxNetAppVersion());
+
+        public static NugetPackageInfo ArdalisSpecificationEntityFrameworkCore(IOutputTarget outputTarget) => NugetRegistry.GetVersion(ArdalisSpecificationEntityFrameworkCorePackageName, outputTarget.GetMaxNetAppVersion());
+    }
 }

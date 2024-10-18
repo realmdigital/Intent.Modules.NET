@@ -1,3 +1,24 @@
+### Version 5.5.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.5.2
+
+- Improvement: Support for modeled security `Role`s and `Policy`s
+- Improvement: Controllers and their operations will now generate `[ApiExplorerSettings(IgnoreApi = <value>]` attributes based on the _OpenAPI Settings_ Stereotype's _Ignore_ property's value.
+
+### Version 5.5.1
+
+- Improvement: File transfer ( upload / download ) support.
+
+### Version 5.5.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
+### Version 5.4.2
+
+- Improvement: Added Support for `+` in roles, to describe `and` relationships between roles e.g. `Admin,Manager` (or) vs `Admin+Manager` (and)
+
 ### Version 5.4.1
 
 - Improvement: Will now respect query string parameter names as introduced in [`Intent.Metadata.WebApi` version `4.3.2`](https://github.com/IntentArchitect/Intent.Modules/blob/development/Modules/Intent.Modules.Metadata.WebApi/release-notes.md#version-432).

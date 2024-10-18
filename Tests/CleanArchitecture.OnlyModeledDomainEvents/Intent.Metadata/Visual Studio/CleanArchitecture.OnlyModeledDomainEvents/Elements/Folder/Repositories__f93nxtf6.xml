@@ -4,7 +4,6 @@
   <display>Repositories</display>
   <isAbstract>false</isAbstract>
   <sort-children>by-type-then-by-name</sort-children>
-  <order>4</order>
   <genericTypes />
   <isMapped>false</isMapped>
   <parentFolderId>dbd1894e-bdee-4802-8443-4a98b970827d</parentFolderId>
@@ -22,10 +21,10 @@
   </stereotypes>
   <metadata />
   <childElements>
-    <childElement id="cc1a3969-1346-40e4-9915-cbfe85227c8d" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
-      <name>Intent.Entities.Repositories.Api.EntityRepositoryInterface</name>
-      <display>Intent.Entities.Repositories.Api.EntityRepositoryInterface</display>
-      <externalReference>Intent.Entities.Repositories.Api</externalReference>
+    <childElement id="47bd7ea0-042a-4089-aa8f-9576fd5ed52d" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.CosmosDB.CosmosDBRepositoryInterface</name>
+      <display>Intent.CosmosDB.CosmosDBRepositoryInterface</display>
+      <externalReference>Intent.CosmosDB</externalReference>
       <isAbstract>false</isAbstract>
       <genericTypes />
       <isMapped>false</isMapped>
@@ -38,9 +37,9 @@
       </metadata>
       <childElements />
     </childElement>
-    <childElement id="c15f72f3-a856-4914-8cdc-ed598b41bb74" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
-      <name>Intent.Entities.Repositories.Api.PagedResultInterface</name>
-      <display>Intent.Entities.Repositories.Api.PagedResultInterface</display>
+    <childElement id="cc1a3969-1346-40e4-9915-cbfe85227c8d" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Entities.Repositories.Api.EntityRepositoryInterface</name>
+      <display>Intent.Entities.Repositories.Api.EntityRepositoryInterface</display>
       <externalReference>Intent.Entities.Repositories.Api</externalReference>
       <isAbstract>false</isAbstract>
       <genericTypes />
@@ -102,10 +101,10 @@
       </metadata>
       <childElements />
     </childElement>
-    <childElement id="47bd7ea0-042a-4089-aa8f-9576fd5ed52d" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
-      <name>Intent.CosmosDB.CosmosDBRepositoryInterface</name>
-      <display>Intent.CosmosDB.CosmosDBRepositoryInterface</display>
-      <externalReference>Intent.CosmosDB</externalReference>
+    <childElement id="07efe1b9-873b-4a11-b51e-c1b6514ca328" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Entities.Repositories.Api.PagedListInterface</name>
+      <display>Intent.Entities.Repositories.Api.PagedListInterface</display>
+      <externalReference>Intent.Entities.Repositories.Api</externalReference>
       <isAbstract>false</isAbstract>
       <genericTypes />
       <isMapped>false</isMapped>

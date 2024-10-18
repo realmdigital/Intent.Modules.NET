@@ -22,7 +22,7 @@ namespace Intent.Modules.Azure.BlobStorage.Templates.AzureBlobStorageImplementat
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
+    #line 1 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class AzureBlobStorageImplementationTemplate : CSharpTemplateBase<object>
     {
@@ -34,28 +34,28 @@ namespace Intent.Modules.Azure.BlobStorage.Templates.AzureBlobStorageImplementat
         {
             this.Write("using System;\r\nusing System.Collections.Generic;\r\nusing System.IO;\r\nusing System.Runtime.CompilerServices;\r\nusing System.Threading;\r\nusing System.Threading.Tasks;\r\nusing Azure.Storage.Blobs;\r\nusing Azure.Storage.Blobs.Models;\r\nusing Microsoft.Extensions.Configuration;\r\n\r\n[assembly: DefaultIntentManaged(Mode.Fully)]\r\n\r\nnamespace ");
             
-            #line 23 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
+            #line 23 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n    public class ");
             
-            #line 25 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
+            #line 25 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ClassName));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 25 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
+            #line 25 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.GetBlobStorageInterfaceName()));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n        private const PublicAccessType ContainerPublicAccessType = PublicAccessType.None;\r\n        private readonly BlobServiceClient _client;\r\n\r\n        public ");
             
-            #line 30 "C:\Dev\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
+            #line 30 "E:\Intent.Modules.NET\Modules\Intent.Modules.Azure.BlobStorage\Templates\AzureBlobStorageImplementation\AzureBlobStorageImplementationTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ClassName));
             
             #line default

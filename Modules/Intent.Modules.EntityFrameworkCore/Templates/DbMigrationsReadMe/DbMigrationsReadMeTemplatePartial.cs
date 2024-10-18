@@ -27,22 +27,66 @@ namespace Intent.Modules.EntityFrameworkCore.Templates.DbMigrationsReadMe
         [IntentManaged(Mode.Merge, Signature = Mode.Merge)]
         public DbMigrationsReadMeTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
+            IncludeDbContextArguments = DbContextManager.GetDbContexts(ExecutionContext.GetApplicationConfig().Id, ExecutionContext.MetadataManager).Count > 1;
         }
 
         public bool IncludeStartupProjectArguments { get; set; } = true;
-        public bool IncludeDbContextArguments { get; set; } = false;
+        public bool IncludeDbContextArguments { get; set; }
         public List<string> ExtraArguments { get; } = new();
         public string ExtraComments { get; set; } = string.Empty;
 
         public string BoundedContextName => OutputTarget.ApplicationName();
         public string MigrationProject => OutputTarget.GetProject().Name;
-        public string StartupProject => ExecutionContext.OutputTargets.FirstOrDefault(x => x.Type == VisualStudioProjectTypeIds.CoreWebApp)?.Name ?? "UNKNOWN";
-        public string DbContext => ExecutionContext.FindTemplateInstance<IClassProvider>(DbContextTemplate.TemplateId)?.ClassName ?? "UNKNOWN";
+        //Backwards compatible
+        public string StartupProject => ExecutionContext.OutputTargets.FirstOrDefault(x =>
+        {
+            if (x.Type == VisualStudioProjectTypeIds.CoreWebApp)
+            {
+                return true;
+            }
+            if (x.GetProject() is IHasStereotypes stereotypes && stereotypes.HasStereotype(".NET Settings"))
+            {
+                var settings = stereotypes.GetStereotype(".NET Settings");
+                switch (settings.GetProperty("SDK").Value)
+                {
+                    case "Microsoft.NET.Sdk.Web":
+                    case "Microsoft.NET.Sdk.Worker":
+                        return true;
+                    default:
+                        break;
+                }
+
+                var outputType = settings.GetProperty("Output Type");
+                if (outputType != null)
+                {
+                    switch (outputType.Value)
+                    {
+                        case "Console Application":
+                        case "Windows Application":
+                            return true;
+                        default:
+                            break;
+                    }
+                }
+                var azureFunctionVersion = settings.GetProperty("Azure Functions Version");
+                if (azureFunctionVersion != null && !string.IsNullOrEmpty(azureFunctionVersion.Value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        })?.Name ?? "UNKNOWN";
+        public string DbContext => ExecutionContext.FindTemplateInstance<IClassProvider>(TemplateRoles.Infrastructure.Data.DbContext)?.ClassName ?? "DBCONTEXT_NAME";
 
         public override void BeforeTemplateExecution()
         {
             base.BeforeTemplateExecution();
             ExecutionContext.EventDispatcher.Publish(new DbMigrationsReadMeCreatedEvent(this));
+        }
+
+        public override bool CanRunTemplate()
+        {
+            return DbContextManager.GetDbContexts(this.ExecutionContext.GetApplicationConfig().Id, ExecutionContext.MetadataManager).Any();
         }
 
         [IntentManaged(Mode.Merge, Body = Mode.Ignore, Signature = Mode.Fully)]
@@ -60,8 +104,8 @@ namespace Intent.Modules.EntityFrameworkCore.Templates.DbMigrationsReadMe
         {
             return new[]
             {
-                NugetPackages.EntityFrameworkCoreDesign(OutputTarget),
-                NugetPackages.EntityFrameworkCoreTools(OutputTarget)
+                NugetPackages.MicrosoftEntityFrameworkCoreDesign(OutputTarget),
+                NugetPackages.MicrosoftEntityFrameworkCoreTools(OutputTarget)
             };
         }
 

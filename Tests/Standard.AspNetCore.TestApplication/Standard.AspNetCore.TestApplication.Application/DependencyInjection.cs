@@ -21,9 +21,13 @@ namespace Standard.AspNetCore.TestApplication.Application
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<IValidatorProvider, ValidatorProvider>();
             services.AddTransient<IValidationService, ValidationService>();
+            services.AddTransient<IClientsService, ClientsService>();
             services.AddTransient<IIntegrationService, IntegrationService>();
             services.AddTransient<IInvoicesService, InvoicesService>();
             services.AddTransient<IMultiVersionService, MultiVersionService>();
+            services.AddTransient<IOpenApiIgnoreAllImplicitService, OpenApiIgnoreAllImplicitService>();
+            services.AddTransient<IOpenApiIgnoreSingleService, OpenApiIgnoreSingleService>();
+            services.AddTransient<IOpenApiOptOutSingleService, OpenApiOptOutSingleService>();
             services.AddTransient<IPluralsService, PluralsService>();
             services.AddTransient<IQueryStringNamesService, QueryStringNamesService>();
             services.AddTransient<IValidationTestingService, ValidationTestingService>();

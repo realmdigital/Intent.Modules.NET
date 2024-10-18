@@ -7,8 +7,10 @@ using Intent.Eventing;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Configuration;
 using Intent.Modules.Common.CSharp.Configuration;
+using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
+using Intent.Modules.VisualStudio.Projects.Api;
 using Intent.SdkEvolutionHelpers;
 using Intent.Templates;
 
@@ -20,14 +22,18 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.LaunchSettings
         private int _randomSslPort;
         private string _defaultLaunchUrlPath = string.Empty;
         private bool _launchProfileHttpPortRequired;
+        private CSharpProjectNETModel _model;
 
-        private readonly ICollection<EnvironmentVariableRegistrationRequest> _environmentVariables = new List<EnvironmentVariableRegistrationRequest>();
+        private readonly List<EnvironmentVariableRegistrationRequest> _environmentVariables = new();
+        private bool _noDefaultLaunchSettingsFile;
 
         public const string Identifier = "Intent.VisualStudio.Projects.CoreWeb.LaunchSettings";
 
         public LaunchSettingsJsonTemplate(IOutputTarget outputTarget, IApplicationEventDispatcher applicationEventDispatcher)
             : base(Identifier, outputTarget, null)
         {
+            _model = ExecutionContext.MetadataManager.VisualStudio(ExecutionContext.GetApplicationConfig().Id).GetCSharpProjectNETModels().First(m => m.Id == OutputTarget.Id);
+
             ExecutionContext.EventDispatcher.Subscribe<EnvironmentVariableRegistrationRequest>(HandleEnvironmentVariable);
             ExecutionContext.EventDispatcher.Subscribe<LaunchProfileRegistrationRequest>(HandleLaunchProfileRegistration);
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -35,6 +41,7 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.LaunchSettings
 #pragma warning restore CS0618 // Type or member is obsolete
             ExecutionContext.EventDispatcher.Subscribe<DefaultLaunchUrlPathRequest>(HandleDefaultLaunchUrlRequest);
             ExecutionContext.EventDispatcher.Subscribe(LaunchProfileHttpPortRequired.EventId, _ => _launchProfileHttpPortRequired = true);
+            ExecutionContext.EventDispatcher.Subscribe<AddProjectPropertyEvent>(HandleNoDefaultLaunchSettingsFile);
         }
 
         public override string GetCorrelationId()
@@ -62,6 +69,26 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.LaunchSettings
                     out var publishAllPorts) && publishAllPorts ? null : true,
                 UseSsl = bool.TryParse(@event.TryGetValue(LaunchProfileRegistrationEvent.UseSSL), out var useSsl) && useSsl ? null : false,
             });
+        }
+
+        private void HandleNoDefaultLaunchSettingsFile(AddProjectPropertyEvent @event)
+        {
+            if (!OutputTarget.GetProject().Equals(@event.Target))
+            {
+                return;
+            }
+
+            if (@event.PropertyName != "NoDefaultLaunchSettingsFile")
+            {
+                return;
+            }
+
+            _noDefaultLaunchSettingsFile = @event.PropertyValue == "true";
+        }
+        
+        public override bool CanRunTemplate()
+        {
+            return !_noDefaultLaunchSettingsFile;
         }
 
         private void HandleLaunchProfileRegistration(LaunchProfileRegistrationRequest request)
@@ -160,54 +187,12 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.LaunchSettings
         {
             var launchSettings = TryGetExistingFileContent(out var content)
                 ? LaunchSettings.FromJson(content)
-                : new LaunchSettings
-                {
-                    IisSettings = new IisSetting
-                    {
-                        WindowsAuthentication = false,
-                        AnonymousAuthentication = true,
-                        IisExpress = new IisExpressClass
-                        {
-                            ApplicationUrl = new Uri($"http://localhost:{_randomPort}/"),
-                            SslPort = _randomSslPort
-                        }
-                    },
-                    Profiles = new Dictionary<string, Profile>
-                    {
-
-                        [Project.Name] = Profiles.ContainsKey(Project.Name) ?
-                            ReplacePorts(Profiles[Project.Name])
-                            :  new()
-                            {
-                                CommandName = CommandName.Project,
-                                LaunchBrowser = true,
-                                ApplicationUrl = $"https://localhost:{_randomSslPort}/",
-                                LaunchUrl = _defaultLaunchUrlPath == null
-                                    ? null
-                                    : $"https://localhost:{_randomSslPort}/{_defaultLaunchUrlPath}"
-                            },
-                        ["IIS Express"] = Profiles.ContainsKey("IIS Express") ?
-                            ReplacePorts(Profiles["IIS Express"])
-                            : new()
-                        {
-                            CommandName = CommandName.IisExpress,
-                            LaunchBrowser = true,
-                            LaunchUrl = _defaultLaunchUrlPath == null
-                                ? null
-                                : $"https://localhost:{_randomSslPort}/{_defaultLaunchUrlPath}"
-                        }
-                    }
-                };
+                : GetDefaultLaunchSettings();
 
             foreach (var (key, profile) in Profiles)
             {
                 launchSettings.Profiles ??= new Dictionary<string, Profile>();
-                if (launchSettings.Profiles.ContainsKey(key))
-                {
-                    continue;
-                }
-
-                launchSettings.Profiles[key] = profile;
+                launchSettings.Profiles.TryAdd(key, profile);
             }
 
             if (_launchProfileHttpPortRequired)
@@ -225,15 +210,23 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.LaunchSettings
                 }
             }
 
-            // In case has not been set through an event, sets this be default.
-            _environmentVariables.Add(new EnvironmentVariableRegistrationRequest(
-                "ASPNETCORE_ENVIRONMENT", "Development",
-                new[]
-                {
-                    "IIS Express",
-                    Project.Name
-                }));
-
+            if (IsMicrosoftNETSdkWorker())
+            {
+                // In case has not been set through an event, sets this be default.
+                _environmentVariables.Insert(0, new EnvironmentVariableRegistrationRequest(
+                    "DOTNET_ENVIRONMENT", "Development", new[]{ Project.Name}));
+            }
+            else
+            {
+                // In case has not been set through an event, sets this be default.
+                _environmentVariables.Insert(0, new EnvironmentVariableRegistrationRequest(
+                    "ASPNETCORE_ENVIRONMENT", "Development",
+                    new[]
+                    {
+                        "IIS Express",
+                        Project.Name
+                    }));
+            }
             foreach (var environmentVariable in _environmentVariables)
             {
                 var keys = environmentVariable.TargetProfiles ??= launchSettings.Profiles.Keys;
@@ -250,6 +243,80 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.LaunchSettings
             }
 
             return launchSettings.ToJson();
+        }
+
+        private bool IsMicrosoftNETSdkWorker()
+        {
+            return _model.HasNETSettings() && _model.GetNETSettings().SDK().IsMicrosoftNETSdkWorker();
+        }
+
+        private LaunchSettings GetDefaultLaunchSettings()
+        {
+
+            if (IsMicrosoftNETSdkWorker())
+            {
+                return GetDefaultMicrosoftNETSdkWorkerLaunchSettings();
+            }
+            return GetDefaultWebLaunchSettings();
+        }
+
+        private LaunchSettings GetDefaultMicrosoftNETSdkWorkerLaunchSettings()
+        {
+            return new LaunchSettings
+            {
+                Profiles = new Dictionary<string, Profile>
+                {
+                    [Project.Name] = Profiles.ContainsKey(Project.Name) ?
+                        ReplacePorts(Profiles[Project.Name])
+                        : new()
+                        {
+                            CommandName = CommandName.Project,
+                            DotnetRunMessages = true
+                        }
+                }
+            };
+        }
+
+        private LaunchSettings GetDefaultWebLaunchSettings()
+        {
+            return new LaunchSettings
+            {
+                IisSettings = new IisSetting
+                {
+                    WindowsAuthentication = false,
+                    AnonymousAuthentication = true,
+                    IisExpress = new IisExpressClass
+                    {
+                        ApplicationUrl = new Uri($"http://localhost:{_randomPort}/"),
+                        SslPort = _randomSslPort
+                    }
+                },
+                Profiles = new Dictionary<string, Profile>
+                {
+
+                    [Project.Name] = Profiles.ContainsKey(Project.Name) ?
+                        ReplacePorts(Profiles[Project.Name])
+                        : new()
+                        {
+                            CommandName = CommandName.Project,
+                            LaunchBrowser = true,
+                            ApplicationUrl = $"https://localhost:{_randomSslPort}/",
+                            LaunchUrl = _defaultLaunchUrlPath == null
+                                ? null
+                                : $"https://localhost:{_randomSslPort}/{_defaultLaunchUrlPath}"
+                        },
+                    ["IIS Express"] = Profiles.ContainsKey("IIS Express") ?
+                        ReplacePorts(Profiles["IIS Express"])
+                        : new()
+                        {
+                            CommandName = CommandName.IisExpress,
+                            LaunchBrowser = true,
+                            LaunchUrl = _defaultLaunchUrlPath == null
+                                ? null
+                                : $"https://localhost:{_randomSslPort}/{_defaultLaunchUrlPath}"
+                        }
+                }
+            };
         }
 
         private Profile ReplacePorts(Profile profile)

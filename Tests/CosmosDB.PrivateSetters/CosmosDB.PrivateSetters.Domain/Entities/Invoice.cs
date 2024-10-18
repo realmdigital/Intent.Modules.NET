@@ -4,6 +4,8 @@ using CosmosDB.PrivateSetters.Domain.Common;
 using CosmosDB.PrivateSetters.Domain.Common.Interfaces;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace CosmosDB.PrivateSetters.Domain.Entities
 {
     public class Invoice : IHasDomainEvent, IAuditable

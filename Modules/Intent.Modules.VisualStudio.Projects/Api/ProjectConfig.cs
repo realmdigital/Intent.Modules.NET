@@ -23,7 +23,8 @@ namespace Intent.Modules.VisualStudio.Projects.Api
                 ["Language Version"] = _project.LanguageVersion,
                 ["Nullable Enabled"] = _project.NullableEnabled,
                 ["Target Frameworks"] = _project.TargetFrameworkVersion(),
-                ["Root Namespace"] = _project.GetNETCoreSettings()?.RootNamespace(),
+                ["Root Namespace"] = _project.GetNETSettings()?.RootNamespace() ?? _project.GetNETCoreSettings()?.RootNamespace(),
+                ["InternalElement"] = project.InternalElement,
                 [MetadataKey.IsMatch] = true
             };
         }
@@ -39,7 +40,7 @@ namespace Intent.Modules.VisualStudio.Projects.Api
             .Select(x => x.Trim())
             .ToArray();
         public IEnumerable<IOutputTargetRole> Roles => _project.Roles;
-        public IEnumerable<IOutputTargetTemplate> Templates => _project.TemplateOutputs;
+        public IEnumerable<IOutputTargetTemplate> Templates => _project.TemplateOutputs.DetectDuplicates();
         public IDictionary<string, object> Metadata { get; }
     }
 
@@ -64,7 +65,7 @@ namespace Intent.Modules.VisualStudio.Projects.Api
 
         public IEnumerable<string> SupportedFrameworks => Array.Empty<string>();
         public IEnumerable<IOutputTargetRole> Roles => _model.Roles;
-        public IEnumerable<IOutputTargetTemplate> Templates => _model.TemplateOutputs;
+        public IEnumerable<IOutputTargetTemplate> Templates => _model.TemplateOutputs.DetectDuplicates();
         public IDictionary<string, object> Metadata { get; }
     }
 }

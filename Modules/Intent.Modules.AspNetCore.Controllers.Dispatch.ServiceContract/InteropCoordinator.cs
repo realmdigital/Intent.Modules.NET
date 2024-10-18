@@ -1,24 +1,22 @@
 ﻿using Intent.Engine;
 using Intent.Modules.Common;
+using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
+using Intent.Modules.UnitOfWork.Persistence.Shared;
 
 namespace Intent.Modules.AspNetCore.Controllers.Dispatch.ServiceContract;
 
 public static class InteropCoordinator
 {
-    public static bool ShouldInstallUnitOfWork(IApplication application)
+    public static bool ShouldInstallUnitOfWork(ICSharpFileBuilderTemplate template)
     {
-        var hasUnitOfWorkInterface =
-            application.FindTemplateInstance<IClassProvider>(TemplateFulfillingRoles.Domain.UnitOfWork) != null ||
-            application.FindTemplateInstance<IClassProvider>(TemplateFulfillingRoles.Application.Common.DbContextInterface) != null;
-        var hasUnitOfWorkConcrete = application.FindTemplateInstance<IClassProvider>("Infrastructure.Data.DbContext") != null;
-        return hasUnitOfWorkInterface && hasUnitOfWorkConcrete;
+        return template.SystemUsesPersistenceUnitOfWork();
     }
 
     public static bool ShouldInstallMessageBus(IApplication application)
     {
-        return application.FindTemplateInstance<IClassProvider>(TemplateFulfillingRoles.Application.Eventing.EventBusInterface) != null;
+        return application.FindTemplateInstance<IClassProvider>(TemplateRoles.Application.Eventing.EventBusInterface) != null;
     }
     
     public static bool ShouldInstallMongoDbUnitOfWork(IApplication application)

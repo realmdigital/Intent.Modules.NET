@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Intent.RoslynWeaver.Attributes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using RichDomain.Application.Common.Interfaces;
 using RichDomain.Domain.Common;
 using RichDomain.Domain.Common.Interfaces;
@@ -21,11 +22,11 @@ namespace RichDomain.Infrastructure.Persistence
         private readonly ICurrentUserService _currentUserService;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,
-            IDomainEventService domainEventService,
-            ICurrentUserService currentUserService) : base(options)
+            ICurrentUserService currentUserService,
+            IDomainEventService domainEventService) : base(options)
         {
-            _domainEventService = domainEventService;
             _currentUserService = currentUserService;
+            _domainEventService = domainEventService;
         }
 
         public DbSet<BaseClass> BaseClasses { get; set; }
@@ -104,6 +105,7 @@ namespace RichDomain.Infrastructure.Persistence
                 .Select(entry => new
                 {
                     entry.State,
+                    Property = new Func<string, PropertyEntry>(entry.Property),
                     Auditable = (IAuditable)entry.Entity
                 })
                 .ToArray();
@@ -113,7 +115,7 @@ namespace RichDomain.Infrastructure.Persistence
                 return;
             }
 
-            var userId = _currentUserService.UserId ?? throw new InvalidOperationException("UserId is null");
+            var userIdentifier = _currentUserService.UserId ?? throw new InvalidOperationException("UserId is null");
             var timestamp = DateTimeOffset.UtcNow;
 
             foreach (var entry in auditableEntries)
@@ -121,10 +123,12 @@ namespace RichDomain.Infrastructure.Persistence
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Auditable.SetCreated(userId, timestamp);
+                        entry.Auditable.SetCreated(userIdentifier, timestamp);
                         break;
                     case EntityState.Modified or EntityState.Deleted:
-                        entry.Auditable.SetUpdated(userId, timestamp);
+                        entry.Auditable.SetUpdated(userIdentifier, timestamp);
+                        entry.Property("CreatedBy").IsModified = false;
+                        entry.Property("CreatedDate").IsModified = false;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

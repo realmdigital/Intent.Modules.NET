@@ -14,8 +14,8 @@ using Intent.RoslynWeaver.Attributes;
 using Intent.SoftwareFactory;
 using Intent.Templates;
 
-[assembly: IntentTemplate("Intent.ModuleBuilder.TemplateRegistration.FilePerModel", Version = "1.0")]
 [assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.TemplateRegistration.FilePerModel", Version = "1.0")]
 
 namespace Intent.Modules.Entities.Templates.DomainEntity
 {
@@ -31,6 +31,7 @@ namespace Intent.Modules.Entities.Templates.DomainEntity
 
         public override string TemplateId => DomainEntityTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, ClassModel model)
         {
             return new DomainEntityTemplate(outputTarget, model);

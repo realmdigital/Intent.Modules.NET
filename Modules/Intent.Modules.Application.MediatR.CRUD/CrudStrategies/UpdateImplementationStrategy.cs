@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
+using System.Threading;
 using Intent.Metadata.Models;
 using Intent.Modelers.Domain.Api;
 using Intent.Modelers.Services.Api;
@@ -8,13 +10,17 @@ using Intent.Modelers.Services.CQRS.Api;
 using Intent.Modules.Application.MediatR.CRUD.Decorators;
 using Intent.Modules.Application.MediatR.Templates;
 using Intent.Modules.Application.MediatR.Templates.CommandHandler;
+using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
+using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
-using Intent.Modules.Entities.Repositories.Api.Templates;
 using Intent.Modules.Entities.Settings;
 using Intent.Modules.Modelers.Domain.Settings;
+using Intent.Templates;
+using OperationModelExtensions = Intent.Modelers.Domain.Api.OperationModelExtensions;
+using ParameterModelExtensions = Intent.Modelers.Domain.Api.ParameterModelExtensions;
 
 namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
 {
@@ -39,9 +45,9 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
         public void ApplyStrategy()
         {
             var @class = ((ICSharpFileBuilderTemplate)_template).CSharpFile.Classes.First(x => x.HasMetadata("handler"));
-            _template.AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Primary);
-            _template.AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
-            _template.AddTypeSource(TemplateFulfillingRoles.Domain.DataContract);
+            _template.AddTypeSource(TemplateRoles.Domain.Entity.Primary);
+            _template.AddTypeSource(TemplateRoles.Domain.ValueObject);
+            _template.AddTypeSource(TemplateRoles.Domain.DataContract);
             _template.AddUsing("System.Linq");
             
             var ctor = @class.Constructors.First();
@@ -78,7 +84,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                 codeLines.Add($"var aggregateRoot = await {repository.FieldName}.FindByIdAsync({aggregateRootIdFields.GetEntityIdFromRequest(_template.Model.InternalElement)}, cancellationToken);");
                 codeLines.Add(_template.CreateThrowNotFoundIfNullStatement(
                     variable: "aggregateRoot",
-                    message: $"{{nameof({_template.GetTypeName(TemplateFulfillingRoles.Domain.Entity.Primary, nestedCompOwner)})}} of Id '{aggregateRootIdFields.GetEntityIdFromRequestDescription()}' could not be found"));
+                    message: $"{{nameof({_template.GetTypeName(TemplateRoles.Domain.Entity.Primary, nestedCompOwner)})}} of Id '{aggregateRootIdFields.GetEntityIdFromRequestDescription()}' could not be found"));
                 codeLines.Add(string.Empty);
 
                 var association = nestedCompOwner.GetNestedCompositeAssociation(_matchingElementDetails.Value.FoundEntity);
@@ -86,7 +92,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                 codeLines.Add($@"var {entityVariableName} = aggregateRoot.{association.Name.ToCSharpIdentifier(CapitalizationBehaviour.AsIs)}.FirstOrDefault({idFields.GetPropertyToRequestMatchClause()});");
                 codeLines.Add(_template.CreateThrowNotFoundIfNullStatement(
                     variable: entityVariableName,
-                    message: $"{{nameof({_template.GetTypeName(TemplateFulfillingRoles.Domain.Entity.Primary, foundEntity)})}} of Id '{idFields.GetEntityIdFromRequestDescription()}' could not be found associated with {{nameof({_template.GetTypeName(TemplateFulfillingRoles.Domain.Entity.Primary, nestedCompOwner)})}} of Id '{aggregateRootIdFields.GetEntityIdFromRequestDescription()}'"));
+                    message: $"{{nameof({_template.GetTypeName(TemplateRoles.Domain.Entity.Primary, foundEntity)})}} of Id '{idFields.GetEntityIdFromRequestDescription()}' could not be found associated with {{nameof({_template.GetTypeName(TemplateRoles.Domain.Entity.Primary, nestedCompOwner)})}} of Id '{aggregateRootIdFields.GetEntityIdFromRequestDescription()}'"));
                 codeLines.Add(string.Empty);
 
                 codeLines.AddRange(GetDtoPropertyAssignments(entityVarName: entityVariableName, dtoVarName: "request", domainAttributes: foundEntity.Attributes, dtoFields: _template.Model.Properties.Where(FilterForAnaemicMapping).ToList(), skipIdField: true));
@@ -104,6 +110,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                 variable: entityVariableName,
                 message: $"Could not find {foundEntity.Name.ToPascalCase()} '{idFields.GetEntityIdFromRequestDescription()}'"));
             codeLines.Add(string.Empty);
+
 
             codeLines.AddRange(GetDtoPropertyAssignments(entityVarName: entityVariableName, dtoVarName: "request", domainAttributes: foundEntity.Attributes, dtoFields: _template.Model.Properties, skipIdField: true));
 
@@ -132,7 +139,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
         private bool RepositoryRequiresExplicitUpdate()
         {
             return _template.TryGetTemplate<ICSharpFileBuilderTemplate>(
-                       TemplateFulfillingRoles.Repository.Interface.Entity,
+                       TemplateRoles.Repository.Interface.Entity,
                        _matchingElementDetails.Value.RepositoryInterfaceModel,
                        out var repositoryInterfaceTemplate) &&
                    repositoryInterfaceTemplate.CSharpFile.Interfaces[0].TryGetMetadata<bool>("requires-explicit-update", out var requiresUpdate) &&
@@ -165,8 +172,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
             var nestedCompOwner = foundEntity.GetNestedCompositionalOwner();
             var repositoryInterfaceModel = nestedCompOwner != null ? nestedCompOwner : foundEntity;
 
-            var repositoryInterface = _template.GetEntityRepositoryInterfaceName(repositoryInterfaceModel);
-            if (repositoryInterface == null)
+            if (!_template.TryGetTypeName(TemplateRoles.Repository.Interface.Entity, repositoryInterfaceModel, out var repositoryInterface))
             {
                 return NoMatch;
             }
@@ -246,7 +252,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                                 }
                                 else
                                 {
-                                    codeLines.Add($"{property} = {dtoVarName}.{field.Name.ToPascalCase()}.Select(x => {factoryMethodName}(x)).ToList());");
+                                    codeLines.Add($"{property} = {dtoVarName}.{field.Name.ToPascalCase()}.Select(x => {factoryMethodName}(x)).ToList();");
                                 }
                                 ((ICSharpFileBuilderTemplate)_template).AddValueObjectFactoryMethod(factoryMethodName, targetValueObject, field);
                                 break;
@@ -285,21 +291,30 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
             return $"(e, d) => {string.Join(" && ", dtoFields.Select(dtoField => $"e.{(dtoField.Mapping != null ? dtoField.Mapping.Element.AsAttributeModel().Name.ToPascalCase() : "Id")} == d.{dtoField.Name.ToPascalCase()}"))}";
         }
 
+        public void BindToTemplate(ICSharpFileBuilderTemplate template)
+        {
+            template.CSharpFile.AfterBuild(_ => ApplyStrategy());
+        }
+
         private void AddCreateOrUpdateMethod(string updateMethodName, IElement domainElement, DTOFieldModel field)
         {
-            var domainTypeName = _template.GetTypeName(domainElement);
+            var createEntityInterfaces = _template.ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces();            
+            var implementationName = _template.GetTypeName(TemplateRoles.Domain.Entity.EntityImplementation, domainElement);
+            var interfaceName = createEntityInterfaces ? _template.GetTypeName(TemplateRoles.Domain.Entity.Interface, domainElement) : implementationName;
+            string nullableChar = _template.OutputTarget.GetProject().NullableEnabled ? "?" : "";
+
             var fieldIsNullable = field.TypeReference.IsNullable;
+            var nullable = fieldIsNullable ? "?" : string.Empty;
 
             var @class = ((ICSharpFileBuilderTemplate)_template).CSharpFile.Classes.First(x => x.HasMetadata("handler"));
             var existingMethod = @class.FindMethod(x => x.Name == updateMethodName &&
-                                                        x.ReturnType == domainTypeName &&
-                                                        x.Parameters.FirstOrDefault()?.Type == domainTypeName &&
+                                                        x.ReturnType == $"{interfaceName}{nullable}" &&
+                                                        x.Parameters.FirstOrDefault()?.Type == $"{interfaceName}{nullable}" &&
                                                         x.Parameters.Skip(1).FirstOrDefault()?.Type == _template.GetTypeName((IElement)field.TypeReference.Element));
             if (existingMethod == null)
             {
-                var nullable = fieldIsNullable ? "?" : string.Empty;
 
-                @class.AddMethod($"{domainTypeName}{nullable}",
+                @class.AddMethod($"{interfaceName}{nullable}",
                     updateMethodName,
                     method =>
                     {
@@ -307,7 +322,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                         method.Private()
                             .Static()
                             .AddAttribute(CSharpIntentManagedAttribute.Fully())
-                            .AddParameter($"{domainTypeName}{nullable}", "entity")
+                            .AddParameter($"{interfaceName}{nullableChar}", "entity")
                             .AddParameter($"{_template.GetTypeName((IElement)field.TypeReference.Element)}{nullable}", "dto");
 
                         if (fieldIsNullable)
@@ -316,7 +331,7 @@ namespace Intent.Modules.Application.MediatR.CRUD.CrudStrategies
                                 .AddStatement("return null;"));
                         }
 
-                        method.AddStatement($"entity ??= new {domainTypeName}();", s => s.SeparatedFromPrevious())
+                        method.AddStatement($"entity ??= new {implementationName}();", s => s.SeparatedFromPrevious())
                             .AddStatements(GetDtoPropertyAssignments(
                                 entityVarName: "entity",
                                 dtoVarName: "dto",

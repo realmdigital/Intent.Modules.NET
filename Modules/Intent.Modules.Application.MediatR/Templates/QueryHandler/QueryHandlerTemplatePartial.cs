@@ -27,6 +27,8 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryHandler
         [IntentManaged(Mode.Merge, Signature = Mode.Fully)]
         public QueryHandlerTemplate(IOutputTarget outputTarget, QueryModel model) : base(TemplateId, outputTarget, model)
         {
+
+
             SetDefaultCollectionFormatter(CSharpCollectionFormatter.CreateList());
             CSharpFile = new CSharpFile($"{this.GetQueryNamespace()}", $"{this.GetQueryFolderPath()}");
             Configure(this, model);
@@ -39,10 +41,13 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryHandler
 
         public static void Configure(ICSharpFileBuilderTemplate template, QueryModel model)
         {
-            template.AddNugetDependency(NuGetPackages.MediatR);
-            template.AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
-            template.AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
-            template.AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Enum);
+            template.AddNugetDependency(NugetPackages.MediatR(template.OutputTarget));
+            template.AddTypeSource(TemplateRoles.Application.Query);
+            template.AddTypeSource(TemplateRoles.Domain.Enum);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Dto);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Enum);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Clients.Dto);
+            template.AddTypeSource(TemplateRoles.Application.Contracts.Clients.Enum);
 
             template.CSharpFile
                 .AddUsing("System")
@@ -53,19 +58,21 @@ namespace Intent.Modules.Application.MediatR.Templates.QueryHandler
                 {
                     @class.AddMetadata("handler", true);
                     @class.AddMetadata("model", model);
-                    @class.WithBaseType(GetRequestHandlerInterface(template, model));
+                    @class.ImplementsInterface(GetRequestHandlerInterface(template, model));
                     @class.AddAttribute("IntentManaged(Mode.Merge, Signature = Mode.Fully)");
                     @class.AddConstructor(ctor =>
                     {
-                        ctor.AddAttribute("IntentManaged(Mode.Ignore)");
+                        ctor.AddAttribute(CSharpIntentManagedAttribute.Merge());
                     });
                     @class.AddMethod($"Task<{template.GetTypeName(model.TypeReference)}>", "Handle", method =>
                     {
+                        method.RegisterAsProcessingHandlerForModel(model);
                         method.TryAddXmlDocComments(model.InternalElement);
                         method.Async();
                         method.AddAttribute(CSharpIntentManagedAttribute.IgnoreBody());
                         method.AddParameter(GetQueryModelName(template, model), "request");
                         method.AddParameter("CancellationToken", "cancellationToken");
+                        method.AddStatement($"// TODO: Implement {method.Name} ({@class.Name}) functionality");
                         method.AddStatement($@"throw new NotImplementedException(""Your implementation here..."");");
                     });
                 });

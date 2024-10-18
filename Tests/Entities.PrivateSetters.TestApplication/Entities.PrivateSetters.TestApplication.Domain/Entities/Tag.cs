@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Intent.RoslynWeaver.Attributes;
+
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
 
 namespace Entities.PrivateSetters.TestApplication.Domain.Entities
 {
@@ -10,7 +11,5 @@ namespace Entities.PrivateSetters.TestApplication.Domain.Entities
         public Guid Id { get; private set; }
 
         public string Name { get; private set; }
-
-        protected virtual ICollection<Invoice> Invoices { get; set; }
     }
 }

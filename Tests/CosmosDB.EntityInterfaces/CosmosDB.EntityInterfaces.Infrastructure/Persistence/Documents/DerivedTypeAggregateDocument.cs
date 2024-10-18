@@ -13,12 +13,15 @@ namespace CosmosDB.EntityInterfaces.Infrastructure.Persistence.Documents
     internal class DerivedTypeAggregateDocument : IDerivedTypeAggregateDocument, ICosmosDBDocument<IDerivedTypeAggregate, DerivedTypeAggregate, DerivedTypeAggregateDocument>
     {
         private string? _type;
+        [JsonProperty("_etag")]
+        protected string? _etag;
         [JsonProperty("type")]
         string IItem.Type
         {
             get => _type ??= GetType().GetNameForDocument();
             set => _type = value;
         }
+        string? IItemWithEtag.Etag => _etag;
         public string Id { get; set; } = default!;
 
         public DerivedTypeAggregate ToEntity(DerivedTypeAggregate? entity = default)
@@ -30,21 +33,25 @@ namespace CosmosDB.EntityInterfaces.Infrastructure.Persistence.Documents
             return entity;
         }
 
-        public DerivedTypeAggregateDocument PopulateFromEntity(IDerivedTypeAggregate entity)
+        public DerivedTypeAggregateDocument PopulateFromEntity(IDerivedTypeAggregate entity, Func<string, string?> getEtag)
         {
             Id = entity.Id;
+
+            _etag = _etag == null ? getEtag(((IItem)this).Id) : _etag;
 
             return this;
         }
 
-        public static DerivedTypeAggregateDocument? FromEntity(IDerivedTypeAggregate? entity)
+        public static DerivedTypeAggregateDocument? FromEntity(
+            IDerivedTypeAggregate? entity,
+            Func<string, string?> getEtag)
         {
             if (entity is null)
             {
                 return null;
             }
 
-            return new DerivedTypeAggregateDocument().PopulateFromEntity(entity);
+            return new DerivedTypeAggregateDocument().PopulateFromEntity(entity, getEtag);
         }
     }
 }

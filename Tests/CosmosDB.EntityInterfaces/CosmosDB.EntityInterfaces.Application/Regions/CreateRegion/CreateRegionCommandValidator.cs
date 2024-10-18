@@ -1,3 +1,4 @@
+using CosmosDB.EntityInterfaces.Application.Common.Validation;
 using FluentValidation;
 using Intent.RoslynWeaver.Attributes;
 
@@ -6,21 +7,23 @@ using Intent.RoslynWeaver.Attributes;
 
 namespace CosmosDB.EntityInterfaces.Application.Regions.CreateRegion
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class CreateRegionCommandValidator : AbstractValidator<CreateRegionCommand>
     {
         [IntentManaged(Mode.Merge)]
-        public CreateRegionCommandValidator()
+        public CreateRegionCommandValidator(IValidatorProvider provider)
         {
-            ConfigureValidationRules();
+            ConfigureValidationRules(provider);
         }
 
-        private void ConfigureValidationRules()
+        private void ConfigureValidationRules(IValidatorProvider provider)
         {
             RuleFor(v => v.Name)
                 .NotNull();
 
             RuleFor(v => v.Countries)
-                .NotNull();
+                .NotNull()
+                .ForEach(x => x.SetValidator(provider.GetValidator<CreateRegionCountryDto>()!));
         }
     }
 }

@@ -7,6 +7,7 @@ using TableStorage.Tests.Application.Common.Validation;
 
 namespace TableStorage.Tests.Application.Orders.CreateOrder
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
     {
         [IntentManaged(Mode.Merge)]
@@ -29,6 +30,10 @@ namespace TableStorage.Tests.Application.Orders.CreateOrder
             RuleFor(v => v.Customer)
                 .NotNull()
                 .SetValidator(provider.GetValidator<CreateOrderCustomerDto>()!);
+
+            RuleFor(v => v.OrderLines)
+                .NotNull()
+                .ForEach(x => x.SetValidator(provider.GetValidator<CreateOrderOrderLineDto>()!));
         }
     }
 }

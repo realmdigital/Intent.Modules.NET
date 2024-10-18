@@ -1,3 +1,53 @@
+### Version 4.7.0
+
+- Fixed: Domain constraints not being propagated into validators when the data graph is more than two levels deep.
+- Fixed: Validations not being applied when mapping to constructor parameters.
+
+### Version 4.6.4
+
+- Fixed: Update the `UnhandledExceptionBehaviour` in `Intent.Application.MediatR.Behaviours` to not allow logging of `ValidationExceptions` as part of unhandled exceptions.
+
+### Version 4.6.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.6.2
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.6.1
+
+- Improvement: Added `TODO` comments on `NotImplementedException`.
+- Fix: Unique Constraint validation ignores Included columns.
+
+### Version 4.6.0
+
+- Improvement: Added Regular Expressions for Validation.
+- Improvement: Module project updated to .NET 8.
+- Fix: Fixed issue where DTO's for compositional entities does not include validation rules.
+
+### Version 4.5.3
+
+- Improvement: Ignore custom validation rules when generating service proxies.
+
+### Version 4.5.2
+
+- Improvement: Added IntentManaged Body Merge attribute to the `ConfigureValidationRules` method to prevent it from being updated when the Software Factory is re-executed.
+
+### Version 4.5.1
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
+### Version 4.5.0
+
+- Improvement: Removed `// IntentMatch(...)` code management instructions from templates which are no longer needed since version `4.4.0` of the `Intent.OutputManager.RoslynWeaver` module.
+- Improvement: Added CascadeMode option on Fluent Validations to specify this behaviour.
+- Fixed: Text constraint and Index unique constraints will work again with advanced mapping scenarios.
+
+### Version 4.4.3
+
+- Fixed: Migration improvement using Roslyn instead of Regex to avoid updating incorrect IntentManaged attributes.
+
 ### Version 4.4.2
 
 - Improvement: Added support for the [new Email Address](https://github.com/IntentArchitect/Intent.Modules.NET/blob/development/Modules/Intent.Modules.Application.FluentValidation/release-notes.md#version-383) option on the Validation stereotype.

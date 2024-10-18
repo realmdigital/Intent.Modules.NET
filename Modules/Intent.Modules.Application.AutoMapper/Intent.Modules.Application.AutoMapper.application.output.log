@@ -3,13 +3,21 @@
   <ApplicationId>cece4e6c-f47b-4af0-8f8f-9581465e9792</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#67bbd2be-4fe1-4309-a20b-8a9ad4720cd1</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#67bbd2be-4fe1-4309-a20b-8a9ad4720cd1</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.Net.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>34f467f9-4a45-43ad-8fe7-5dcb850e724a</ProjectId>
+      <ProjectId>4c521b48-b619-4ce1-b177-f18cb4391bc8</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.Templates.FactoryExtension#c728fd6f-1d65-4d54-96b7-b1d7c45ea647</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>FactoryExtentions/EFRepositoryExtension.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>EFRepositoryExtension.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>07e0ac96-6376-4f9b-bffc-6fe478595bd6</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.IModSpecFile</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Application.AutoMapper.imodspec</ApplicationRelativeFilePath>
@@ -17,19 +25,19 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>34f467f9-4a45-43ad-8fe7-5dcb850e724a</ProjectId>
-      <CorrelationId>Intent.VisualStudio.Projects.CoreLibrary.CSProject#34f467f9-4a45-43ad-8fe7-5dcb850e724a</CorrelationId>
-      <OverwriteBehaviour>once-off</OverwriteBehaviour>
+      <ProjectId>07e0ac96-6376-4f9b-bffc-6fe478595bd6</ProjectId>
+      <CorrelationId>Intent.VisualStudio.Projects.CSharpProject#07e0ac96-6376-4f9b-bffc-6fe478595bd6</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Modules.Application.AutoMapper.csproj</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Intent.Modules.Application.AutoMapper.csproj</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>34f467f9-4a45-43ad-8fe7-5dcb850e724a</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
+      <ProjectId>07e0ac96-6376-4f9b-bffc-6fe478595bd6</ProjectId>
+      <CorrelationId>Intent.ModuleBuilder.CSharp.Templates.NugetPackages</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>NugetPackages.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>NugetPackages.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -102,7 +110,7 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Templates/TemplateExtensions.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>TemplateExtensions.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
+      <IsIgnored>true</IsIgnored>
     </FileLog>
   </FileLogs>
 </outputLog>

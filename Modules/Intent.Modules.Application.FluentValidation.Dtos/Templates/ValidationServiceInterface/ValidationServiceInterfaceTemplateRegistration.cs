@@ -29,9 +29,11 @@ namespace Intent.Modules.Application.FluentValidation.Dtos.Templates.ValidationS
             if (!application.MetadataManager.Services(application).GetDTOModels()
                     .Any(x => !x.HasMapFromDomainMapping() && ValidationRulesExtensions.HasValidationRules(
                         dtoModel: x,
-                        dtoTemplateId: TemplateFulfillingRoles.Application.Contracts.Dto,
-                        dtoValidatorTemplateId: TemplateFulfillingRoles.Application.Validation.Dto,
-                        uniqueConstraintValidationEnabled: application.Settings.GetFluentValidationApplicationLayer().UniqueConstraintValidation().IsDefaultEnabled())))
+                        dtoTemplateId: TemplateRoles.Application.Contracts.Dto,
+                        dtoValidatorTemplateId: TemplateRoles.Application.Validation.Dto,
+                        uniqueConstraintValidationEnabled: application.Settings.GetFluentValidationApplicationLayer().UniqueConstraintValidation().IsDefaultEnabled(),
+                        customValidationEnabled: true,
+                        associationedElements: x.InternalElement?.AssociatedElements)))
             {
                 AbortRegistration(); // Need cleaner, more obvious way, to do this
                 return;
@@ -39,6 +41,7 @@ namespace Intent.Modules.Application.FluentValidation.Dtos.Templates.ValidationS
             base.DoRegistration(registry, application);
         }
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget)
         {
             return new ValidationServiceInterfaceTemplate(outputTarget);

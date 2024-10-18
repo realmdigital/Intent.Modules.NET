@@ -1,4 +1,17 @@
-﻿### Version 4.1.1
+### Version 4.2.1
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.2.0
+
+- New Feature: Value Objects can now be `Record` types.
+- Improvement: Updated to .NET 8 for Module project.
+
+### Version 4.1.3
+
+- Fixed: Value Object equality comparisons now taking into account EF Lazy Loading Proxies (Castle Proxies).
+
+### Version 4.1.1
 
 - Fixed: Nullability related compiler warnings.
 

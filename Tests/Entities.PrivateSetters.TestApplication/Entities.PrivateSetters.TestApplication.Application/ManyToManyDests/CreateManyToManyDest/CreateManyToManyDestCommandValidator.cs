@@ -1,4 +1,3 @@
-using System;
 using FluentValidation;
 using Intent.RoslynWeaver.Attributes;
 
@@ -7,6 +6,7 @@ using Intent.RoslynWeaver.Attributes;
 
 namespace Entities.PrivateSetters.TestApplication.Application.ManyToManyDests.CreateManyToManyDest
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class CreateManyToManyDestCommandValidator : AbstractValidator<CreateManyToManyDestCommand>
     {
         [IntentManaged(Mode.Fully, Body = Mode.Merge, Signature = Mode.Merge)]

@@ -1,13 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Intent.Dapr.AspNetCore.Pubsub.Api;
 using Intent.Engine;
 using Intent.Modules.Common;
+using Intent.Modules.Common.CSharp.AppStartup;
 using Intent.Modules.Common.CSharp.Builder;
+using Intent.Modules.Common.CSharp.DependencyInjection;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
-using Intent.Modules.Dapr.AspNetCore.Pubsub.Templates.EventHandler;
+using Intent.Modules.Dapr.AspNetCore.Pubsub.Templates.EventHandlerImplementation;
 using Intent.Modules.Eventing.Contracts.Templates;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -25,8 +28,8 @@ namespace Intent.Modules.Dapr.AspNetCore.Pubsub.Templates.DaprEventHandlerContro
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public DaprEventHandlerControllerTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NuGetPackages.DaprAspNetCore);
-            AddNugetDependency(NuGetPackages.MediatR);
+            AddNugetDependency(NugetPackages.DaprAspNetCore(outputTarget));
+            AddNugetDependency(NugetPackages.MediatR(outputTarget));
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("System.Threading")
@@ -46,7 +49,7 @@ namespace Intent.Modules.Dapr.AspNetCore.Pubsub.Templates.DaprEventHandlerContro
                             .AddParameter("ISender", "mediatr", p => p.IntroduceReadonlyField())
                         );
 
-                    var eventHandlerTemplates = ExecutionContext.FindTemplateInstances<EventHandlerTemplate>(TemplateDependency.OfType<EventHandlerTemplate>())
+                    var eventHandlerTemplates = ExecutionContext.FindTemplateInstances<EventHandlerImplementationTemplate>(TemplateDependency.OfType<EventHandlerImplementationTemplate>())
                         .ToArray();
 
                     foreach (var eventHandler in eventHandlerTemplates)
@@ -71,35 +74,30 @@ namespace Intent.Modules.Dapr.AspNetCore.Pubsub.Templates.DaprEventHandlerContro
         {
             base.AfterTemplateRegistration();
 
-            var startupTemplate = ExecutionContext.FindTemplateInstance<ICSharpFileBuilderTemplate>("App.Startup");
-            if (startupTemplate == null)
+            var startupTemplate = ExecutionContext.FindTemplateInstance<IAppStartupTemplate>(IAppStartupTemplate.RoleName);
+            startupTemplate?.CSharpFile.AfterBuild(_ =>
             {
-                return;
-            }
-
-            startupTemplate.CSharpFile.AfterBuild(file =>
-            {
-                var configureMethod = file.Classes.First().FindMethod("Configure");
-                if (configureMethod == null)
+                startupTemplate.StartupFile.ConfigureApp((statements, context) =>
                 {
-                    return;
-                }
+                    ExecutionContext.EventDispatcher.Publish(
+                        ApplicationBuilderRegistrationRequest.ToRegister(
+                                extensionMethodName: "UseCloudEvents")
+                            .WithPriority(-200));
+                });
 
-                configureMethod.Statements[1].BeforeSeparator = CSharpCodeSeparatorType.NewLine;
-                configureMethod.Statements[1].InsertAbove("app.UseCloudEvents();", s => s.SeparatedFromPrevious());
-
-                var block = (IHasCSharpStatements)configureMethod
-                    .FindStatement(x => x.ToString().Contains("app.UseEndpoints"));
-
-                block?
-                    .FindStatement(x => x.ToString().Contains("endpoints.MapControllers()"))
-                    .InsertAbove("endpoints.MapSubscribeHandler();");
+                startupTemplate.StartupFile.ConfigureEndpoints((statements, context) =>
+                {
+                    statements
+                        .FindStatement(x => x.ToString()!.Contains(".MapControllers("))
+                        .InsertAbove($"{context.Endpoints}.MapSubscribeHandler();");
+                });
             });
         }
 
         public override bool CanRunTemplate()
         {
-            var eventHandlerTemplates = ExecutionContext.FindTemplateInstances<EventHandlerTemplate>(TemplateDependency.OfType<EventHandlerTemplate>())
+            var eventHandlerTemplates = ExecutionContext
+                .FindTemplateInstances<EventHandlerImplementationTemplate>(TemplateDependency.OfType<EventHandlerImplementationTemplate>())
                 .ToArray();
 
             return eventHandlerTemplates.Any() && base.CanRunTemplate();

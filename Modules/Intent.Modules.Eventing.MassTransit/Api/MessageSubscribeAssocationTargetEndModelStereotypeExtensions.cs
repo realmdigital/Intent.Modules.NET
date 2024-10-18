@@ -15,14 +15,14 @@ namespace Intent.Eventing.MassTransit.Api
     {
         public static AzureServiceBusConsumerSettings GetAzureServiceBusConsumerSettings(this MessageSubscribeAssocationTargetEndModel model)
         {
-            var stereotype = model.GetStereotype("Azure Service Bus Consumer Settings");
+            var stereotype = model.GetStereotype("a592112c-5f85-4755-b07c-cfa293fce8df");
             return stereotype != null ? new AzureServiceBusConsumerSettings(stereotype) : null;
         }
 
 
         public static bool HasAzureServiceBusConsumerSettings(this MessageSubscribeAssocationTargetEndModel model)
         {
-            return model.HasStereotype("Azure Service Bus Consumer Settings");
+            return model.HasStereotype("a592112c-5f85-4755-b07c-cfa293fce8df");
         }
 
         public static bool TryGetAzureServiceBusConsumerSettings(this MessageSubscribeAssocationTargetEndModel model, out AzureServiceBusConsumerSettings stereotype)
@@ -33,20 +33,20 @@ namespace Intent.Eventing.MassTransit.Api
                 return false;
             }
 
-            stereotype = new AzureServiceBusConsumerSettings(model.GetStereotype("Azure Service Bus Consumer Settings"));
+            stereotype = new AzureServiceBusConsumerSettings(model.GetStereotype("a592112c-5f85-4755-b07c-cfa293fce8df"));
             return true;
         }
 
         public static RabbitMQConsumerSettings GetRabbitMQConsumerSettings(this MessageSubscribeAssocationTargetEndModel model)
         {
-            var stereotype = model.GetStereotype("Rabbit MQ Consumer Settings");
+            var stereotype = model.GetStereotype("43ff81bf-7e41-40c9-a1cd-041b4195cade");
             return stereotype != null ? new RabbitMQConsumerSettings(stereotype) : null;
         }
 
 
         public static bool HasRabbitMQConsumerSettings(this MessageSubscribeAssocationTargetEndModel model)
         {
-            return model.HasStereotype("Rabbit MQ Consumer Settings");
+            return model.HasStereotype("43ff81bf-7e41-40c9-a1cd-041b4195cade");
         }
 
         public static bool TryGetRabbitMQConsumerSettings(this MessageSubscribeAssocationTargetEndModel model, out RabbitMQConsumerSettings stereotype)
@@ -57,11 +57,12 @@ namespace Intent.Eventing.MassTransit.Api
                 return false;
             }
 
-            stereotype = new RabbitMQConsumerSettings(model.GetStereotype("Rabbit MQ Consumer Settings"));
+            stereotype = new RabbitMQConsumerSettings(model.GetStereotype("43ff81bf-7e41-40c9-a1cd-041b4195cade"));
             return true;
         }
 
-        public class AzureServiceBusConsumerSettings
+        [IntentManaged(Mode.Fully, Signature = Mode.Merge)]
+        public class AzureServiceBusConsumerSettings : IAzureServiceBusConsumerSettings
         {
             private IStereotype _stereotype;
 
@@ -71,6 +72,22 @@ namespace Intent.Eventing.MassTransit.Api
             }
 
             public string Name => _stereotype.Name;
+
+            public string EndpointName()
+            {
+                return _stereotype.GetProperty<string>("Endpoint Name");
+            }
+
+            [IntentIgnore]
+            public EndpointTypeOptionsAdapted EndpointTypeSelection()
+            {
+                return new EndpointTypeOptionsAdapted(EndpointType().Value);
+            }
+
+            public EndpointTypeOptions EndpointType()
+            {
+                return new EndpointTypeOptions(_stereotype.GetProperty<string>("Endpoint Type"));
+            }
 
             public int? PrefetchCount()
             {
@@ -122,9 +139,58 @@ namespace Intent.Eventing.MassTransit.Api
                 return _stereotype.GetProperty<int?>("Max Delivery Count");
             }
 
+            public int? ConcurrentMessageLimit()
+            {
+                return _stereotype.GetProperty<int?>("Concurrent Message Limit");
+            }
+
+            public int? MaxConcurrentCallsPerSession()
+            {
+                return _stereotype.GetProperty<int?>("Max Concurrent Calls Per Session");
+            }
+
+            public class EndpointTypeOptions
+            {
+                public readonly string Value;
+
+                public EndpointTypeOptions(string value)
+                {
+                    Value = value;
+                }
+
+                public EndpointTypeOptionsEnum AsEnum()
+                {
+                    switch (Value)
+                    {
+                        case "Receive Endpoint":
+                            return EndpointTypeOptionsEnum.ReceiveEndpoint;
+                        case "Subscription Endpoint":
+                            return EndpointTypeOptionsEnum.SubscriptionEndpoint;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+
+                public bool IsReceiveEndpoint()
+                {
+                    return Value == "Receive Endpoint";
+                }
+                public bool IsSubscriptionEndpoint()
+                {
+                    return Value == "Subscription Endpoint";
+                }
+            }
+
+            public enum EndpointTypeOptionsEnum
+            {
+                ReceiveEndpoint,
+                SubscriptionEndpoint
+            }
+
         }
 
-        public class RabbitMQConsumerSettings
+        [IntentManaged(Mode.Fully, Signature = Mode.Merge)]
+        public class RabbitMQConsumerSettings : IRabbitMQConsumerSettings
         {
             private IStereotype _stereotype;
 
@@ -134,6 +200,11 @@ namespace Intent.Eventing.MassTransit.Api
             }
 
             public string Name => _stereotype.Name;
+
+            public string EndpointName()
+            {
+                return _stereotype.GetProperty<string>("Endpoint Name");
+            }
 
             public int? PrefetchCount()
             {
@@ -158,6 +229,11 @@ namespace Intent.Eventing.MassTransit.Api
             public bool Exclusive()
             {
                 return _stereotype.GetProperty<bool>("Exclusive");
+            }
+
+            public int? ConcurrentMessageLimit()
+            {
+                return _stereotype.GetProperty<int?>("Concurrent Message Limit");
             }
 
         }

@@ -10,8 +10,8 @@ using Intent.Registrations;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
-[assembly: IntentTemplate("Intent.ModuleBuilder.TemplateRegistration.Custom", Version = "1.0")]
 [assembly: DefaultIntentManaged(Mode.Merge)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.TemplateRegistration.Custom", Version = "1.0")]
 
 namespace Intent.Modules.VisualStudio.Projects.Templates.CoreWeb.AppSettings
 {
@@ -36,6 +36,9 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.CoreWeb.AppSettings
                     x.RuntimeEnvironments,
                     Location = "",
                     RequiresSpecifiedRole = false,
+                    IncludeAllowHosts = true,
+                    IncludeAspNetCoreLoggingLevel = true,
+
                 })
                 .Union(_metadataManager.VisualStudio(applicationManager).GetCSharpProjectNETModels()
                     .Where(x => x.GetNETSettings().SDK().IsMicrosoftNETSdkWeb())
@@ -45,6 +48,19 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.CoreWeb.AppSettings
                         x.RuntimeEnvironments,
                         Location = "",
                         RequiresSpecifiedRole = false,
+                        IncludeAllowHosts = true,
+                        IncludeAspNetCoreLoggingLevel = true,
+                    }))
+                .Union(_metadataManager.VisualStudio(applicationManager).GetCSharpProjectNETModels()
+                    .Where(x => x.GetNETSettings().SDK().IsMicrosoftNETSdkWorker())
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.RuntimeEnvironments,
+                        Location = "",
+                        RequiresSpecifiedRole = false,
+                        IncludeAllowHosts = false,
+                        IncludeAspNetCoreLoggingLevel = false,
                     }))
                 .Union(_metadataManager.VisualStudio(applicationManager).GetCSharpProjectNETModels()
                     .Where(x => x.GetNETSettings().SDK().IsMicrosoftNETSdkBlazorWebAssembly())
@@ -54,17 +70,19 @@ namespace Intent.Modules.VisualStudio.Projects.Templates.CoreWeb.AppSettings
                         x.RuntimeEnvironments,
                         Location = "wwwroot",
                         RequiresSpecifiedRole = true,
+                        IncludeAllowHosts = true,
+                        IncludeAspNetCoreLoggingLevel = false,
                     }));
 
             foreach (var aspProject in projects)
             {
                 var outputTarget = applicationManager.OutputTargets.Single(x => x.Id == aspProject.Id);
 
-                registry.RegisterTemplate(TemplateId, outputTarget, target => new AppSettingsTemplate(target, new AppSettingsModel(null, aspProject.Location, aspProject.RequiresSpecifiedRole)));
+                registry.RegisterTemplate(TemplateId, outputTarget, target => new AppSettingsTemplate(target, new AppSettingsModel(null, aspProject.Location, aspProject.RequiresSpecifiedRole, aspProject.IncludeAllowHosts, aspProject.IncludeAspNetCoreLoggingLevel)));
 
                 foreach (var runtimeEnvironment in aspProject.RuntimeEnvironments)
                 {
-                    registry.RegisterTemplate(TemplateId, outputTarget, target => new AppSettingsTemplate(target, new AppSettingsModel(runtimeEnvironment, aspProject.Location, aspProject.RequiresSpecifiedRole)));
+                    registry.RegisterTemplate(TemplateId, outputTarget, target => new AppSettingsTemplate(target, new AppSettingsModel(runtimeEnvironment, aspProject.Location, aspProject.RequiresSpecifiedRole, aspProject.IncludeAllowHosts, aspProject.IncludeAspNetCoreLoggingLevel)));
                 }
             }
         }

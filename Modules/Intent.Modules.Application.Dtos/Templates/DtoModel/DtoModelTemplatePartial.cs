@@ -31,11 +31,13 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public DtoModelTemplate(IOutputTarget outputTarget, DTOModel model) : base(TemplateId, outputTarget, model)
         {
-            FulfillsRole(TemplateFulfillingRoles.Application.Contracts.Dto);
+            FulfillsRole(TemplateRoles.Application.Contracts.Dto);
             AddAssemblyReference(new GacAssemblyReference("System.Runtime.Serialization"));
             SetDefaultCollectionFormatter(CSharpCollectionFormatter.CreateList());
             AddTypeSource(DtoModelTemplate.TemplateId);
-            AddTypeSource(TemplateFulfillingRoles.Domain.Enum);
+            AddTypeSource(TemplateRoles.Domain.Enum);
+            AddTypeSource(TemplateRoles.Application.Contracts.Enum);
+            AddTypeSource(TemplateRoles.Application.Contracts.Clients.Enum);
             AddTypeSource(ContractEnumModelTemplate.TemplateId);
 
             var csharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath());
@@ -43,6 +45,7 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
             csharpFile.OnBuild((Action<CSharpFile>)(file =>
                 {
                     var @class = file.TypeDeclarations.First();
+                    @class.RepresentsModel(Model);
 
                     ConfigureClass(@class);
 
@@ -56,6 +59,19 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
                     var ctor = @class.Constructors.First();
                     if (IsNonPublicPropertyAccessors())
                     {
+                        @class.AddConstructor(protectedCtor =>
+                        {
+                            if (ExecutionContext.Settings.GetDTOSettings().Sealed())
+                            {
+                                protectedCtor.Private();
+                            }
+                            else
+                            {
+                                protectedCtor.Protected();
+                            }
+                            PopulateDefaultCtor(protectedCtor);
+                        });
+
                         foreach (var field in Model.Fields)
                         {
                             ctor.AddParameter(GetTypeName(field.TypeReference), field.Name.ToParameterName());
@@ -88,7 +104,7 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
                                     {
                                         block.AddArgument(field.Name.ToParameterName());
                                     }
-                                });  
+                                });
                             }
                             else
                             {
@@ -99,7 +115,7 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
                                         block.AddInitStatement(field.Name.ToPascalCase(), field.Name.ToParameterName());
                                     }
                                     block.WithSemicolon();
-                                });   
+                                });
                             }
                         });
                     }
@@ -108,6 +124,7 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
                     {
                         @class.AddProperty(base.GetTypeName(field.TypeReference), field.Name.ToPascalCase(), property =>
                         {
+                            property.RepresentsModel(field);
                             property.TryAddXmlDocComments(field.InternalElement);
                             SetAccessLevel(property.Setter);
                             property.WithComments(field.GetXmlDocLines());
@@ -156,11 +173,12 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
             }
         }
 
-        private static bool NeedsNullabilityAssignment(IResolvedTypeInfo typeInfo)
+        private bool NeedsNullabilityAssignment(IResolvedTypeInfo typeInfo)
         {
             return !(typeInfo.IsPrimitive
-                || typeInfo.IsNullable == true
-                || (typeInfo.TypeReference != null && typeInfo.TypeReference.Element.IsEnumModel()));
+                     || typeInfo.IsNullable == true
+                     || (typeInfo.TypeReference != null && typeInfo.TypeReference.Element.IsEnumModel())
+                     || (Model.GenericTypes.Any(x => typeInfo.Name == x)));
         }
 
         private void SetAccessLevel(CSharpPropertyAccessor setter)
@@ -275,7 +293,7 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
                 @class.WithBaseType(GetTypeName(Model.ParentDtoTypeReference));
                 if (isTypeSealed)
                 {
-                    if (TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Application.Contracts.Dto, Model.ParentDtoTypeReference.Element, out var template))
+                    if (TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Application.Contracts.Dto, Model.ParentDtoTypeReference.Element, out var template))
                     {
                         var parentClass = template.CSharpFile.TypeDeclarations.First();
                         parentClass.Unsealed();
@@ -309,16 +327,31 @@ namespace Intent.Modules.Application.Dtos.Templates.DtoModel
         [IntentManaged(Mode.Fully)]
         public CSharpFile CSharpFile { get; }
 
-        [IntentManaged(Mode.Fully)]
+        [IntentManaged(Mode.Ignore)]
         protected override CSharpFileConfig DefineFileConfig()
         {
-            return CSharpFile.GetConfig();
+
+            return new CSharpFileConfig(
+                className: Model.Name,
+                @namespace: $"{this.GetNamespace()}",
+                fileName: $"{GetTemplateFileName()}",
+                relativeLocation: $"{this.GetFolderPath()}");
         }
 
         [IntentManaged(Mode.Fully)]
         public override string TransformText()
         {
             return CSharpFile.ToString();
+        }
+
+        private string GetTemplateFileName()
+        {
+            if (!Model.GenericTypes.Any())
+            {
+                return Model.Name;
+            }
+
+            return $"{Model.Name}Of{string.Join("And", Model.GenericTypes)}";
         }
     }
 }

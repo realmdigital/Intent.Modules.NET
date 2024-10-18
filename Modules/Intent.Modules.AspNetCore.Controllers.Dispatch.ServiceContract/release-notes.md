@@ -1,3 +1,27 @@
+### Version 5.2.8
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.2.7
+
+- Fixed: Duplicate `IDistributedCacheWithUnitOfWork` would be generated into classes under certain circumstances.
+
+### Version 5.2.6
+
+- Improvement: Added support for `IDistributedCacheWithUnitOfWork` to unit of work implementation.
+
+### Version 5.2.5
+
+- Improvement: File transfer ( upload / download ) support.
+
+### Version 5.2.4
+
+- Fixed: Addressed an issue around UnitOfWork pattern for `ServiceModel` based services and CosmosDB.
+
+### Version 5.2.1
+
+- Improvement: Added support for a customizable service dispatch.
+
 ### Version 5.2.0
 
 - Fixed: Controller methods which return nullable types will no longer return `NotFound()` for `null` results. To force that a `404 Not Found` HTTP response be returned, a `throw new NotFoundException("<message>")` can be performed as appropriate.

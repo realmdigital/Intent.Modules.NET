@@ -10,6 +10,7 @@ using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.CSharp.TypeResolvers;
 using Intent.Modules.Common.Templates;
+using Intent.Modules.Constants;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
@@ -19,55 +20,90 @@ using Intent.Templates;
 namespace Intent.Modules.Application.Contracts.Templates.ServiceContract;
 
 [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-public partial class ServiceContractTemplate : CSharpTemplateBase<ServiceModel, ServiceContractDecorator>,
-    ICSharpFileBuilderTemplate
+public partial class ServiceContractTemplate : CSharpTemplateBase<ServiceModel, ServiceContractDecorator>, ICSharpFileBuilderTemplate
 {
     public const string TemplateId = "Intent.Application.Contracts.ServiceContract";
 
     [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
-    public ServiceContractTemplate(IOutputTarget outputTarget, ServiceModel model) : base(TemplateId, outputTarget,
-        model)
+    public ServiceContractTemplate(IOutputTarget outputTarget, ServiceModel model) : base(TemplateId, outputTarget, model)
     {
-        AddTypeSource(DtoModelTemplate.TemplateId).WithCollectionFormatter(CSharpCollectionFormatter.CreateList());
         SetDefaultCollectionFormatter(CSharpCollectionFormatter.CreateList());
 
-        CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
-            .AddInterface($"I{Model.Name.RemoveSuffix("RestController", "Controller", "Service")}Service", inter =>
+        AddTypeSource(TemplateRoles.Application.Contracts.Enum);
+        AddTypeSource(DtoModelTemplate.TemplateId).WithCollectionFormatter(CSharpCollectionFormatter.CreateList());
+        AddTypeSource(TemplateRoles.Domain.Enum);
+        AddTypeSource(TemplateRoles.Application.Contracts.Clients.Dto);
+        AddTypeSource(TemplateRoles.Application.Contracts.Clients.Enum);
+
+        CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath(), this)
+            .AddInterface($"I{Model.Name.RemoveSuffix("RestController", "Controller", "Service")}Service", @interface =>
             {
-                inter.ImplementsInterfaces(new[] { UseType("System.IDisposable") });
-                inter.TryAddXmlDocComments(Model.InternalElement);
+                @interface.RepresentsModel(Model);
+                @interface.ImplementsInterfaces([UseType("System.IDisposable")]);
+                @interface.TryAddXmlDocComments(Model.InternalElement);
                 foreach (var operation in Model.Operations)
                 {
-                    inter.AddMethod(GetOperationReturnType(operation), operation.Name.ToPascalCase(),
-                        method =>
+                    @interface.AddMethod(operation, method =>
+                    {
+                        foreach (var genericType in operation.GenericTypes)
                         {
-                            method.TryAddXmlDocComments(operation.InternalElement);
+                            @method.AddGenericParameter(genericType);
+                        }
 
-                            foreach (var parameterModel in operation.Parameters)
-                            {
-                                method.AddParameter(GetTypeName(parameterModel.TypeReference), parameterModel.Name, p => p.WithXmlDocComment(parameterModel.InternalElement));
-                            }
+                        method.TryAddXmlDocComments(operation.InternalElement);
 
-                            if (operation.IsAsync())
+                        foreach (var parameterModel in operation.Parameters)
+                        {
+                            method.AddParameter(GetTypeName(parameterModel.TypeReference), parameterModel.Name, param =>
                             {
-                                method.AddParameter(UseType("System.Threading.CancellationToken"), "cancellationToken", p => p.WithDefaultValue("default"));
-                            }
-                        });
+                                // If you change anything here, please check also: WorkaroundForGetTypeNameIssue()
+                                param.AddMetadata("model", parameterModel);
+                                param.WithXmlDocComment(parameterModel.InternalElement);
+                            });
+                        }
+
+                        if (operation.IsAsync())
+                        {
+                            method.Async();
+                            method.AddParameter(UseType("System.Threading.CancellationToken"), "cancellationToken", p => p.WithDefaultValue("default"));
+                        }
+                    });
                 }
-            });
+            })
+            .AfterBuild(WorkaroundForGetTypeNameIssue, 1000);
     }
 
-    private string GetOperationReturnType(OperationModel o)
+    // Due to the nature of how GetTypeName resolves namespaces
+    // there are cases where ambiguous references still exist
+    // and causes compilation errors, this forces to re-evaluate
+    // a lot of types in this template. For example when a service
+    // is calling a proxy with the same Dto names on both sides.
+    private void WorkaroundForGetTypeNameIssue(CSharpFile file)
     {
-        if (o.ReturnType == null)
+        var priInterface = file.Interfaces.First();
+        foreach (var method in priInterface.Methods)
         {
-            return o.IsAsync() ? UseType("System.Threading.Tasks.Task") : "void";
+            var parameterTypesToReplace = method.Parameters
+                .Select((param, index) => new { Param = param, Index = index })
+                .Where(p => p.Param.HasMetadata("model"))
+                .ToArray();
+            foreach (var entry in parameterTypesToReplace)
+            {
+                var paramModel = entry.Param.GetMetadata<IElementWrapper>("model");
+                var param = new CSharpParameter(GetTypeName(paramModel.InternalElement.TypeReference), entry.Param.Name, method);
+                param.WithDefaultValue(entry.Param.DefaultValue);
+                param.WithXmlDocComment(entry.Param.XmlDocComment);
+                foreach (var attribute in entry.Param.Attributes)
+                {
+                    param.Attributes.Add(attribute);
+                }
+                method.Parameters[entry.Index] = param;
+            }
         }
-
-        return o.IsAsync() ? $"{UseType("System.Threading.Tasks.Task")}<{GetTypeName(o.ReturnType)}>" : GetTypeName(o.TypeReference);
     }
 
-    [IntentManaged(Mode.Fully)] public CSharpFile CSharpFile { get; }
+    [IntentManaged(Mode.Fully)]
+    public CSharpFile CSharpFile { get; }
 
     [IntentManaged(Mode.Fully)]
     protected override CSharpFileConfig DefineFileConfig()

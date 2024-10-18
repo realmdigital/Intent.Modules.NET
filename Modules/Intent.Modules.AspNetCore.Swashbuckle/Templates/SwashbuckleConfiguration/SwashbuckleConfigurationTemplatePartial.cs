@@ -26,7 +26,7 @@ public partial class SwashbuckleConfigurationTemplate : CSharpTemplateBase<objec
         var useSimpleSchemaIdentifiers = ExecutionContext.Settings.GetSwaggerSettings().UseSimpleSchemaIdentifiers();
         var markNonNullableFieldsAsRequired = ExecutionContext.Settings.GetSwaggerSettings().MarkNonNullableFieldsAsRequired();
 
-        AddNugetDependency(NugetPackages.SwashbuckleAspNetCore);
+        AddNugetDependency(NugetPackages.SwashbuckleAspNetCore(OutputTarget));
         AddUsing("System");
         AddUsing("System.Collections.Generic");
         AddUsing("System.IO");
@@ -70,7 +70,7 @@ public partial class SwashbuckleConfigurationTemplate : CSharpTemplateBase<objec
 
                                 lambdaBlock.AddStatement(useSimpleSchemaIdentifiers
                                     ? "options.CustomSchemaIds(GetFriendlyName);"
-                                    : "options.CustomSchemaIds(x => x.FullName);");
+                                    : "options.CustomSchemaIds(x => x.FullName?.Replace(\"+\", \"_\"));");
 
                                 lambdaBlock.AddStatement(
                                     "var apiXmlFile = Path.Combine(AppContext.BaseDirectory, $\"{Assembly.GetExecutingAssembly().GetName().Name}.xml\");",
@@ -120,7 +120,7 @@ public partial class SwashbuckleConfigurationTemplate : CSharpTemplateBase<objec
                             .AddStatement($@"options.EnableDeepLinking();")
                             .AddStatement($@"options.DisplayOperationId();")
                             .AddStatement($@"options.DefaultModelsExpandDepth(2);")
-                            .AddStatement($@"options.DefaultModelRendering(ModelRendering.Model);")
+                            .AddStatement($@"options.DefaultModelRendering(ModelRendering.Example);")
                             .AddStatement($@"options.DocExpansion(DocExpansion.List);")
                             .AddStatement($@"options.ShowExtensions();")
                             .AddStatement($@"options.EnableFilter(string.Empty);"))

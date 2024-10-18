@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace Entities.PrivateSetters.EF.SqlServer.Domain.Entities
 {
     [DefaultIntentManaged(Mode.Fully, Targets = Targets.Methods, Body = Mode.Ignore, AccessModifiers = AccessModifiers.Public)]
@@ -23,7 +25,5 @@ namespace Entities.PrivateSetters.EF.SqlServer.Domain.Entities
         public Guid Id { get; private set; }
 
         public string Name { get; private set; }
-
-        protected virtual ICollection<Invoice> Invoices { get; set; }
     }
 }

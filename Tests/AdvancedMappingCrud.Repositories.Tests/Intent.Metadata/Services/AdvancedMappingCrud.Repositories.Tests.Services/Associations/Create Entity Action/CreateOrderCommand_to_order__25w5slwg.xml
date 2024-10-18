@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<association id="7c6dae1f-0648-4530-94dd-0b4046346f87">
+  <sourceEnd id="dc967abb-263d-4e26-b351-ea32225374d7" type="Create Entity Action Source End" typeId="a3e7c59e-b0a1-47e1-ba29-66f2c7047b0a">
+    <display>created by : Orders.CreateOrderCommand</display>
+    <order>0</order>
+    <typeReference id="411d1f72-898a-4256-8244-48a4ba1826d5">
+      <typeId>03a2d5ea-6731-4d44-8c9a-04777b640f3f</typeId>
+      <isNavigable>true</isNavigable>
+      <isNullable>false</isNullable>
+      <isCollection>false</isCollection>
+      <isRequired>true</isRequired>
+      <typePackageName>AdvancedMappingCrud.Repositories.Tests.Services</typePackageName>
+      <typePackageId>767d2f86-de29-4abb-8816-180c4b6005b6</typePackageId>
+      <stereotypes />
+      <genericTypeParameters />
+    </typeReference>
+    <stereotypes />
+    <metadata />
+    <childElements />
+  </sourceEnd>
+  <targetEnd id="7c6dae1f-0648-4530-94dd-0b4046346f87" type="Create Entity Action Target End" typeId="328f54e5-7bad-4b5f-90ca-03ce3105d016">
+    <name>order</name>
+    <display>[create] order: Order</display>
+    <order>9</order>
+    <traits>
+      <trait id="d00a2ab0-9a23-4192-b8bb-166798fc7dba" name="[Processing Action]" />
+    </traits>
+    <typeReference id="df867a41-f92e-4d9c-9eab-6b1c9f885bdc">
+      <typeId>9cf81436-99bd-4077-bcd0-de9f1f75c8e5</typeId>
+      <isNavigable>true</isNavigable>
+      <isNullable>false</isNullable>
+      <isCollection>false</isCollection>
+      <isRequired>true</isRequired>
+      <typePackageName>AdvancedMappingCrud.Repositories.Tests.Domain</typePackageName>
+      <typePackageId>e5ed367e-aea5-4a03-890f-dd671a48d907</typePackageId>
+      <stereotypes />
+      <genericTypeParameters />
+    </typeReference>
+    <stereotypes />
+    <mappings>
+      <mapping type="Create Entity Mapping" typeId="5f172141-fdba-426b-980e-163e782ff53e">
+        <source applicationId="090169cc-05b9-4267-81d7-81ad5bb954a2" designerId="81104ae6-2bc5-4bae-b05a-f987b0372d81" elementId="03a2d5ea-6731-4d44-8c9a-04777b640f3f" location="[AdvancedMappingCrud.Repositories.Tests].[Services].[CreateOrderCommand]" />
+        <target applicationId="090169cc-05b9-4267-81d7-81ad5bb954a2" designerId="6ab29b31-27af-4f56-a67c-986d82097d63" elementId="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" location="[AdvancedMappingCrud.Repositories.Tests].[Services].[Order]" />
+        <mappedEnds>
+          <mappedEnd>
+            <expression>{CreateOrderCommand}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+            </path>
+            <sources>
+              <source identifier="CreateOrderCommand" mappingType="Invocation Mapping" mappingTypeId="47dc4a51-30a3-4ee8-8c7d-25a35bb965b9">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{RefNo}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="c7f28411-4e59-448f-bb0e-a0b8e49c0caf" name="RefNo" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="RefNo" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="26371f81-48d9-4d1f-81b5-986468419931" name="RefNo" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{OrderDate}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="74fb21fb-91d4-4ad7-a1bd-cee31814fe4c" name="OrderDate" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="OrderDate" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="7e4575d6-a90d-453d-a5ae-7181455d73b1" name="OrderDate" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{OrderStatus}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="d5cf2aca-22e9-4719-a337-dcf9d285ebae" name="OrderStatus" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="OrderStatus" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="e06887ff-2a90-47b3-9376-aa31903a0d02" name="OrderStatus" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{CustomerId}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="5856ecd5-41d6-42bd-8919-20c289cd5106" name="CustomerId" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="CustomerId" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="8bfe7b1a-a4fd-4372-a30e-c900a97d21d8" name="CustomerId" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{Line1}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e0372fae-4737-4d17-8b05-1df5e0fa52bd" name="BillingAddress" type="association" specialization="Association Target End" />
+              <target id="7273ff2a-1d03-4745-94f6-9ae19e9b829b" name="Line1" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="Line1" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="46589eb9-7e3f-4cba-b900-a4bce8f40b97" name="Line1" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{Line2}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e0372fae-4737-4d17-8b05-1df5e0fa52bd" name="BillingAddress" type="association" specialization="Association Target End" />
+              <target id="c49d4b74-264e-4c5d-a76c-b0c51e660f38" name="Line2" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="Line2" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="b92438d8-ef36-4891-89e4-cbb379addb57" name="Line2" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{City}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e0372fae-4737-4d17-8b05-1df5e0fa52bd" name="BillingAddress" type="association" specialization="Association Target End" />
+              <target id="43a2bef6-f50d-466f-b72b-08e01480e7a0" name="City" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="City" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="4ab89743-0223-45c9-ba5d-dd7c08e5999c" name="City" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{Postal}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e0372fae-4737-4d17-8b05-1df5e0fa52bd" name="BillingAddress" type="association" specialization="Association Target End" />
+              <target id="dc7032ab-1aec-4a80-8f0b-4245bed070d1" name="Postal" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="Postal" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="304095e1-32ef-4166-b2cb-f86293911cbb" name="Postal" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{Line1}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="b431663d-06eb-4896-9033-e2e2ca840fff" name="DeliveryAddress" type="association" specialization="Association Target End" />
+              <target id="7273ff2a-1d03-4745-94f6-9ae19e9b829b" name="Line1" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="Line1" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="46589eb9-7e3f-4cba-b900-a4bce8f40b97" name="Line1" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{Line2}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="b431663d-06eb-4896-9033-e2e2ca840fff" name="DeliveryAddress" type="association" specialization="Association Target End" />
+              <target id="c49d4b74-264e-4c5d-a76c-b0c51e660f38" name="Line2" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="Line2" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="b92438d8-ef36-4891-89e4-cbb379addb57" name="Line2" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{City}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="b431663d-06eb-4896-9033-e2e2ca840fff" name="DeliveryAddress" type="association" specialization="Association Target End" />
+              <target id="43a2bef6-f50d-466f-b72b-08e01480e7a0" name="City" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="City" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="4ab89743-0223-45c9-ba5d-dd7c08e5999c" name="City" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{Postal}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="b431663d-06eb-4896-9033-e2e2ca840fff" name="DeliveryAddress" type="association" specialization="Association Target End" />
+              <target id="dc7032ab-1aec-4a80-8f0b-4245bed070d1" name="Postal" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="Postal" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="304095e1-32ef-4166-b2cb-f86293911cbb" name="Postal" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{OrderItems}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e77aa094-3146-4b74-abd1-db5df3a88110" name="OrderItems" type="association" specialization="Association Target End" />
+            </path>
+            <sources>
+              <source identifier="OrderItems" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="23f4526b-341d-48ef-8d19-544611f695e2" name="OrderItems" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{OrderItems.Quantity}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e77aa094-3146-4b74-abd1-db5df3a88110" name="OrderItems" type="association" specialization="Association Target End" />
+              <target id="42aebfae-bf00-4fab-904d-df4fd2f5f66f" name="Quantity" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="OrderItems.Quantity" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="23f4526b-341d-48ef-8d19-544611f695e2" name="OrderItems" type="element" specialization="DTO-Field" />
+                  <target id="8eaca9e1-8f49-4160-ac9c-0801d8544407" name="Quantity" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{OrderItems.Amount}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e77aa094-3146-4b74-abd1-db5df3a88110" name="OrderItems" type="association" specialization="Association Target End" />
+              <target id="514a5a22-934e-46cb-8b5d-fc74423c3b90" name="Amount" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="OrderItems.Amount" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="23f4526b-341d-48ef-8d19-544611f695e2" name="OrderItems" type="element" specialization="DTO-Field" />
+                  <target id="79dd7412-7ab9-46e5-8523-0761817f7c84" name="Amount" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+          <mappedEnd>
+            <expression>{OrderItems.ProductId}</expression>
+            <path>
+              <target id="9cf81436-99bd-4077-bcd0-de9f1f75c8e5" name="Order" type="element" specialization="Class" />
+              <target id="e77aa094-3146-4b74-abd1-db5df3a88110" name="OrderItems" type="association" specialization="Association Target End" />
+              <target id="fb97c74a-e0f6-4c59-9d2a-866a73a2607b" name="ProductId" type="element" specialization="Attribute" />
+            </path>
+            <sources>
+              <source identifier="OrderItems.ProductId" mappingType="Data Mapping" mappingTypeId="50dccfb2-bd24-4135-adf6-ed31f28f8fe0">
+                <path>
+                  <target id="03a2d5ea-6731-4d44-8c9a-04777b640f3f" name="CreateOrderCommand" type="element" specialization="Command" />
+                  <target id="23f4526b-341d-48ef-8d19-544611f695e2" name="OrderItems" type="element" specialization="DTO-Field" />
+                  <target id="12d8b83f-7ee8-4ef2-a168-0aa727b8557d" name="ProductId" type="element" specialization="DTO-Field" />
+                </path>
+              </source>
+            </sources>
+          </mappedEnd>
+        </mappedEnds>
+      </mapping>
+    </mappings>
+    <metadata />
+    <childElements />
+  </targetEnd>
+  <associationType>Create Entity Action</associationType>
+  <associationTypeId>7a3f0474-3cf8-4249-baac-8c07c49465e0</associationTypeId>
+  <stereotypes />
+</association>

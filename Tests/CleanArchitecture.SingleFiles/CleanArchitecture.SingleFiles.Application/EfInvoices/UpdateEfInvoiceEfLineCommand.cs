@@ -60,12 +60,13 @@ namespace CleanArchitecture.SingleFiles.Application.EfInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class UpdateEfInvoiceEfLineCommandValidator : AbstractValidator<UpdateEfInvoiceEfLineCommand>
     {
         [IntentManaged(Mode.Merge)]
         public UpdateEfInvoiceEfLineCommandValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

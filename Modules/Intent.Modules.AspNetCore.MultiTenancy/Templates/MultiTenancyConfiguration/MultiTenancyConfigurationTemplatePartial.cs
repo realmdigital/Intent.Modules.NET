@@ -17,7 +17,7 @@ using Intent.Templates;
 namespace Intent.Modules.AspNetCore.MultiTenancy.Templates.MultiTenancyConfiguration
 {
     [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-    partial class MultiTenancyConfigurationTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
+    public partial class MultiTenancyConfigurationTemplate : CSharpTemplateBase<object>, ICSharpFileBuilderTemplate
     {
         [IntentManaged(Mode.Fully)]
         public const string TemplateId = "Intent.Modules.AspNetCore.MultiTenancy.MultiTenancyConfiguration";
@@ -25,9 +25,9 @@ namespace Intent.Modules.AspNetCore.MultiTenancy.Templates.MultiTenancyConfigura
         [IntentManaged(Mode.Ignore, Signature = Mode.Fully)]
         public MultiTenancyConfigurationTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NugetPackages.FinbuckleMultiTenant);
-            AddNugetDependency(NugetPackages.FinbuckleMultiTenantAspNetCore);
-            FulfillsRole(TemplateFulfillingRoles.Distribution.WebApi.MultiTenancyConfiguration);
+            AddNugetDependency(NugetPackages.FinbuckleMultiTenant(outputTarget));
+            AddNugetDependency(NugetPackages.FinbuckleMultiTenantAspNetCore(outputTarget));
+            FulfillsRole(TemplateRoles.Distribution.WebApi.MultiTenancyConfiguration);
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("System")

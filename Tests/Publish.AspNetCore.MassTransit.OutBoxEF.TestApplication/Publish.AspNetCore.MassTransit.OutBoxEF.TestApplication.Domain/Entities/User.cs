@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace Publish.AspNetCore.MassTransit.OutBoxEF.TestApplication.Domain.Entities
 {
     public class User

@@ -13,7 +13,7 @@ using Intent.RoslynWeaver.Attributes;
 namespace Intent.Modules.VisualStudio.Projects.Api
 {
     [IntentManaged(Mode.Merge)]
-    public class CSharpProjectNETModel : IMetadataModel, IHasStereotypes, IHasName, IVisualStudioProject
+    public class CSharpProjectNETModel : IMetadataModel, IHasStereotypes, IHasName, IVisualStudioProject, IElementWrapper
     {
         public const string SpecializationType = "C# Project (.NET)";
         public const string SpecializationTypeId = "8e9e6693-2888-4f48-a0d6-0f163baab740";
@@ -39,12 +39,14 @@ namespace Intent.Modules.VisualStudio.Projects.Api
 
         public string Type => SpecializationType;
 
+        [IntentIgnore]
         public string ProjectTypeId
         {
             get
             {
-                var dotnetSettings = this.GetNETSettings();
-                if (dotnetSettings.SDK().IsMicrosoftNETSdkWeb())
+                /*
+				var dotnetSettings = this.GetNETSettings();
+				if (dotnetSettings.SDK().IsMicrosoftNETSdkWeb())
                 {
                     return VisualStudioProjectTypeIds.CoreWebApp;
                 }
@@ -60,6 +62,8 @@ namespace Intent.Modules.VisualStudio.Projects.Api
                 }
 
                 return VisualStudioProjectTypeIds.CoreCSharpLibrary;
+                */
+                return VisualStudioProjectTypeIds.SdkCSharpProject;
             }
         }
 
@@ -105,6 +109,11 @@ namespace Intent.Modules.VisualStudio.Projects.Api
             .GetElementsOfType(RoleModel.SpecializationTypeId)
             .Select(x => new RoleModel(x))
             .ToList();
+
+        public CustomImplicitUsingsModel CustomImplicitUsings => _element.ChildElements
+            .GetElementsOfType(CustomImplicitUsingsModel.SpecializationTypeId)
+            .Select(x => new CustomImplicitUsingsModel(x))
+            .SingleOrDefault();
 
         public override string ToString()
         {

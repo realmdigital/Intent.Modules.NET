@@ -16,7 +16,6 @@
       <display>SwashbuckleSettings.All.Infrastructure</display>
       <externalReference>6c18c234-6c17-4288-a6e4-a95e3ba5037d</externalReference>
       <isAbstract>false</isAbstract>
-      <order>1</order>
       <genericTypes />
       <isMapped>false</isMapped>
       <parentFolderId>85bb73e3-9c78-4144-81f5-238d425b19c2</parentFolderId>
@@ -30,7 +29,7 @@
             <property name="6a7d81d7-351e-4cdf-a596-142a74507455" display="Output Type" isActive="true" />
             <property name="9da51e12-529a-4592-9119-491d7bc9d5d5" display="Azure Functions Version" isActive="true" />
             <property name="e1cab7e9-28f1-4e82-8c02-bfb9e460d9e0" display="Target Multiple Frameworks" value="false" isActive="true" />
-            <property name="d53ab03c-90cf-4b6a-b733-73b6983ab603" display="Target Framework" value="0cd4e056-3bc1-4f8c-9cba-7d362d42c33c" isActive="true" />
+            <property name="d53ab03c-90cf-4b6a-b733-73b6983ab603" display="Target Framework" value="f8b1618d-1e64-4c2c-9787-e0725c3633a1" isActive="true" />
             <property name="b9685057-b337-42d8-9536-d0185ea69b73" display="Target Frameworks" value="" isActive="false" />
             <property name="8ee6e435-e556-439c-9712-a3f287972813" display="Runtime Identifiers" isActive="true" />
             <property name="c9fc7052-9557-4485-a759-fa33363472b3" display="Configurations" isActive="true" />
@@ -62,7 +61,6 @@
           <display>Infrastructure</display>
           <externalReference>85686dd2-fb9f-4b8f-886e-2be24d503492</externalReference>
           <isAbstract>false</isAbstract>
-          <order>1</order>
           <genericTypes />
           <isMapped>false</isMapped>
           <parentFolderId>34a4299f-6385-4e23-a9c2-ae150c05b56a</parentFolderId>
@@ -75,7 +73,6 @@
           <display>Repository.Implementation</display>
           <externalReference>352eeda5-4ba6-45bd-be6b-e4e730503ddc</externalReference>
           <isAbstract>false</isAbstract>
-          <order>2</order>
           <genericTypes />
           <isMapped>false</isMapped>
           <parentFolderId>34a4299f-6385-4e23-a9c2-ae150c05b56a</parentFolderId>

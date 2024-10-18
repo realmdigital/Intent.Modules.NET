@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using EntityFrameworkCore.CosmosDb.TestApplication.Domain.Common;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace EntityFrameworkCore.CosmosDb.TestApplication.Domain.Entities.Associations
 {
     [DefaultIntentManaged(Mode.Fully, Targets = Targets.Methods, Body = Mode.Ignore, AccessModifiers = AccessModifiers.Public)]
@@ -13,8 +15,6 @@ namespace EntityFrameworkCore.CosmosDb.TestApplication.Domain.Entities.Associati
         public string PartitionKey { get; set; }
 
         public string OptionalAggrNavAttr { get; set; }
-
-        public Guid? FOptionaldependentId { get; set; }
 
         public Guid? F_OptionalDependentId { get; set; }
 

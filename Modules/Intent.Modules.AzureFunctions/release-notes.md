@@ -1,3 +1,39 @@
+### Version 4.1.3
+
+- Improvement: Updated NuGet package versions.
+- Improvement: Updated module NuGet packages infrastructure.
+- Improvement: Updated templates to use new NuGet package system.
+
+### Version 4.1.2
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 4.1.1
+
+- Fixed: _Http Settings_ stereotype will no longer be removed from operations, queries or commands unless an _Azure Function_ stereotype is present with its _Trigger_ set to anything other than `Http Trigger`.
+
+### Version 4.1.0
+
+- Improvement: Module project updated to .NET 8.
+- Improvement: Introduced setting to generate Function names with full path to avoid conflicting names.
+- Fixed: Namespace generation takes folders into account to avoid possible class name conflicts and to bring it into alignment with the other module patterns.
+- Fixed: Enums can now be supplied as route parameters and parsed correctly.
+
+### Version 4.0.16
+
+- Improvement: Updated Interoperable dependency versions.
+
+### Version 4.0.15
+
+- Fixed: `Expose as HTTP` would fail when used on Commands and Queries with advanced mappings.
+- Improvement: Updated icon to SVG format.
+
+### Version 4.0.13
+
+- New Feature: Azure Functions can now receive RabbitMQ triggers.
+- Improvement: Removed `Intent.Application.DTOs` dependency since DTOs can be resolved using Role names.
+- Improvement: Startup file is now generated using a File Builder Template.
+
 ### Version 4.0.11
 
 - Fixed: Queue Trigger handler parameter name clashes with inline variable name.

@@ -39,7 +39,7 @@ public partial class GetAllQueryHandlerTestsTemplate : CSharpTemplateBase<QueryM
         AddNugetDependency(NugetPackages.Xunit);
         AddNugetDependency(NugetPackages.XunitRunnerVisualstudio);
 
-        AddTypeSource(TemplateFulfillingRoles.Application.Contracts.Dto);
+        AddTypeSource(TemplateRoles.Application.Contracts.Dto);
 
         CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
             .AddClass($"{Model.Name}HandlerTests")
@@ -107,7 +107,8 @@ public partial class GetAllQueryHandlerTestsTemplate : CSharpTemplateBase<QueryM
         }
         else if (StrategyFactory.GetMatchedQueryStrategy(template, Project.Application) is GetAllImplementationStrategy strategy && strategy.IsMatch())
         {
-            _canRunTemplate = Model.GetClassModel()?.IsAggregateRoot() == true && Model.GetClassModel().InternalElement.Package.HasStereotype("Relational Database");
+            _canRunTemplate = Model.GetClassModel()?.IsAggregateRoot() == true &&
+                              Model.GetClassModel().InternalElement.Package.HasStereotype("Relational Database");
         }
         else
         {

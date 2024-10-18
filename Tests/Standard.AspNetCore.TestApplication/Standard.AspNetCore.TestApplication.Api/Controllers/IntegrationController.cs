@@ -79,7 +79,7 @@ namespace Standard.AspNetCore.TestApplication.Api.Controllers
             CancellationToken cancellationToken = default)
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-                new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
             {
                 await _appService.HeaderParamOp(param1, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -106,7 +106,7 @@ namespace Standard.AspNetCore.TestApplication.Api.Controllers
             CancellationToken cancellationToken = default)
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-                new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
             {
                 await _appService.FormParamOp(param1, param2, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -132,7 +132,7 @@ namespace Standard.AspNetCore.TestApplication.Api.Controllers
             CancellationToken cancellationToken = default)
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-                new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
             {
                 await _appService.RouteParamOp(param1, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -159,7 +159,7 @@ namespace Standard.AspNetCore.TestApplication.Api.Controllers
         {
             await _validationService.Handle(param1, cancellationToken);
             using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-                new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
             {
                 await _appService.BodyParamOp(param1, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -181,7 +181,7 @@ namespace Standard.AspNetCore.TestApplication.Api.Controllers
         public async Task<ActionResult> ThrowsException(CancellationToken cancellationToken = default)
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Required,
-                new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
+                new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }, TransactionScopeAsyncFlowOption.Enabled))
             {
                 await _appService.ThrowsException(cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -328,6 +328,29 @@ namespace Standard.AspNetCore.TestApplication.Api.Controllers
             var result = default(CustomDTO);
             result = await _appService.GetInvoiceOpWithReturnTypeWrapped(cancellationToken);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <response code="200">Returns the specified List&lt;CustomDTO&gt;.</response>
+        /// <response code="400">One or more validation errors have occurred.</response>
+        /// <response code="401">Unauthorized request.</response>
+        /// <response code="403">Forbidden request.</response>
+        /// <response code="404">No List&lt;CustomDTO&gt; could be found with the provided parameters.</response>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(List<CustomDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<CustomDTO>>> GetItems(
+            [FromQuery] List<string> ids,
+            CancellationToken cancellationToken = default)
+        {
+            var result = default(List<CustomDTO>);
+            result = await _appService.GetItems(ids, cancellationToken);
+            return result == null ? NotFound() : Ok(result);
         }
     }
 }

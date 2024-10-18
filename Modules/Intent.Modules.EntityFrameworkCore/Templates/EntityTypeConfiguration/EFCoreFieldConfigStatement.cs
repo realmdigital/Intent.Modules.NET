@@ -5,6 +5,7 @@ using Intent.Metadata.Models;
 using Intent.Metadata.RDBMS.Api;
 using Intent.Modelers.Domain.Api;
 using Intent.EntityFrameworkCore.Api;
+using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.EntityFrameworkCore.Settings;
@@ -19,18 +20,20 @@ public class EfCoreFieldConfigStatement : CSharpStatement, IHasCSharpStatements
     public IList<CSharpStatement> Statements { get; } = new List<CSharpStatement>();
 
     public static EfCoreFieldConfigStatement CreateProperty(AttributeModel attribute,
-        DatabaseSettings dbSettings)
+        DatabaseSettings dbSettings,
+        int? columnOrder = null)
     {
         var databaseProvider = dbSettings.DatabaseProvider().AsEnum();
         var field = new EfCoreFieldConfigStatement($"builder.Property(x => x.{attribute.Name.ToPascalCase()})", attribute);
-        if (!attribute.Type.IsNullable)
+
+		if (!attribute.Type.IsNullable)
         {
             field.AddStatement(".IsRequired()");
         }
 
         if (databaseProvider != DatabaseSettingsExtensions.DatabaseProviderOptionsEnum.Cosmos)
         {
-            field.AddStatements(field.AddRdbmsMappingStatements(attribute, dbSettings));
+            field.AddStatements(field.AddRdbmsMappingStatements(attribute, dbSettings, columnOrder));
         }
 
         return field;
@@ -91,7 +94,7 @@ public class EfCoreFieldConfigStatement : CSharpStatement, IHasCSharpStatements
     ", Statements.Select(x => x.GetText(indentation)))}" : string.Empty)};";
     }
 
-    private List<CSharpStatement> AddRdbmsMappingStatements(AttributeModel attribute, DatabaseSettings dbSettings)
+    private List<CSharpStatement> AddRdbmsMappingStatements(AttributeModel attribute, DatabaseSettings dbSettings, int? implicitColumnOrder)
     {
         var statements = new List<CSharpStatement>();
 
@@ -179,6 +182,12 @@ public class EfCoreFieldConfigStatement : CSharpStatement, IHasCSharpStatements
                     statements.Add($".HasColumnType(\"decimal({safeString})\")");
                 }
             }
+            else if (attribute.Type.Element.GetStereotype("C#")?.GetProperty("Namespace")?.Value == "NetTopologySuite.Geometries" && 
+                     dbSettings.DatabaseProvider().IsPostgresql())
+            {
+                // https://www.npgsql.org/efcore/mapping/nts.html#constraining-your-type-names
+                statements.Add($@".HasColumnType(""geography ({attribute.Type.Element.Name.ToLower()})"")");
+            }
         }
 
         var columnName = attribute.GetColumn()?.Name();
@@ -187,12 +196,18 @@ public class EfCoreFieldConfigStatement : CSharpStatement, IHasCSharpStatements
             statements.Add($".HasColumnName(\"{EscapeHelper.EscapeName(columnName)}\")");
         }
 
-        var computedValueSql = attribute.GetComputedValue()?.SQL();
+		var columnOrder = attribute.GetColumn()?.Order();
+		if (columnOrder != null || implicitColumnOrder != null)
+		{
+			statements.Add($".HasColumnOrder({columnOrder ?? implicitColumnOrder})");
+		}
+
+		var computedValueSql = attribute.GetComputedValue()?.SQL();
         if (!string.IsNullOrWhiteSpace(computedValueSql))
         {
 
             statements.Add(
-                $".HasComputedColumnSql(\"{EscapeComputed(computedValueSql)}\"{(attribute.GetComputedValue().Stored() ? ", stored: true" : string.Empty)})");
+                $".HasComputedColumnSql({SanitizeUserInputString(computedValueSql)}{(attribute.GetComputedValue().Stored() ? ", stored: true" : string.Empty)})");
         }
 
         if (attribute.HasRowVersion())
@@ -202,15 +217,16 @@ public class EfCoreFieldConfigStatement : CSharpStatement, IHasCSharpStatements
 
         if (!string.IsNullOrEmpty(attribute.InternalElement?.Comment))
         {
-            statements.Add($".HasComment(\"{EscapeComputed(attribute.InternalElement?.Comment)}\")");
+            statements.Add($".HasComment({SanitizeUserInputString(attribute.InternalElement?.Comment)})");
         }
 
         return statements;
     }
 
-    private static string EscapeComputed(string computedValueSql)
+    private static string SanitizeUserInputString(string computedValueSql)
     {
-        var result = computedValueSql.Trim('"');
-        return result.Replace("\"", "\\\"");
+        var result = computedValueSql.Trim().Trim('"').Trim();
+        result = result.Replace("\"", "\"\"");
+        return "@\"" + result + "\"";
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using Intent.Engine;
 using Intent.Modelers.Domain.Api;
 using Intent.Modelers.Services.Api;
+using Intent.Modelers.Services.DomainInteractions.Api;
 using Intent.Modules.Application.Contracts;
 using Intent.Modules.Application.Dtos.Templates.DtoModel;
 using Intent.Modules.Application.ServiceImplementations.Templates.ServiceImplementation;
@@ -11,7 +12,7 @@ using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
-using Intent.Modules.Entities.Repositories.Api.Templates;
+using Intent.Templates;
 using OperationModel = Intent.Modelers.Services.Api.OperationModel;
 using ParameterModel = Intent.Modelers.Services.Api.ParameterModel;
 
@@ -19,15 +20,29 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
 
 public class GetAllPaginationImplementationStrategy : IImplementationStrategy
 {
-    private readonly ServiceImplementationTemplate _template;
+    private readonly ICSharpFileBuilderTemplate _template;
 
-    public GetAllPaginationImplementationStrategy(ServiceImplementationTemplate template, IApplication application)
+    public GetAllPaginationImplementationStrategy(ICSharpFileBuilderTemplate template, IApplication application)
     {
         _template = template;
     }
 
     public bool IsMatch(OperationModel operationModel)
     {
+        if (operationModel.CreateEntityActions().Any()
+            || operationModel.UpdateEntityActions().Any()
+            || operationModel.DeleteEntityActions().Any()
+            || operationModel.QueryEntityActions().Any())
+        {
+            return false;
+        }
+        
+        if (_template.CSharpFile.Classes.First()
+                .FindMethod(m => m.TryGetMetadata<OperationModel>("model", out var model) && model.Id == operationModel.Id) is null)
+        {
+            return false;
+        }
+
         if ((!operationModel.Parameters.Any(IsPageNumberParam)
              && !operationModel.Parameters.Any(IsPageIndexParam))
              || !operationModel.Parameters.Any(IsPageSizeParam)
@@ -38,22 +53,38 @@ public class GetAllPaginationImplementationStrategy : IImplementationStrategy
         }
 
         var dtoModel = operationModel.ReturnType.GenericTypeParameters.First().Element.AsDTOModel();
-        return dtoModel.Mapping?.Element?.AsClassModel() != null;
+        var domainModel = dtoModel.Mapping?.Element.AsClassModel();
+
+        if (domainModel == null)
+        {
+            return false;
+        }
+
+        if (!_template.TryGetTemplate<ITemplate>(TemplateRoles.Repository.Interface.Entity, domainModel, out _))
+        {
+            return false;
+        }
+
+        return true;
+    }
+    public void BindToTemplate(ICSharpFileBuilderTemplate template, OperationModel operationModel)
+    {
+        template.CSharpFile.AfterBuild(_ => ApplyStrategy(operationModel));
     }
 
     public void ApplyStrategy(OperationModel operationModel)
     {
-        _template.AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Primary);
-        _template.AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
+        _template.AddTypeSource(TemplateRoles.Domain.Entity.Primary);
+        _template.AddTypeSource(TemplateRoles.Domain.ValueObject);
         _template.AddUsing("System.Linq");
 
         var genericDtoElement = operationModel.TypeReference.GenericTypeParameters.First().Element;
         var dtoModel = genericDtoElement.AsDTOModel();
-        var dtoType = _template.TryGetTypeName(DtoModelTemplate.TemplateId, dtoModel, out var dtoName)
-            ? dtoName
+        var unqualifiedDtoTypeName = _template.TryGetTemplate<IClassProvider>(DtoModelTemplate.TemplateId, dtoModel, out var dtoTemplate)
+            ? dtoTemplate.ClassName
             : dtoModel.Name.ToPascalCase();
         var domainModel = dtoModel.Mapping.Element.AsClassModel();
-        var repositoryTypeName = _template.GetEntityRepositoryInterfaceName(domainModel);
+        var repositoryTypeName = _template.GetTypeName(TemplateRoles.Repository.Interface.Entity, domainModel);
         var repositoryParameterName = repositoryTypeName.Split('.').Last()[1..].ToLocalVariableName();
         var repositoryFieldName = repositoryParameterName.ToPrivateMemberName();
 
@@ -66,10 +97,10 @@ public class GetAllPaginationImplementationStrategy : IImplementationStrategy
             .AddArgument($"pageSize: {pageSizeVar.Name.ToParameterName()}")
             .AddStatement("cancellationToken: cancellationToken")
             .WithArgumentsOnNewLines());
-        codeLines.Add($"return results.MapToPagedResult(x => x.MapTo{dtoType}(_mapper));");
+        codeLines.Add($"return results.MapToPagedResult(x => x.MapTo{unqualifiedDtoTypeName}(_mapper));");
 
         var @class = _template.CSharpFile.Classes.First();
-        var method = @class.FindMethod(m => m.Name.Equals(operationModel.Name, StringComparison.OrdinalIgnoreCase));
+        var method = @class.FindMethod(m => m.TryGetMetadata<OperationModel>("model", out var model) && model.Id == operationModel.Id);
         var attr = method.Attributes.OfType<CSharpIntentManagedAttribute>().FirstOrDefault();
         if (attr == null)
         {

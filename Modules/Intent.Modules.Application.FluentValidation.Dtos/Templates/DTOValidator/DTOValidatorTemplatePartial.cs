@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Intent.Engine;
+using Intent.Metadata.Models;
 using Intent.Modelers.Services.Api;
 using Intent.Modules.Application.Dtos.Templates.DtoModel;
 using Intent.Modules.Application.FluentValidation.Settings;
@@ -17,18 +19,20 @@ namespace Intent.Modules.Application.FluentValidation.Dtos.Templates.DTOValidato
     {
         public const string TemplateId = "Intent.Application.FluentValidation.Dtos.DTOValidator";
 
-        public DTOValidatorTemplate(IOutputTarget outputTarget, DTOModel model)
+        public DTOValidatorTemplate(IOutputTarget outputTarget, DTOModel model, IEnumerable<IAssociationEnd> associationedElements)
             : base(
                 templateId: TemplateId,
                 outputTarget: outputTarget,
                 model: model,
                 toValidateTemplateId: DtoModelTemplate.TemplateId,
-                dtoTemplateId: TemplateFulfillingRoles.Application.Contracts.Dto,
-                dtoValidatorTemplateId: TemplateFulfillingRoles.Application.Validation.Dto,
+                dtoTemplateId: TemplateRoles.Application.Contracts.Dto,
+                dtoValidatorTemplateId: TemplateRoles.Application.Validation.Dto,
                 modelParameterName: "model",
                 validatorProviderInterfaceTemplateId: "Application.Common.ValidatorProviderInterface",
                 uniqueConstraintValidationEnabled: outputTarget.ExecutionContext.Settings.GetFluentValidationApplicationLayer().UniqueConstraintValidation().IsDefaultEnabled(),
-                repositoryInjectionEnabled: true)
+                repositoryInjectionEnabled: true,
+                associationedElements: associationedElements,
+                customValidationEnabled: true)
         {
         }
     }

@@ -19,18 +19,13 @@ namespace Intent.Modules.Dapr.AspNetCore.Templates.StaticContentTemplateRegistra
 
         public override string ContentSubFolder => "DaprFiles";
 
+        [IntentIgnore]
+        public override string RelativeOutputPathPrefix => "dapr";
+
+        public override string[] BinaryFileGlobbingPatterns => new string[] { "*.jpg", "*.png", "*.xlsx", "*.ico", "*.pdf" };
+
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
-        public override IReadOnlyDictionary<string, string> Replacements(IOutputTarget outputTarget) => new Dictionary<string, string>
-        {
-        };
-
-        [IntentManaged(Mode.Ignore)]
-        protected override ITemplate CreateTemplate(IOutputTarget outputTarget, string fileFullPath, string fileRelativePath, OverwriteBehaviour defaultOverwriteBehaviour)
-        {
-            fileRelativePath = $"dapr/{fileRelativePath}";
-
-            return base.CreateTemplate(outputTarget, fileFullPath, fileRelativePath, defaultOverwriteBehaviour);
-        }
+        public override IReadOnlyDictionary<string, string> Replacements(IOutputTarget outputTarget) => new Dictionary<string, string>();
 
         [IntentManaged(Mode.Ignore)]
         protected override OverwriteBehaviour DefaultOverrideBehaviour => OverwriteBehaviour.OnceOff;

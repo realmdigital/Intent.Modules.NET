@@ -1,3 +1,24 @@
+### Version 5.0.8
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.0.7
+
+- Fixed: Due to the nature of how GetTypeName resolves namespaces there are cases where ambiguous references still exist and causes compilation errors, this fix forces to re-evaluate a lot of types in this module.
+
+### Version 5.0.6
+
+- Fixed: Service Operations didn't generate generic type parameters.
+- Fixed: Referencing Domain Enums will now add their respective using directives.
+
+### Version 5.0.5
+
+- Fixed: Enums using directives will now be resolved.
+
+### Version 5.0.4
+
+- Improvement: Making use of more sophisticated resolution systems when generating C# code.
+
 ### Version 5.0.3
 
 - Fixed: Nullability related compiler warnings.

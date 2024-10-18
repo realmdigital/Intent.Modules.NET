@@ -1,30 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Intent.Engine;
 using Intent.Eventing;
+using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Common.VisualStudio;
 using Intent.Modules.Constants;
 using Intent.Modules.VisualStudio.Projects.Api;
 using Intent.Modules.VisualStudio.Projects.Events;
 using Intent.Modules.VisualStudio.Projects.FactoryExtensions;
-using Intent.Modules.VisualStudio.Projects.FactoryExtensions.NuGet;
 using Intent.Modules.VisualStudio.Projects.FactoryExtensions.NuGet.HelperTypes;
 using Intent.Modules.VisualStudio.Projects.NuGet;
 using Intent.Templates;
-using Intent.Utils;
 
 namespace Intent.Modules.VisualStudio.Projects.Templates;
 
-public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTemplateBase<TModel>, IVisualStudioProjectTemplate
+public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTemplateBase<TModel>, IVisualStudioProjectTemplate, IHasGlobalUsings
     where TModel : IVisualStudioProject
 {
     private string _fileContent;
+    private readonly Dictionary<string, string> _moduleRequestedProperties = [];
+
     protected VisualStudioProjectTemplateBase(string templateId, IOutputTarget outputTarget, TModel model) : base(templateId, outputTarget, model)
     {
+        ExecutionContext.EventDispatcher.Subscribe<AddProjectPropertyEvent>(HandleAddProjectPropertyEvent);
+        ExecutionContext.EventDispatcher.Subscribe<AddUserSecretsEvent>(HandleAddUserSecretsEvent);
     }
 
     public string ProjectId => Model.Id;
@@ -51,8 +57,8 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
     public void UpdateContent(string content, ISoftwareFactoryEventDispatcher sfEventDispatcher)
     {
         // Normalize the content of both by parsing with no whitespace and calling .ToString()
-        var targetContent = XDocument.Parse(content).ToString();
-        var existingContent = LoadContent();
+        var targetContent = XDocument.Parse(content).ToString().ReplaceLineEndings();
+        var existingContent = LoadContent().ReplaceLineEndings();
 
         if (existingContent == targetContent)
         {
@@ -62,7 +68,7 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
         var change = ExecutionContext.ChangeManager.FindChange(FilePath);
         if (change != null)
         {
-            change.ChangeContent(content);
+            change.ChangeContent(content, content);
             return;
         }
 
@@ -97,7 +103,7 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
 
         var content = hadExistingContent
             ? existingFileContent
-            : base.RunTemplate();
+            : base.RunTemplate().ReplaceLineEndings();
 
         content = ApplyAdditionalTransforms(content);
 
@@ -143,7 +149,7 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
     /// <summary>
     /// Applies settings from stereotypes in the Visual Studio designer.
     /// </summary>
-    /// <returns>Whether or not there was a change.</returns>
+    /// <returns>Whether there was a change.</returns>
     private bool ApplySettings(XDocument doc)
     {
         if (doc.ResolveProjectScheme() != VisualStudioProjectScheme.Sdk)
@@ -205,6 +211,8 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
             {
                 hasChange |= SyncProperty(doc, "NoWarn", netSettings.SuppressWarnings());
             }
+
+            hasChange |= SyncUsings(doc, model);
         }
 
         var projectOptions = project.GetCSharpProjectOptions();
@@ -232,6 +240,49 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
                 // back to it if Nullable() is unset.
                 hasChange |= SyncProperty(doc, "Nullable", "enable");
             }
+        }
+
+        if (_moduleRequestedProperties.Count == 0)
+        {
+            return hasChange;
+        }
+
+        foreach (var property in _moduleRequestedProperties)
+        {
+            hasChange |= AddProperty(doc, property.Key, property.Value);
+        }
+
+        return hasChange;
+    }
+
+    private static bool SyncUsings(XDocument doc, CSharpProjectNETModel model)
+    {
+        var implicitUsings = model.CustomImplicitUsings?.ImplicitUsings?.Select(x => x.Name).ToArray() ?? [];
+        if (implicitUsings.Length == 0)
+        {
+            return false;
+        }
+
+        var hasChange = false;
+
+        var usingGroup = GetUsingItemGroup(doc);
+        foreach (var implicitUsing in implicitUsings)
+        {
+            if (usingGroup.Elements().Any(x => x.Name == "Using" && x.Attribute("Include")?.Value == implicitUsing))
+            {
+                continue;
+            }
+
+            usingGroup.Add(new XElement("Using", new XAttribute("Include", implicitUsing)));
+            hasChange = true;
+        }
+
+        // Sort alphabetically:
+        if (hasChange)
+        {
+            var elements = usingGroup.Elements().OrderBy(x => x.Name).ThenBy(x => x.Attribute("Include")?.Value).Cast<object>().ToArray();
+            usingGroup.RemoveAll();
+            usingGroup.Add(elements);
         }
 
         return hasChange;
@@ -318,6 +369,30 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
     }
 
     /// <returns>True if there was a change.</returns>
+    private static bool AddProperty(XDocument doc, string propertyName, string value)
+    {
+        var element = GetPropertyGroupElement(doc, propertyName);
+        if (element != null)
+        {
+            return false;
+        }
+
+        var propertyGroupElement = GetPropertyGroupElement(doc, "TargetFramework")?.Parent ??
+                                   GetPropertyGroupElement(doc, "TargetFrameworks")?.Parent;
+        if (propertyGroupElement == null)
+        {
+            throw new Exception("Could not determine target property group element.");
+        }
+
+        element = new XElement(propertyName);
+        propertyGroupElement.Add(element);
+        element.Value = value;
+
+        return true;
+    }
+
+
+    /// <returns>True if there was a change.</returns>
     private bool SyncFrameworks(XDocument doc)
     {
         var targetFrameworks = GetTargetFrameworks().ToArray();
@@ -342,7 +417,7 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
             return false;
         }
 
-        var elementName = targetFrameworks.Count() == 1
+        var elementName = targetFrameworks.Length == 1
             ? "TargetFramework"
             : "TargetFrameworks";
 
@@ -351,10 +426,179 @@ public abstract class VisualStudioProjectTemplateBase<TModel> : IntentFileTempla
         return true;
     }
 
+    private void HandleAddUserSecretsEvent(AddUserSecretsEvent @event)
+    {
+        if (@event.Target.Id != Project.Id || @event.SecretsToAdd == null)
+        {
+            return;
+        }
+
+        var project = ((IVisualStudioProjectTemplate)this).Project;
+        if (project is not CSharpProjectNETModel model ||
+            !model.HasNETSettings() ||
+            !string.IsNullOrEmpty(model.GetNETSettings().UserSecretsId()))
+        {
+            return;
+        }
+
+        CreateUserSecretsFile(@event);
+    }
+
+    private void CreateUserSecretsFile(AddUserSecretsEvent @event)
+    {
+        var userSecretsId = Guid.NewGuid().ToString();
+        _moduleRequestedProperties.Add("UserSecretsId", userSecretsId);
+
+        var directory = GetUserSecretsDirectoryName(userSecretsId);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.WriteAllText(Path.Combine(directory, "secrets.json"), JsonSerializer.Serialize(@event.SecretsToAdd));
+    }
+
+    private static string GetUserSecretsDirectoryName(string userSecretsId)
+    {
+        var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var userSecretsDir = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? Path.Combine(appDataDir, "Microsoft", "UserSecrets", userSecretsId)
+            : Path.Combine(homeDir, ".microsoft", "usersecrets", userSecretsId);
+        return userSecretsDir;
+    }
+
+    private void HandleAddProjectPropertyEvent(AddProjectPropertyEvent @event)
+    {
+        if (@event.Target.Id != Project.Id)
+        {
+            return;
+        }
+        _moduleRequestedProperties[@event.PropertyName] = @event.PropertyValue;
+    }
+
     private static XElement GetPropertyGroupElement(XDocument doc, string name)
     {
         var (prefix, namespaceManager, _) = doc.GetNamespaceManager();
 
         return doc.XPathSelectElement($"/{prefix}:Project/{prefix}:PropertyGroup/{prefix}:{name}", namespaceManager);
+    }
+
+    private static XElement GetUsingItemGroup(XDocument doc)
+    {
+        var (prefix, namespaceManager, _) = doc.GetNamespaceManager();
+
+        var usingGroup = doc.XPathSelectElements($"/{prefix}:Project/{prefix}:ItemGroup", namespaceManager)
+            .FirstOrDefault(x => x.Descendants("Using").Any());
+        if (usingGroup != null)
+        {
+            return usingGroup;
+        }
+
+        usingGroup = new XElement("ItemGroup");
+
+        doc.Elements().First().Add(usingGroup);
+
+        return usingGroup;
+    }
+
+    IEnumerable<string> IHasGlobalUsings.GetGlobalUsings()
+    {
+        var project = ((IVisualStudioProjectTemplate)this).Project;
+        var (implicitUsingsIsEnabled, sdk, customImplicitUsings) = GetSettings(project);
+
+        foreach (var customImplicitUsing in customImplicitUsings)
+        {
+            yield return customImplicitUsing;
+        }
+
+        if (TryGetExistingFileContent(out var content))
+        {
+            var doc = XDocument.Parse(content);
+            if (implicitUsingsIsEnabled == null)
+            {
+                var implicitUsingsValue = doc.Root?.Descendants("ImplicitUsings").FirstOrDefault()?.Value;
+                if (string.Equals("enable", implicitUsingsValue, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals("true", implicitUsingsValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    implicitUsingsIsEnabled = true;
+                }
+            }
+
+            sdk ??= doc.Root?.Attribute("Sdk")?.Value;
+
+            var usings = doc.Root!
+                .Descendants("Using")
+                .Select(x => x.Attribute("Include")?.Value)
+                .Where(x => x != null);
+
+            foreach (var @using in usings)
+            {
+                yield return @using;
+            }
+        }
+
+        if (implicitUsingsIsEnabled == true)
+        {
+            var implicitUsings = sdk switch
+            {
+                "Microsoft.NET.Sdk" => ImplicitUsings.ForSdk,
+                "Microsoft.NET.Sdk.BlazorWebAssembly" => ImplicitUsings.ForBlazorWebAssemblySdk,
+                "Microsoft.NET.Sdk.Web" => ImplicitUsings.ForWebSdk,
+                "Microsoft.NET.Sdk.Worker" => ImplicitUsings.ForWorkerSdk,
+                _ => Enumerable.Empty<string>()
+            };
+
+            foreach (var implicitUsing in implicitUsings)
+            {
+                yield return implicitUsing;
+            }
+        }
+
+        yield break;
+
+        static (bool? ImplicitUsingsIsEnabled, string Sdk, IEnumerable<string> CustomImplicitUsings) GetSettings(IVisualStudioProject project)
+        {
+            if (project.HasNETCoreSettings())
+            {
+                var settings = project.GetNETCoreSettings();
+
+                var implicitUsings = settings.ImplicitUsings();
+                if (implicitUsings.IsEnable())
+                {
+                    return (true, null, []);
+                }
+
+                if (implicitUsings.IsDisable())
+                {
+                    return (false, null, []);
+                }
+
+                return (null, null, []);
+            }
+
+            if (project is CSharpProjectNETModel model &&
+                model.HasNETSettings())
+            {
+                var settings = model.GetNETSettings();
+                var sdk = settings.SDK().Value;
+                var customImplicitUsings = model.CustomImplicitUsings?.ImplicitUsings?.Select(x => x.Name) ?? [];
+
+                var implicitUsings = settings.ImplicitUsings();
+                if (implicitUsings.IsEnable())
+                {
+                    return (true, sdk, customImplicitUsings);
+                }
+
+                if (implicitUsings.IsDisable())
+                {
+                    return (false, sdk, customImplicitUsings);
+                }
+
+                return (null, sdk, customImplicitUsings);
+            }
+
+            return (null, null, []);
+        }
     }
 }

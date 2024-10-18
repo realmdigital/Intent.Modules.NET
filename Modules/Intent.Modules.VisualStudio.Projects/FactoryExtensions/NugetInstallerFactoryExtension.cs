@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Intent.Engine;
@@ -8,6 +9,7 @@ using Intent.Eventing;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Plugins;
+using Intent.Modules.Common.VisualStudio;
 using Intent.Modules.Constants;
 using Intent.Modules.VisualStudio.Projects.Events;
 using Intent.Modules.VisualStudio.Projects.FactoryExtensions.NuGet;
@@ -19,6 +21,7 @@ using Intent.Modules.VisualStudio.Projects.Templates;
 using Intent.Plugins.FactoryExtensions;
 using Intent.Templates;
 using Intent.Utils;
+using Microsoft.Build.Evaluation;
 using NuGet.Versioning;
 
 namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
@@ -126,12 +129,13 @@ namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
         private void SaveProject(string filePath, string content)
         {
             var change = _changeManager.FindChange(filePath);
+            content = content.ReplaceLineEndings();
 
             // Normalize the content of both by parsing with no whitespace and calling .ToString()
             var targetContent = XDocument.Parse(content).ToString();
             var existingContent = change != null
-                ? XDocument.Parse(change.Content).ToString()
-                : XDocument.Load(filePath).ToString();
+                ? XDocument.Parse(change.Content).ToString().ReplaceLineEndings()
+                : XDocument.Load(filePath).ToString().ReplaceLineEndings();
 
             if (existingContent == targetContent)
             {
@@ -164,6 +168,8 @@ namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
         {
             string report;
             var (projectPackages, highestVersions) = DeterminePackages(nuGetProjectSchemeProcessors, applicationProjects);
+
+            ConsolidateRequestedPackages(projectPackages);
 
             if (_settingConsolidatePackageVersions &&
                 !string.IsNullOrWhiteSpace(report = GetPackagesWithMultipleVersionsReport(projectPackages)))
@@ -218,7 +224,180 @@ namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
                            $"{Environment.NewLine}" +
                            $"{report}");
             }
+        }
 
+        /// <summary>
+        /// This method does the  following
+        /// 1.) Consolidates version numbers across requested packages if required (including Implicit dependencies)
+        /// 2.) Removes Requested Nuget packages if they already present from transative dependencies (including Implicit dependencies)
+        /// </summary>
+        /// <param name="projectPackages"></param>
+        internal void ConsolidateRequestedPackages(IEnumerable<NuGetProject> projectPackages)
+        {
+            ConsolidateVersionsUpfront(projectPackages);
+            RemoveTransativeDependencies(projectPackages);
+        }
+
+        private void ConsolidateVersionsUpfront(IEnumerable<NuGetProject> projectPackages)
+        {
+            var highestRequestedVersions = new Dictionary<string, VersionRange>();
+            foreach (var projectPackage in projectPackages)
+            {
+                foreach (var kvp in projectPackage.RequestedPackages)
+                {
+                    DetermineHighest(highestRequestedVersions, kvp.Key, kvp.Value.Version);
+                    if (kvp.Value.RequestedPackage?.Dependencies?.Any() == true)
+                    {
+                        foreach (var dependant in kvp.Value.RequestedPackage?.Dependencies)
+                        {
+                            var dependantVersion = VersionRange.Parse(dependant.Version);
+                            DetermineHighest(highestRequestedVersions, dependant.Name, dependantVersion);
+                        }
+                    }
+                }
+            }
+
+            foreach (var projectPackage in projectPackages)
+            {
+                foreach (var kvp in projectPackage.RequestedPackages)
+                {
+                    var highestRequested = highestRequestedVersions[kvp.Key];
+                    if (kvp.Value.Version.MinVersion < highestRequested.MinVersion)
+                    {
+                        kvp.Value.Update(highestRequested, null);
+                    }
+                }
+            }
+
+
+            static void DetermineHighest(Dictionary<string, VersionRange> highestRequestedVersions, string packageName, VersionRange version)
+            {
+                if (!highestRequestedVersions.TryGetValue(packageName, out var current))
+                {
+                    highestRequestedVersions.Add(packageName, version);
+                }
+                else
+                {
+                    if (version.MinVersion > current.MinVersion)
+                    {
+                        highestRequestedVersions[packageName] = version;
+                    }
+                }
+            }
+        }
+
+        private void RemoveTransativeDependencies(IEnumerable<NuGetProject> projectPackages)
+        {
+            var projectToNugetPackageMap = new Dictionary<string, Dictionary<string, VersionRange>>();
+            foreach (var projectPackage in projectPackages)
+            {
+                var requestedPackages = new Dictionary<string, VersionRange>();
+                foreach (var kvp in projectPackage.RequestedPackages)
+                {
+                    AddUpdatePackageVersion(requestedPackages, kvp.Key, kvp.Value.Version);
+                    if (kvp.Value.RequestedPackage?.Dependencies?.Any() == true)
+                    {
+                        foreach (var dependant in kvp.Value.RequestedPackage?.Dependencies)
+                        {
+                            var dependentVersion = VersionRange.Parse(dependant.Version);
+                            AddUpdatePackageVersion(requestedPackages, dependant.Name, dependentVersion);
+                        }
+                    }
+                }
+                projectToNugetPackageMap[projectPackage.OutputTarget.Id] = requestedPackages;
+            }
+
+            foreach (var projectPackage in projectPackages)
+            {
+                var dependantPackages = GetDependantPackages(projectPackage.OutputTarget, projectToNugetPackageMap);
+                foreach (var dependantPackage in dependantPackages)
+                {
+                    if (projectPackage.RequestedPackages.TryGetValue(dependantPackage.Key, out var packge))
+                    {
+                        //If the package is already installed, don't remove it, so that the request can still update the installed package if required
+                        if (projectPackage.InstalledPackages.ContainsKey(dependantPackage.Key))
+                        {
+                            continue;
+                        }
+                        //The requested package is higher than the dependent so install the higher version, 
+                        //This scenario happens if an implicit version is lower than requested as the explicits are consolodated.
+                        if (projectPackage.RequestedPackages[dependantPackage.Key].Version.MinVersion > dependantPackage.Value.MinVersion)
+                        {
+                            continue;
+                        }
+
+                        projectPackage.RequestedPackages.Remove(dependantPackage.Key);
+                    }
+                }
+
+                List<string> toRemove = new List<string>();
+                foreach (var requestedPackage in projectPackage.RequestedPackages)
+                {
+                    if (requestedPackage.Value.RequestedPackage?.Dependencies?.Any() == true)
+                    {
+                        foreach (var dependant in requestedPackage.Value.RequestedPackage?.Dependencies)
+                        {
+                            if (projectPackage.RequestedPackages.ContainsKey(dependant.Name))
+                            {
+                                var dependentVersion = VersionRange.Parse(dependant.Version);
+                                if (projectPackage.RequestedPackages[dependant.Name].Version.MinVersion <= dependentVersion.MinVersion)
+                                {
+                                    toRemove.Add(dependant.Name);
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (var name in toRemove)
+                {
+                    projectPackage.RequestedPackages.Remove(name);
+                }
+            }
+        }
+
+        private Dictionary<string, VersionRange> GetDependantPackages(IOutputTarget project, Dictionary<string, Dictionary<string, VersionRange>> projectToNugetPackageMap)
+        {
+            var collectedPackages = new Dictionary<string, VersionRange>();
+
+            if (!project.Dependencies().Any())
+            {
+                return collectedPackages;
+            }
+
+            foreach (var dependentProject in project.Dependencies())
+            {
+                if (projectToNugetPackageMap.TryGetValue(dependentProject.Id, out var packages))
+                {
+                    foreach (var package in packages)
+                    {
+                        AddUpdatePackageVersion(collectedPackages, package.Key, package.Value);
+                    }
+                }
+
+                // Recursively collect packages from the dependent projects of this dependent project
+                var dependentPackages = GetDependantPackages(dependentProject, projectToNugetPackageMap);
+                foreach (var package in dependentPackages)
+                {
+                    AddUpdatePackageVersion(collectedPackages, package.Key, package.Value);
+                }
+            }
+
+            return collectedPackages;
+        }
+
+        private static void AddUpdatePackageVersion(Dictionary<string, VersionRange> packages, string packageName, VersionRange version)
+        {
+            if (packages.TryGetValue(packageName, out var current))
+            {
+                if (current.MinVersion < version.MinVersion)
+                {
+                    packages[packageName] = version;
+                }
+            }
+            else
+            {
+                packages[packageName] = version;
+            }
         }
 
         /// <summary>
@@ -295,11 +474,14 @@ namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
 
                 if (requestedPackages.TryGetValue(package.Name, out var requestedPackage))
                 {
-                    requestedPackage.Update(highestVersion, package);
+                    if (requestedPackage.Version.MinVersion < semanticVersion.MinVersion)
+                    {
+                        requestedPackage.Update(semanticVersion, package);
+                    }
                 }
                 else
                 {
-                    requestedPackages.Add(package.Name, NuGetPackage.Create(template.FilePath, package, highestVersion));
+                    requestedPackages.Add(package.Name, NuGetPackage.Create(template.FilePath, package, semanticVersion));
                 }
             }
 
@@ -314,7 +496,8 @@ namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
                 HighestVersions = highestVersionsInProject,
                 Name = template.Name,
                 FilePath = template.FilePath,
-                Processor = processor
+                Processor = processor,
+                OutputTarget = template.OutputTarget,
             };
         }
 
@@ -324,13 +507,16 @@ namespace Intent.Modules.VisualStudio.Projects.FactoryExtensions
             {
                 foreach (var projectPackage in projectPackages)
                 {
-                    if (projectPackage.RequestedPackages.TryGetValue(highestVersion.Key, out var requestedPackage) &&
-                        requestedPackage.Version.MinVersion < highestVersion.Value.MinVersion)
+                    if (projectPackage.RequestedPackages.TryGetValue(highestVersion.Key, out var requestedPackage))
                     {
-                        requestedPackage.Version = highestVersion.Value;
+                        if (requestedPackage.Version.MinVersion < highestVersion.Value.MinVersion)
+                        {
+                            requestedPackage.Version = highestVersion.Value;
+                        }
+                        
                         continue;
                     }
-
+                    
                     if (projectPackage.InstalledPackages.TryGetValue(highestVersion.Key, out var installedPackage) &&
                         installedPackage.Version.MinVersion < highestVersion.Value.MinVersion)
                     {

@@ -1,5 +1,8 @@
-﻿using Intent.Engine;
+﻿using System.Collections.Generic;
+using Intent.Engine;
+using Intent.Exceptions;
 using Intent.Modules.VisualStudio.Projects.Api;
+using Intent.Modules.VisualStudio.Projects.Templates.JavaScriptProject;
 using Intent.Registrations;
 
 namespace Intent.Modules.VisualStudio.Projects.OutputTargets
@@ -19,7 +22,7 @@ namespace Intent.Modules.VisualStudio.Projects.OutputTargets
             foreach (var model in models)
             {
                 registry.RegisterOutputTarget(model.ToOutputTargetConfig());
-                foreach (var folder in model.Folders)
+                foreach (var folder in model.Folders.DetectDuplicates())
                 {
                     Register(registry, folder);
                 }
@@ -30,14 +33,43 @@ namespace Intent.Modules.VisualStudio.Projects.OutputTargets
             {
                 registry.RegisterOutputTarget(solutionFolder.ToOutputTarget());
             }
+
+            var javaScriptProjects = _metadataManager.VisualStudio(application).GetJavaScriptProjectModels();
+            foreach (var model in javaScriptProjects)
+            {
+                registry.RegisterOutputTarget(model.ToOutputTargetConfig());
+                foreach (var folder in model.Folders.DetectDuplicates())
+                {
+                    Register(registry, folder);
+                }
+            }
         }
 
         private static void Register(IOutputTargetRegistry registry, FolderModel folder)
         {
-            registry.RegisterOutputTarget(folder.ToOutputTargetConfig());
-            foreach (var child in folder.Folders)
+            var outputTargetConfig = folder.ToOutputTargetConfig();
+            
+            registry.RegisterOutputTarget(outputTargetConfig);
+            foreach (var child in folder.Folders.DetectDuplicates())
             {
                 Register(registry, child);
+            }
+        }
+    }
+
+    internal static class OutputTargetRegistrationExtensions
+    {
+        public static IEnumerable<FolderModel> DetectDuplicates(this IEnumerable<FolderModel> sequence)
+        {
+            var folderNameSet = new HashSet<string>();
+
+            foreach (var folderModel in sequence)
+            {
+                if (!folderNameSet.Add(folderModel.Name))
+                {
+                    throw new ElementException(folderModel.InternalElement, $"Duplicate Folder found at same location.");
+                }
+                yield return folderModel;
             }
         }
     }

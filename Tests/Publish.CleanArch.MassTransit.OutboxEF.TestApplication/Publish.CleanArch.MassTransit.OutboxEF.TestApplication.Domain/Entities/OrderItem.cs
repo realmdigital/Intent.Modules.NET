@@ -1,6 +1,8 @@
 using System;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace Publish.CleanArch.MassTransit.OutboxEF.TestApplication.Domain.Entities
 {
     public class OrderItem

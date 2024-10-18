@@ -1,4 +1,24 @@
-﻿### Version 5.0.4
+### Version 5.0.9
+
+- Fixed: Possible PagedResult duplication through DTOs as opposed to only using the PagedResult template. 
+
+### Version 5.0.8
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.0.7
+
+- Improvement: Added support for gathering Service Proxy information from the Services designer too.
+
+### Version 5.0.6
+
+- Improvement: Improved internal processes for working with Service Proxies.
+
+### Version 5.0.5
+
+- Improvement: Updating various modules to use the more sophisticated CSharp mapping resolution systems.
+
+### Version 5.0.4
 
 - Improvement: Updated version for `Intent.Metadata.WebApi` dependency.
 

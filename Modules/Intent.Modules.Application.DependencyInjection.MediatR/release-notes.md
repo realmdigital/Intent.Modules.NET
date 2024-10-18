@@ -1,6 +1,23 @@
+### Version 3.5.14
+
+- Improvement: Updated module NuGet packages infrastructure.
+- Improvement: Updated templates to use new NuGet package system.
+
+### Version 3.5.13
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 3.5.12
+
+- Improvement: Updated Interoperable dependency version.
+
+### Version 3.5.11
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
 ### Version 3.5.0
 
-- Deprecated: This functionality is now covered the `Intent.Application.MediatR` module itself.
+- Improvement: Updated MediatR version.
 
 ### Version 3.4.2
 

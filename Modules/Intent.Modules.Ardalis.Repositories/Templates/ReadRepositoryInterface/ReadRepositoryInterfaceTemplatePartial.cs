@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
@@ -23,7 +24,7 @@ namespace Intent.Modules.Ardalis.Repositories.Templates.ReadRepositoryInterface
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public ReadRepositoryInterfaceTemplate(IOutputTarget outputTarget, ClassModel model) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NugetPackages.ArdalisSpecification);
+            AddNugetDependency(NugetPackages.ArdalisSpecification(OutputTarget));
         }
 
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
@@ -42,12 +43,12 @@ namespace Intent.Modules.Ardalis.Repositories.Templates.ReadRepositoryInterface
 
         private string GetDomainEntityTypeName()
         {
-            return GetTypeName(TemplateFulfillingRoles.Domain.Entity.Interface, Model);
+            return GetTypeName(TemplateRoles.Domain.Entity.Interface, Model);
         }
 
         private bool HasSinglePrimaryKey()
         {
-            if (!TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Domain.Entity.Primary, Model, out var entityTemplate))
+            if (!TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Domain.Entity.Primary, Model, out var entityTemplate))
             {
                 return false;
             }
@@ -57,7 +58,7 @@ namespace Intent.Modules.Ardalis.Repositories.Templates.ReadRepositoryInterface
 
         private string GetSurrogateKey()
         {
-            if (!TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateFulfillingRoles.Domain.Entity.Primary, Model, out var entityTemplate))
+            if (!TryGetTemplate<ICSharpFileBuilderTemplate>(TemplateRoles.Domain.Entity.Primary, Model, out var entityTemplate))
             {
                 return string.Empty;
             }

@@ -1,3 +1,36 @@
+### Version 3.9.3
+
+- TODO
+
+### Version 3.9.2
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 3.9.1
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 3.9.0
+
+- Improvement: Added Regular Expressions for Validation.
+- Improvement: Module project updated to .NET 8.
+
+### Version 3.8.10
+
+- Improvement: Updated Interoperable dependency versions.
+
+### Version 3.8.9
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
+### Version 3.8.7
+
+- Improvement: Added CascadeMode option on Fluent Validations to specify this behaviour.
+
+### Version 3.8.6
+
+- Fixed: Would cause slow designer load times when it contained very many DTOs.
+
 ### Version 3.8.3
 
 - Improvement: Added "Email Address" option to the "Validation" stereotype.

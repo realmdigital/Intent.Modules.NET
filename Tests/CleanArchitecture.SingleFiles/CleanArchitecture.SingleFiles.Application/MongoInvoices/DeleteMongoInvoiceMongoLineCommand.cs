@@ -59,12 +59,13 @@ namespace CleanArchitecture.SingleFiles.Application.MongoInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class DeleteMongoInvoiceMongoLineCommandValidator : AbstractValidator<DeleteMongoInvoiceMongoLineCommand>
     {
         [IntentManaged(Mode.Merge)]
         public DeleteMongoInvoiceMongoLineCommandValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

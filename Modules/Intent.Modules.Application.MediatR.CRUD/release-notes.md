@@ -1,3 +1,109 @@
+### Version 6.0.19
+
+- Improvement: Basic CRUD support for specifications.
+
+### Version 6.0.18
+
+- Improvement: Improved error when creating illegal queries.
+
+### Version 6.0.17
+
+- Fixed: Issue where `CRUD Update Action` was not generating correct code if Domain Services were injected.
+- Fixed: Query with nullable mapped property, which is paginated generates uncompilable code.
+- Fixed: Advanced mapped DTO fields will now conform to Pascal Case.
+
+### Version 6.0.16
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 6.0.15
+
+- Improvement: Support for nullable `OrderBy` on Paging.
+
+### Version 6.0.14
+
+- Improvement: Support for `OrderBy` on Paging.
+- Improvement: CQRS CRUD script now supports surrogate Primary keys marked as `User supplied`.
+
+### Version 6.0.13
+
+- Improvement: FindAsync handling more mapping scenarios.
+- Improvement: Handler implementation that involves operation invocations returning non-void types will now return appropriate variable declaration types such as `var myVar = ...;` or `var (prop1, prop2, prop3) = ...;`.
+
+### Version 6.0.12
+
+- Improvement: Added `TODO` comments on `NotImplementedException`.
+
+### Version 6.0.11
+
+- Improvement: Added basic support non UOW based repositories.
+
+### Version 6.0.10
+
+- Improvement: Add support for Data Contract mappings with the Advanced mapping system.
+- Fixed: Generating code for advanced mappings where there is a nested target DTO will now properly instantiate that DTO before mapping values.
+- Fixed: Service Call Operations can also now invoke `Operations` on a `Class`.
+- Fixed: Service dependency substitutions can also occur on parameters of a Service Call Operation.
+- Fixed: Command/Query handler implementations failed when the consolidated option was enabled.
+
+### Version 6.0.9
+
+- Fixed: Resolved an issue causing syntax errors when mapping services onto Value Objects using the basic mapping configuration.
+
+### Version 6.0.8
+
+- Improvement: Adding mapped literals for `Query`s caused software factory errors this is now supported.
+- Improvement: Service calls returning DTO's with primary keys on newly created entities now force a UOW save to ensure key is populated.
+
+### Version 6.0.7
+
+- Fixed: Issue around CRUD with nullable return types.
+
+### Version 6.0.6
+
+- Improvement: Automatic wiring up of `DomainService`s in CRUD Implementations.
+- Improvement: `CommandMappingImplementationStrategy` and `QueryMappingImplementationStrategy` was updated to also include the `ServiceOperationMappingTypeResolver` when performing generating implementation logic for mappings.
+- Improvement: `DomainInteractionsManager` - Consolidated CallServiceOperation enhancements include refined service dependency checks, extended support for ClassModel, DataContractModel, and TypeDefinitionModel through VariableType, and robust handling of asynchronous operations with proper awaiting and cancellation token integration, improving clarity and flexibility in service operation calls.
+
+### Version 6.0.5
+
+- Improvement: Removed support for implicit keys, allowing keyless entities to now be modelled.
+
+### Version 6.0.4
+
+- Fixed: If a nested compositional entity does not have an owner Id, it will no longer run the GetAllImplementationStrategy.
+- Fixed: GetAllImplementationStrategy will only execute when it can find a mapped Entity for compositional owner.
+
+### Version 6.0.3
+
+- Improvement: Added support for `ValueObject` collections.
+
+### Version 6.0.2
+
+- Fixed: Optional query filters not working with DbContext oriented data-access.
+- Improvement: CreateOrUpdate methods now support domain interfaces.
+
+### Version 6.0.1
+
+- Improvement: Support for optional query filters when querying lists (or paginated lists) of entities.
+
+### Version 6.0.0
+
+- Improvement: Advanced Mapping system CRUD Support.
+- Improvement: When multiple matching CRUD strategies are found the module will now apply the first strategy based on the registration order.
+
+### Version 5.4.0
+
+- Improvement: Better CRUD support for composite keys.
+
+### Version 5.3.3
+
+- Fixed: When a Query By Id is set to return a nullable object and has a repository that can't find the entity, it will return `default` as opposed to throw a `NotFoundException`.
+
+### Version 5.3.2
+
+- Improvement: Added CRUD Strategy for ODataQuery. 
+
 ### Version 5.3.1
 
 - Improvement: Projecting for Commands now included aggregational foreign keys.

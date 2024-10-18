@@ -59,12 +59,13 @@ namespace CleanArchitecture.SingleFiles.Application.DaprInvoices
         }
     }
 
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class DeleteDaprInvoiceDaprLineCommandValidator : AbstractValidator<DeleteDaprInvoiceDaprLineCommand>
     {
         [IntentManaged(Mode.Merge)]
         public DeleteDaprInvoiceDaprLineCommandValidator()
         {
-            //IntentMatch("ConfigureValidationRules")
+            // IntentFully(Match = "ConfigureValidationRules")
             ConfigureValidationRules();
         }
 

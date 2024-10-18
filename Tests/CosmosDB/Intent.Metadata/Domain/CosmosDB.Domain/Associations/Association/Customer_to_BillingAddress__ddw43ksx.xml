@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<association id="cea3a3b3-da78-47f3-9aaa-4887db211751">
+  <sourceEnd id="f8b98c7c-a208-41b1-963f-e9ca8516651b" type="Association Source End" typeId="8d9d2e5b-bd55-4f36-9ae4-2b9e84fd4e58">
+    <name>Customer</name>
+    <display>Customer: Customer</display>
+    <order>0</order>
+    <typeReference id="184c9015-cd28-4c56-b41f-88b08eb84323">
+      <typeId>55d7a6e9-f464-45a4-a761-e5ea8683067e</typeId>
+      <isNavigable>false</isNavigable>
+      <isNullable>false</isNullable>
+      <isCollection>false</isCollection>
+      <isRequired>true</isRequired>
+      <typePackageName>CosmosDB.Domain</typePackageName>
+      <typePackageId>eca90396-0828-43f5-9bbd-32c16ba595e4</typePackageId>
+      <stereotypes />
+      <genericTypeParameters />
+    </typeReference>
+    <stereotypes />
+    <metadata />
+    <childElements />
+  </sourceEnd>
+  <targetEnd id="cea3a3b3-da78-47f3-9aaa-4887db211751" type="Association Target End" typeId="0a66489f-30aa-417b-a75d-b945863366fd">
+    <name>BillingAddress</name>
+    <display>BillingAddress: Address?</display>
+    <order>4</order>
+    <typeReference id="fb1e0b8d-ebdf-4f97-b87f-95cd787e057b">
+      <typeId>edd1bc45-8a56-413e-bf72-09b932895b29</typeId>
+      <isNavigable>true</isNavigable>
+      <isNullable>true</isNullable>
+      <isCollection>false</isCollection>
+      <isRequired>true</isRequired>
+      <typePackageName>CosmosDB.Domain</typePackageName>
+      <typePackageId>eca90396-0828-43f5-9bbd-32c16ba595e4</typePackageId>
+      <stereotypes />
+      <genericTypeParameters />
+    </typeReference>
+    <stereotypes />
+    <metadata />
+    <childElements />
+  </targetEnd>
+  <associationType>Association</associationType>
+  <associationTypeId>eaf9ed4e-0b61-4ac1-ba88-09f912c12087</associationTypeId>
+  <stereotypes />
+</association>

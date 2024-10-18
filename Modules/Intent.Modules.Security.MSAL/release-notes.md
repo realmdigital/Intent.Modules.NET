@@ -1,3 +1,22 @@
+### Version 4.2.2
+
+- Improvement: Updated module NuGet packages infrastructure.
+- Improvement: Internal updates to module project.
+- Fixed: Changed `JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();` to `JwtSecurityTokenHandler.DefaultMapInboundClaims = false;` to turn off JWT claim keys from being mapped to XML SOAP scheme URLs.
+
+### Version 4.2.1
+
+- Improvement: Updated NuGet packages to latest stables.
+- Improvement: Added support for different UserId Types (guid, long, int).
+
+### Version 4.2.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+ 
+### Version 4.1.7
+
+- Improvement: Updated to be compatible with .NET 8.
+
 ### Version 4.1.6
 
 - Improvement: Added `SignUpSignInPolicyId` configuration option for specifying the PolicyId / User Flow for B2C.

@@ -1,3 +1,33 @@
+### Version 5.1.4
+
+- Fixed: Domain Behaviours not discoverable by a specific role.
+
+### Version 5.1.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.1.2
+
+- Improvement: Added `TODO` comments on `NotImplementedException`.
+
+### Version 5.1.1
+
+- Improvement: Updated `Entity` template metadata that the c# class represents the model, so it can be inferred by the Advanced mapping system.
+
+### Version 5.1.0
+
+- Improvement: `DataContractTemplate` update to include `RepresentsModel` to aid in advanced mapping detection scenarios.
+- Improvement: `DataContractTemplate` constructor will accept parameters to initialize base class first before accepting parameters to populate its own attributes.
+- Improvement: `DataContractTemplate` checks the base type now through its own Generalization association instead of the `Base Type` (Type References).
+
+### Version 5.0.3
+
+- Fixed: Data Contract does not apply Base Type when it is set in the designer.
+
+### Version 5.0.2
+
+- Improvement: Made small changes to UpdateHelper to make it more extensible.
+
 ### Version 4.4.2
 
 - Improvement: Primary domain entity interface qualified properties now also have a `model` metadata populated for identification in other modules.

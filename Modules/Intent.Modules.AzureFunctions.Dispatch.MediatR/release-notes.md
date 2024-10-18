@@ -1,3 +1,15 @@
+### Version 1.1.1
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 1.1.0
+
+- Improvement: Module project updated to .NET 8.
+
+### Version 1.0.10
+
+- Improvement: Updated icon to SVG format.
+
 ### Version 1.0.8
 
 - Update: Improved Queue Trigger support, including receiving messages as `QueueMessage`.

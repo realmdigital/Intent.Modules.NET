@@ -1,3 +1,8 @@
+### Version 1.0.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+- Fixed: SoftDelete not adding filter on inheritance (especially abstract) classes.
+
 ### Version 1.0.2
 
 - Fixed: Integrating with DbContext's SaveChanges now will execute after the possible DomainEvents dispatching.

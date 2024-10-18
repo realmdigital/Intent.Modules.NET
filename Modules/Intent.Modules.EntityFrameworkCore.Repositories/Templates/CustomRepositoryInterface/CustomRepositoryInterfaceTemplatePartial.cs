@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
+using Intent.Metadata.Models;
 using Intent.Modelers.Domain.Repositories.Api;
 using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
+using Intent.Modules.Constants;
 using Intent.Modules.EntityFrameworkCore.Repositories.Templates.CustomRepository;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -25,16 +27,20 @@ namespace Intent.Modules.EntityFrameworkCore.Repositories.Templates.CustomReposi
         public CustomRepositoryInterfaceTemplate(IOutputTarget outputTarget, RepositoryModel model) : base(TemplateId, outputTarget, model)
         {
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
-                .AddInterface($"I{Model.Name.EnsureSuffixedWith("Repository")}", _ =>
+                .AddInterface($"I{Model.Name.EnsureSuffixedWith("Repository")}", @interface =>
                 {
-                    var storedProcedures = Model.GetStoredProcedureModels();
-                    if (!storedProcedures.Any())
-                    {
-                        return;
-                    }
+                    @interface.TryAddXmlDocComments(Model.InternalElement);
 
-                    StoredProcedureHelpers.ApplyInterfaceMethods<CustomRepositoryInterfaceTemplate, RepositoryModel>(this, storedProcedures);
+                    RepositoryOperationHelper.ApplyMethods(this, @interface, model);
                 });
+
+            var storedProcedures = Model.GetGeneralizedStoredProcedures();
+            if (!storedProcedures.Any())
+            {
+                return;
+            }
+
+            StoredProcedureHelpers.ApplyInterfaceMethods<CustomRepositoryInterfaceTemplate, RepositoryModel>(this, storedProcedures);
         }
 
         [IntentManaged(Mode.Fully)]

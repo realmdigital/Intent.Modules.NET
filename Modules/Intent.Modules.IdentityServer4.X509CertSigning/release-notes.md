@@ -1,3 +1,11 @@
+### Version 4.1.1
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.1.0
+
+- Improvement: Updated to be compatible with latest Intent Architect Modules.
+
 ### Version 4.0.2
 
 - Updated dependencies and supported client versions to prevent warnings when used with Intent Architect 4.x.

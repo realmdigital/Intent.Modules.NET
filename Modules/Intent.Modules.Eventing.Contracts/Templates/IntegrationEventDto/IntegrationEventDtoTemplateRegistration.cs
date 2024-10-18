@@ -4,6 +4,7 @@ using System.Linq;
 using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Eventing.Api;
+using Intent.Modelers.Services.EventInteractions;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Registrations;
 using Intent.Modules.Modelers.Eventing;
@@ -27,6 +28,7 @@ namespace Intent.Modules.Eventing.Contracts.Templates.IntegrationEventDto
 
         public override string TemplateId => IntegrationEventDtoTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, EventingDTOModel model)
         {
             return new IntegrationEventDtoTemplate(outputTarget, model);
@@ -35,7 +37,10 @@ namespace Intent.Modules.Eventing.Contracts.Templates.IntegrationEventDto
         [IntentManaged(Mode.Merge, Body = Mode.Ignore, Signature = Mode.Fully)]
         public override IEnumerable<EventingDTOModel> GetModels(IApplication application)
         {
-            return _metadataManager.GetSubscribedToDtoModels(application).Union(_metadataManager.GetPublishedDtoModels(application));
+            return Enumerable.Empty<EventingDTOModel>()
+                .Union(_metadataManager.GetSubscribedToDtoModels(application))
+                .Union(_metadataManager.GetPublishedDtoModels(application))
+                .Union(_metadataManager.GetAssociatedMessageDtoModels(application));
         }
     }
 }

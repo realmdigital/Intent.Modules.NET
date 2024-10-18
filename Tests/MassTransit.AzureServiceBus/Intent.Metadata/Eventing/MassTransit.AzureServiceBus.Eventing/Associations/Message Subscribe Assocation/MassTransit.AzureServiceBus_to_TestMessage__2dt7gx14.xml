@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <association id="a856eb22-872a-4cb2-aa93-5f50f3f604c2">
   <sourceEnd id="a344e469-c73a-40d5-a46d-2ed08077ae5a" type="Message Subscribe Assocation Source End" typeId="18780798-1ea8-462b-b4f9-b8605ad11636">
-    <name>MassTransit.AzureServiceBus</name>
     <display>subscriber: MassTransit.AzureServiceBus</display>
     <order>0</order>
     <typeReference id="34673e4d-b479-4554-8468-c5dd51ae68c6">
@@ -20,7 +19,6 @@
     <childElements />
   </sourceEnd>
   <targetEnd id="a856eb22-872a-4cb2-aa93-5f50f3f604c2" type="Message Subscribe Assocation Target End" typeId="21c3df1c-5140-4f65-9814-a68e1a577768">
-    <name>TestMessage</name>
     <display>subscribe: TestMessage</display>
     <order>1</order>
     <typeReference id="8a1edb5c-cdfc-4fe4-89b7-4b33063d8afe">
@@ -40,6 +38,8 @@
         <definitionPackageName>Intent.Eventing.MassTransit</definitionPackageName>
         <definitionPackageId>6502ee82-f515-4007-9635-bade3eb88e72</definitionPackageId>
         <properties>
+          <property name="3b089016-1e06-4dfc-96f2-de6393cbc264" display="Endpoint Name" isActive="true" />
+          <property name="20b3004c-94ce-4aa8-bee7-a45d2bc94d68" display="Endpoint Type" value="Receive Endpoint" isActive="true" />
           <property name="2084d89a-d4d7-4c2c-815b-1eba6eb53f50" display="Prefetch Count" value="15" isActive="true" />
           <property name="6f645454-16eb-4a6b-97ca-2192d26b0eae" display="Requires Session" value="false" isActive="true" />
           <property name="3b7d1adc-528b-4e29-8705-187b87deb246" display="Default Message Time To Live" value="00:15:00" isActive="true" />
@@ -50,6 +50,8 @@
           <property name="94ed3877-3876-4fa2-bc45-ae679ec6cd21" display="Enable Dead-lettering On Message Expiration" value="true" isActive="true" />
           <property name="23748e16-ae82-41e6-9bc5-bfeae97ba89e" display="Max Queue Size" value="2048" isActive="true" />
           <property name="8482cf1b-82b7-4d47-a5b1-564e699df9ea" display="Max Delivery Count" isActive="true" />
+          <property name="67d129a7-691b-4999-a8be-bc326d7a28a5" display="Concurrent Message Limit" isActive="true" />
+          <property name="69347757-81c6-4e36-b089-a073083e8b2b" display="Max Concurrent Calls Per Session" isActive="true" />
         </properties>
       </stereotype>
     </stereotypes>
@@ -64,6 +66,8 @@
       <definitionPackageName>Intent.Eventing.MassTransit</definitionPackageName>
       <definitionPackageId>6502ee82-f515-4007-9635-bade3eb88e72</definitionPackageId>
       <properties>
+        <property name="3b089016-1e06-4dfc-96f2-de6393cbc264" display="Endpoint Name" isActive="true" />
+        <property name="20b3004c-94ce-4aa8-bee7-a45d2bc94d68" display="Endpoint Type" value="Receive Endpoint" isActive="true" />
         <property name="2084d89a-d4d7-4c2c-815b-1eba6eb53f50" display="Prefetch Count" value="15" isActive="true" />
         <property name="6f645454-16eb-4a6b-97ca-2192d26b0eae" display="Requires Session" value="false" isActive="true" />
         <property name="3b7d1adc-528b-4e29-8705-187b87deb246" display="Default Message Time To Live" value="00:15:00" isActive="true" />
@@ -74,6 +78,8 @@
         <property name="94ed3877-3876-4fa2-bc45-ae679ec6cd21" display="Enable Dead-lettering On Message Expiration" value="true" isActive="true" />
         <property name="23748e16-ae82-41e6-9bc5-bfeae97ba89e" display="Max Queue Size" value="2048" isActive="true" />
         <property name="8482cf1b-82b7-4d47-a5b1-564e699df9ea" display="Max Delivery Count" isActive="true" />
+        <property name="67d129a7-691b-4999-a8be-bc326d7a28a5" display="Concurrent Message Limit" isActive="true" />
+        <property name="69347757-81c6-4e36-b089-a073083e8b2b" display="Max Concurrent Calls Per Session" isActive="true" />
       </properties>
     </stereotype>
   </stereotypes>

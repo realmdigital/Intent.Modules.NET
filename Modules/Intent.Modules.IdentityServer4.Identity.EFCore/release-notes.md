@@ -1,3 +1,19 @@
+### Version 4.2.1
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.2.0
+
+- Improvement: Updated to be compatible with latest Intent Architect Modules.
+
+### Version 4.0.6
+
+- Improvement: Updated to be compatible with .NET 8.
+
+### Version 4.0.5
+
+- Improvement: Updated `AutoMapper` NuGet package to 12.0.1.
+
 ### Version 4.0.4
 
 - Updated `IdentityServer4.EntityFramework` nuget package to 7.0.9.

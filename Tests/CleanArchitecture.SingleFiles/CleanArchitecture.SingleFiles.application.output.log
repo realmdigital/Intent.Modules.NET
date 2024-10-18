@@ -68,6 +68,38 @@
     </FileLog>
     <FileLog>
       <ProjectId>77b72172-707c-4331-b310-e90fe20005f8</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Controllers.Controller#6cb5587f-a3e5-46b5-9489-158e0060bc74</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Controllers/AdvancedMappingCosmosInvoicesController.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoicesController.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>77b72172-707c-4331-b310-e90fe20005f8</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Controllers.Controller#9d45a6c2-45fa-4768-aeb1-45f56a8265d8</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Controllers/AdvancedMappingDaprInvoicesController.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoicesController.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>77b72172-707c-4331-b310-e90fe20005f8</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Controllers.Controller#d0123c0d-cb16-4960-ad56-06d73650492c</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Controllers/AdvancedMappingEfInvoicesController.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoicesController.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>77b72172-707c-4331-b310-e90fe20005f8</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Controllers.Controller#576c58ce-30d7-4b5d-9077-fa4c7c0b1c40</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Controllers/AdvancedMappingMongoInvoicesController.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoicesController.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>77b72172-707c-4331-b310-e90fe20005f8</ProjectId>
       <CorrelationId>Intent.AspNetCore.Controllers.Controller#7a3eff35-877e-4ebc-bf0a-8cb0aeaaf425</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Controllers/CosmosInvoicesController.cs</ApplicationRelativeFilePath>
@@ -123,6 +155,14 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
+      <ProjectId>ede930b8-905e-4c37-8b52-483e5a74d84f</ProjectId>
+      <CorrelationId>Intent.AspNetCore.Swashbuckle.TypeSchemaFilter</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Filters/TypeSchemaFilter.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>TypeSchemaFilter.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
       <ProjectId>c65ee65d-b4c7-4bb2-bb59-72215705884b</ProjectId>
       <CorrelationId>Intent.AspNetCore.Program</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
@@ -152,6 +192,246 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Api/Startup.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Startup.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#69fa00fa-a3c0-4ae1-b1f1-d0ceec6111da</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/CosmosInvoiceCosmosLineDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/CosmosInvoiceCosmosLineDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.AutoMapper.MappingExtensions#69fa00fa-a3c0-4ae1-b1f1-d0ceec6111da</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/CosmosInvoiceCosmosLineDtoMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/CosmosInvoiceCosmosLineDtoMappingExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#c05d0317-70b3-404f-8e8f-eaa78dc1193e</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/CosmosInvoiceDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/CosmosInvoiceDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.AutoMapper.MappingExtensions#c05d0317-70b3-404f-8e8f-eaa78dc1193e</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/CosmosInvoiceDtoMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/CosmosInvoiceDtoMappingExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#727eae08-b68b-4d72-a302-49dde4db311c</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/CreateCosmosInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/CreateCosmosInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#bebeaf29-7e8b-4180-a336-48fa76a1bc7d</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/DeleteCosmosInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/DeleteCosmosInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#cbfd5f80-351f-46d0-ba0e-8aa2e3d31fbb</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/GetCosmosInvoiceByIdQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/GetCosmosInvoiceByIdQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#216efe54-d9d4-44c5-b6de-36f5a50c6283</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/GetCosmosInvoicesQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/GetCosmosInvoicesQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#f25ec1bf-8932-47a3-844c-0c19f0b6dc4a</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingCosmosInvoices/UpdateCosmosInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingCosmosInvoices/UpdateCosmosInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#c0cacd7d-d4e3-43c7-ab7c-6d439b800ca2</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/CreateDaprInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/CreateDaprInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#d5ff2369-8831-4026-bb84-839d5dac8ae3</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/DaprInvoiceDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/DaprInvoiceDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.AutoMapper.MappingExtensions#d5ff2369-8831-4026-bb84-839d5dac8ae3</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/DaprInvoiceDtoMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/DaprInvoiceDtoMappingExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#d97c6e8a-db3f-4c74-8e77-c05ceec8d879</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/DeleteDaprInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/DeleteDaprInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#f316d295-9de2-49ce-bb2b-cf3502af6eee</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/GetDaprInvoiceByIdQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/GetDaprInvoiceByIdQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#09cb75ac-2226-4fd1-a8d7-679043d70900</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/GetDaprInvoicesQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/GetDaprInvoicesQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#f715c495-8e59-42c0-84f3-800b4a2ebf4b</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingDaprInvoices/UpdateDaprInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingDaprInvoices/UpdateDaprInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#ea0bd238-8d5d-48a8-8c7c-17d7fd81d223</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/CreateEfInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/CreateEfInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#3a4afeb6-f447-4855-9385-a63c31648804</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/DeleteEfInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/DeleteEfInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#cf5fd8da-f11c-4938-9f10-7b8acaa3040b</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/EfInvoiceDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/EfInvoiceDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.AutoMapper.MappingExtensions#cf5fd8da-f11c-4938-9f10-7b8acaa3040b</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/EfInvoiceDtoMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/EfInvoiceDtoMappingExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#ecade64d-e2f0-4e81-b220-9521ad265f4b</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/GetEfInvoiceByIdQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/GetEfInvoiceByIdQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#21432c48-bec4-4397-98c0-995344f1e6ec</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/GetEfInvoicesQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/GetEfInvoicesQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#3f06b86d-99d6-429c-9985-7456192873d7</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingEfInvoices/UpdateEfInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingEfInvoices/UpdateEfInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#67578f34-3bee-415b-a2f6-893fb9ffb40d</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/CreateMongoInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/CreateMongoInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#1f573b52-d396-483c-b145-7b1315f79d8c</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/DeleteMongoInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/DeleteMongoInvoiceCommand.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#26a90bf2-9d3b-4424-9e71-656da92a4fe4</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/GetMongoInvoiceByIdQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/GetMongoInvoiceByIdQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.QueryModels#05cb22c4-61d1-403e-8d3b-ca966fc7a1bb</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/GetMongoInvoicesQuery.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/GetMongoInvoicesQuery.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.DtoModel#0eac58e3-413f-47a6-b430-07925b5499db</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/MongoInvoiceDto.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/MongoInvoiceDto.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.Dtos.AutoMapper.MappingExtensions#0eac58e3-413f-47a6-b430-07925b5499db</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/MongoInvoiceDtoMappingExtensions.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/MongoInvoiceDtoMappingExtensions.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>1773a42c-b33a-400c-acbb-0b81956fcadd</ProjectId>
+      <CorrelationId>Intent.Application.MediatR.CommandModels#5206e706-481f-4429-ab45-a4ea9ce12115</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/AdvancedMappingMongoInvoices/UpdateMongoInvoiceCommand.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>AdvancedMappingMongoInvoices/UpdateMongoInvoiceCommand.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -304,6 +584,14 @@
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/Common/Models/Result.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Result.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>6d2bc90b-7dd3-4e45-97b3-2baea94698ea</ProjectId>
+      <CorrelationId>Intent.EntityFrameworkCore.PagedList</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Application/Common/Pagination/PagedList.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>PagedList.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -956,7 +1244,7 @@
     </FileLog>
     <FileLog>
       <ProjectId>8ab523fa-4a96-4d8b-b66f-9c73616a83c3</ProjectId>
-      <CorrelationId>Intent.Entities.Repositories.Api.NotFoundException</CorrelationId>
+      <CorrelationId>Intent.Entities.NotFoundException</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Domain/Common/Exceptions/NotFoundException.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>NotFoundException.cs</ProjectRelativeFilePath>
@@ -1164,10 +1452,10 @@
     </FileLog>
     <FileLog>
       <ProjectId>e99793ef-5c78-4064-8998-162defd96d22</ProjectId>
-      <CorrelationId>Intent.Entities.Repositories.Api.PagedResultInterface</CorrelationId>
+      <CorrelationId>Intent.Entities.Repositories.Api.PagedListInterface</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Domain/Repositories/IPagedResult.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>IPagedResult.cs</ProjectRelativeFilePath>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Domain/Repositories/IPagedList.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IPagedList.cs</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
@@ -1204,6 +1492,14 @@
     </FileLog>
     <FileLog>
       <ProjectId>03861739-2e39-445d-bf0d-b8877d89b3e3</ProjectId>
+      <CorrelationId>Intent.Eventing.MassTransit.IntegrationEventConsumer</CorrelationId>
+      <OverwriteBehaviour>always</OverwriteBehaviour>
+      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Infrastructure/Eventing/IntegrationEventConsumer.cs</ApplicationRelativeFilePath>
+      <ProjectRelativeFilePath>IntegrationEventConsumer.cs</ProjectRelativeFilePath>
+      <IsIgnored>false</IsIgnored>
+    </FileLog>
+    <FileLog>
+      <ProjectId>03861739-2e39-445d-bf0d-b8877d89b3e3</ProjectId>
       <CorrelationId>Intent.Eventing.MassTransit.MassTransitEventBus</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Infrastructure/Eventing/MassTransitEventBus.cs</ApplicationRelativeFilePath>
@@ -1211,16 +1507,8 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>03861739-2e39-445d-bf0d-b8877d89b3e3</ProjectId>
-      <CorrelationId>Intent.Eventing.MassTransit.WrapperConsumer</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Infrastructure/Eventing/WrapperConsumer.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>WrapperConsumer.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
       <ProjectId>addbe589-da5e-46c5-9f4f-61fdcb57f92c</ProjectId>
-      <CorrelationId>Intent.EntityFrameworkCore.DbContext</CorrelationId>
+      <CorrelationId>Intent.EntityFrameworkCore.DbContext#DefaultConnection</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Infrastructure/Persistence/ApplicationDbContext.cs</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>ApplicationDbContext.cs</ProjectRelativeFilePath>
@@ -1380,14 +1668,6 @@
     </FileLog>
     <FileLog>
       <ProjectId>5679ef54-392d-494d-b721-faf0afca4959</ProjectId>
-      <CorrelationId>Intent.EntityFrameworkCore.Repositories.PagedList</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Infrastructure/Repositories/PagedList.cs</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>PagedList.cs</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>5679ef54-392d-494d-b721-faf0afca4959</ProjectId>
       <CorrelationId>Intent.EntityFrameworkCore.Repositories.RepositoryBase</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.Infrastructure/Repositories/RepositoryBase.cs</ApplicationRelativeFilePath>
@@ -1403,7 +1683,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#ca8e7db5-54da-4f00-aa50-68c424acf855</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#ca8e7db5-54da-4f00-aa50-68c424acf855</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>CleanArchitecture.SingleFiles.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>

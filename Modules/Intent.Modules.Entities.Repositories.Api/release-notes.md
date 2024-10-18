@@ -1,3 +1,19 @@
+### Version 5.1.2
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.1.1
+
+- Improvement: Model representation added for advanced mapping purposes.
+
+### Version 5.1.0
+
+- Improvement: Renamed the `IPagedResult<T>` interface to `IPagedList<T>` to remain consistent with the concrete type `PagedList<T>` and to prevent confusion with the `PagedResult<T>` type which is for outbound DTOs.
+
+### Version 4.1.3
+
+- Improvement: Upgrades IUnitOfWork Interface template to CSharpFileBuilder paradigm.
+
 ### Version 4.1.3
 
 - Improvement: Added support for entities with generic type parameters.

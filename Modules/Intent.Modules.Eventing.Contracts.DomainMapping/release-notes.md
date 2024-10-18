@@ -1,3 +1,16 @@
+### Version 4.1.6
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.1.5
+
+- New Feature: Added support for `Integration Command` domain mapping.
+
+
+### Version 4.1.4
+
+- Fixed: Mapping from Value Objects is now supported.
+
 ### Version 4.1.3
 
 - Improvement : Upgraded CRUD Scripts to be forward compatible with Intent Architect v4.1.

@@ -1,3 +1,34 @@
+### Version 4.4.0
+
+- Improvement: The filename of DTOs with generic types will now contain the generic type(s) (e.g. the filename for the DTO ProductDto\<T> will now be named ProductOfT). 
+
+### Version 4.3.2
+
+- Fixed: Constructor nullability assignment omitted for generic type properties.
+
+### Version 4.3.1
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.3.0
+
+- Fixed: An issue where `Event` package enums generated multiple files. 
+> ⚠️ **NOTE**
+>
+> This may move some enums moving to different locations and namespaces.
+
+### Version 4.2.1
+
+- Improvement: TypeSources added for Contract Clients.
+
+### Version 4.2.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
+### Version 4.1.1
+
+- Fixed: Protected Constructor added when parameter constructor is introduced for mapping libraries to instantiate using reflection.
+
 ### Version 4.0.8
 
 - Fixed: Constructor introduced when non-public property accessor setting is configured.

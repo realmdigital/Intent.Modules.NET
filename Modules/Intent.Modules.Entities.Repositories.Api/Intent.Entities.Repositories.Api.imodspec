@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
   <id>Intent.Entities.Repositories.Api</id>
-  <version>4.1.3</version>
-  <supportedClientVersions>[3.4.0-pre.0, 5.0.0-a)</supportedClientVersions>
+  <version>5.1.2</version>
+  <supportedClientVersions>[4.1.0, 5.0.0-a)</supportedClientVersions>
   <summary>Generates interface equivalents for Domain Entity Repositories for the Domain</summary>
   <description>Generates interface equivalents for Domain Entity Repositories for the Domain</description>
   <authors>Intent Architect</authors>
@@ -15,16 +15,8 @@
       <role>Repository.Interface.Entity</role>
       <location>Repositories</location>
     </template>
-    <template id="Intent.Entities.Repositories.Api.NotFoundException" externalReference="f10db7b9-dbed-4b23-8ba0-fab06ddb8115">
-      <config>
-        <add key="ClassName" description="Class name formula override (e.g. '${Model.Name}')" />
-        <add key="Namespace" description="Class namespace formula override (e.g. '${Project.Name}'" />
-      </config>
-      <role>Domain.NotFoundException</role>
-      <location>Common/Exceptions</location>
-    </template>
-    <template id="Intent.Entities.Repositories.Api.PagedResultInterface" externalReference="97d051af-0bef-4bdd-ac68-ea8d27c6d5fb">
-      <role>Repository.Interface.PagedResult</role>
+    <template id="Intent.Entities.Repositories.Api.PagedListInterface" externalReference="97d051af-0bef-4bdd-ac68-ea8d27c6d5fb">
+      <role>Repository.Interface.PagedList</role>
       <location>Repositories</location>
     </template>
     <template id="Intent.Entities.Repositories.Api.RepositoryInterface" externalReference="0ca794e5-a8e2-43c8-a67b-3e4ab606719a">
@@ -42,10 +34,10 @@
   </templates>
   <decorators></decorators>
   <dependencies>
-    <dependency id="Intent.Common" version="3.4.1" />
-    <dependency id="Intent.Common.CSharp" version="3.3.33" />
+    <dependency id="Intent.Common" version="3.5.0" />
+    <dependency id="Intent.Common.CSharp" version="3.5.5" />
     <dependency id="Intent.Common.Types" version="3.3.9" />
-    <dependency id="Intent.Modelers.Domain" version="3.4.4" />
+    <dependency id="Intent.Modelers.Domain" version="3.5.0" />
     <dependency id="Intent.OutputManager.RoslynWeaver" version="4.1.1" />
   </dependencies>
   <files>

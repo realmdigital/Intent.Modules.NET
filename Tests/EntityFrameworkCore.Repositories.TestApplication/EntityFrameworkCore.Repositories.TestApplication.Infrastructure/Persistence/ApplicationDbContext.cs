@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,8 +6,13 @@ using EntityFrameworkCore.Repositories.TestApplication.Application.Common.Interf
 using EntityFrameworkCore.Repositories.TestApplication.Domain.Common;
 using EntityFrameworkCore.Repositories.TestApplication.Domain.Common.Interfaces;
 using EntityFrameworkCore.Repositories.TestApplication.Domain.Contracts;
+using EntityFrameworkCore.Repositories.TestApplication.Domain.Contracts.MappableStoredProcs;
 using EntityFrameworkCore.Repositories.TestApplication.Domain.Entities;
+using EntityFrameworkCore.Repositories.TestApplication.Domain.Entities.MappableStoredProcs;
+using EntityFrameworkCore.Repositories.TestApplication.Domain.Entities.PrimaryKeyTypes;
 using EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persistence.Configurations;
+using EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persistence.Configurations.MappableStoredProcs;
+using EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persistence.Configurations.PrimaryKeyTypes;
 using Intent.RoslynWeaver.Attributes;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +31,7 @@ namespace EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persis
         }
 
         public DbSet<SpResult> SpResults { get; set; }
+        public DbSet<EntityRecord> EntityRecords { get; set; }
 
         public DbSet<AggregateRoot1> AggregateRoot1s { get; set; }
         public DbSet<AggregateRoot2Composition> AggregateRoot2Compositions { get; set; }
@@ -37,6 +44,15 @@ namespace EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persis
         public DbSet<AggregateRoot4Nullable> AggregateRoot4Nullables { get; set; }
         public DbSet<AggregateRoot4Single> AggregateRoot4Singles { get; set; }
         public DbSet<AggregateRoot5> AggregateRoot5s { get; set; }
+        public DbSet<MockEntity> MockEntities { get; set; }
+        public DbSet<NewClassByte> NewClassBytes { get; set; }
+        public DbSet<NewClassDecimal> NewClassDecimals { get; set; }
+        public DbSet<NewClassDouble> NewClassDoubles { get; set; }
+        public DbSet<NewClassFloat> NewClassFloats { get; set; }
+        public DbSet<NewClassGuid> NewClassGuids { get; set; }
+        public DbSet<NewClassInt> NewClassInts { get; set; }
+        public DbSet<NewClassLong> NewClassLongs { get; set; }
+        public DbSet<NewClassShort> NewClassShorts { get; set; }
 
         public override async Task<int> SaveChangesAsync(
             bool acceptAllChangesOnSuccess,
@@ -58,6 +74,7 @@ namespace EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persis
 
             ConfigureModel(modelBuilder);
             modelBuilder.Entity<SpResult>().HasNoKey().ToView(null);
+            modelBuilder.Entity<EntityRecord>().HasNoKey().ToView(null);
             modelBuilder.ApplyConfiguration(new AggregateRoot1Configuration());
             modelBuilder.ApplyConfiguration(new AggregateRoot2CompositionConfiguration());
             modelBuilder.ApplyConfiguration(new AggregateRoot3AggCollectionConfiguration());
@@ -69,6 +86,15 @@ namespace EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persis
             modelBuilder.ApplyConfiguration(new AggregateRoot4NullableConfiguration());
             modelBuilder.ApplyConfiguration(new AggregateRoot4SingleConfiguration());
             modelBuilder.ApplyConfiguration(new AggregateRoot5Configuration());
+            modelBuilder.ApplyConfiguration(new MockEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassByteConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassDecimalConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassDoubleConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassFloatConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassGuidConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassIntConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassLongConfiguration());
+            modelBuilder.ApplyConfiguration(new NewClassShortConfiguration());
         }
 
         [IntentManaged(Mode.Ignore)]
@@ -103,6 +129,25 @@ namespace EntityFrameworkCore.Repositories.TestApplication.Infrastructure.Persis
                 domainEventEntity.IsPublished = true;
                 await _domainEventService.Publish(domainEventEntity, cancellationToken);
             }
+        }
+
+        public async Task<T?> ExecuteScalarAsync<T>(string rawSql, params DbParameter[]? parameters)
+        {
+            var connection = Database.GetDbConnection();
+            await using var command = connection.CreateCommand();
+
+            command.CommandText = rawSql;
+
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                {
+                    command.Parameters.Add(parameter);
+                }
+            }
+
+            await connection.OpenAsync();
+            return (T?)await command.ExecuteScalarAsync();
         }
     }
 }

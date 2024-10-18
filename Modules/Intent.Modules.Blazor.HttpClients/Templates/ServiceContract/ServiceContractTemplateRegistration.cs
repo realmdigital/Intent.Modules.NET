@@ -4,9 +4,10 @@ using System.Linq;
 using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Types.ServiceProxies.Api;
-using Intent.Modelers.WebClient.Api;
+using Intent.Modelers.UI.Api;
 using Intent.Modules.Common;
 using Intent.Modules.Common.Registrations;
+using Intent.Modules.Contracts.Clients.Http.Shared;
 using Intent.Modules.Contracts.Clients.Shared;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -28,6 +29,7 @@ namespace Intent.Modules.Blazor.HttpClients.Templates.ServiceContract
 
         public override string TemplateId => ServiceContractTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, ServiceProxyModel model)
         {
             return new ServiceContractTemplate(outputTarget, model);
@@ -36,7 +38,7 @@ namespace Intent.Modules.Blazor.HttpClients.Templates.ServiceContract
         [IntentManaged(Mode.Merge, Body = Mode.Ignore, Signature = Mode.Fully)]
         public override IEnumerable<ServiceProxyModel> GetModels(IApplication application)
         {
-            return _metadataManager.WebClient(application).GetServiceProxyModels()
+            return _metadataManager.UserInterface(application).GetServiceProxyModels()
                 .Where(x => x.HasMappedEndpoints())
                 .ToArray();
         }

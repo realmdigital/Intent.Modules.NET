@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<stereotypeDefinition id="141b4305-433b-4d5a-97ed-7796eabbe2aa" version="3.1.0">
+  <name>JavaScript Settings</name>
+  <targetMode>of-type</targetMode>
+  <targetTypes>
+    <type id="69af0b31-9d69-4b5a-a6a2-fc9314f11d92">JavaScript Project</type>
+  </targetTypes>
+  <targetReferenceTypes />
+  <applyMode>always</applyMode>
+  <icon type="UrlImagePath" source="data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic3ZnLWljb24iIHN0eWxlPSJ2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlO2ZpbGw6IGN1cnJlbnRDb2xvcjtvdmVyZmxvdzogaGlkZGVuOyINCiAgICB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogICAgPHBhdGgNCiAgICAgICAgZD0iTTc1OC41MjggMzMwLjUzODY2N3Y4NS4zMzMzMzNoODUuMzMzMzMzdjQyNi42NjY2NjdoLTQyNi42NjY2NjZ2LTg1LjMzMzMzNGgtODUuMzMzMzM0djE3MC42NjY2NjdoNTk3LjMzMzMzNHYtNTk3LjMzMzMzM3oiDQogICAgICAgIGZpbGw9IiNGRkNBMjgiIC8+DQogICAgPHBhdGgNCiAgICAgICAgZD0iTTk0LjgwNTMzMyA5Ni4xMjhoNjAzLjEzNlY2OTkuMzA2NjY3SDk0LjgwNTMzM1Y5Ni4xMjhtMTU4LjQ2NCA1MDMuOTM2YzEzLjQ0IDI4LjUwMTMzMyAzOS44OTMzMzMgNTEuOTI1MzMzIDg1LjEyIDUxLjkyNTMzMyA1MC4yNjEzMzMgMCA4NC43Nzg2NjctMjYuNzk0NjY3IDg0Ljc3ODY2Ny04NS40MTg2NjZ2LTE5My43MDY2NjdIMzY2LjIwOHYxOTIuMzg0YzAgMjguOC0xMS43MzMzMzMgMzYuMTgxMzMzLTMwLjE2NTMzMyAzNi4xODEzMzMtMTkuNDEzMzMzIDAtMjcuNDc3MzMzLTEzLjM5NzMzMy0zNi41MjI2NjctMjkuMTg0bC00Ni4yNTA2NjcgMjcuODE4NjY3bTIwMC40MDUzMzQtNi4wMTZjMTYuNzI1MzMzIDMyLjg1MzMzMyA1MC42MDI2NjcgNTcuOTQxMzMzIDEwMy41MDkzMzMgNTcuOTQxMzMzIDUzLjYzMiAwIDkzLjg2NjY2Ny0yNy43NzYgOTMuODY2NjY3LTc5LjA2MTMzMyAwLTQ3LjIzMi0yNy4xNzg2NjctNjguMzUyLTc1LjQzNDY2Ny04OS4xMzA2NjdsLTE0LjA4LTYuMDE2Yy0yNC40NDgtMTAuNDEwNjY3LTM0LjgxNi0xNy40MDgtMzQuODE2LTM0LjE3NiAwLTEzLjczODY2NyAxMC4zNjgtMjQuNDQ4IDI3LjEzNi0yNC40NDggMTYuMDg1MzMzIDAgMjYuNzk0NjY3IDcuMDQgMzYuNTIyNjY3IDI0LjQ0OGw0My45MDQtMjkuMTQxMzMzYy0xOC40MzItMzIuMTcwNjY3LTQ0LjU4NjY2Ny00NC41ODY2NjctODAuNDI2NjY3LTQ0LjU4NjY2Ny01MC42MDI2NjcgMC04My4xMTQ2NjcgMzIuMTcwNjY3LTgzLjExNDY2NyA3NC43MDkzMzQgMCA0Ni4yNTA2NjcgMjcuMTM2IDY4LjA1MzMzMyA2OC4wMTA2NjcgODUuNDYxMzMzbDE0LjA4IDYuMDE2YzI2LjE1NDY2NyAxMS4zOTIgNDEuNTU3MzMzIDE4LjQzMiA0MS41NTczMzMgMzcuODg4IDAgMTYuMDg1MzMzLTE1LjA2MTMzMyAyNy43NzYtMzguNTI4IDI3Ljc3Ni0yNy44MTg2NjcgMC00My45MDQtMTQuMzc4NjY3LTU1Ljk3ODY2Ni0zNC40NzQ2Njd6Ig0KICAgICAgICBmaWxsPSIjRkZDQTI4IiAvPg0KPC9zdmc+" />
+  <displayIcon>false</displayIcon>
+  <displayIconFunction>return false;</displayIconFunction>
+  <displayFunction />
+  <displayAsAnnotation>false</displayAsAnnotation>
+  <displayAsText>true</displayAsText>
+  <autoAdd>false</autoAdd>
+  <allowMultipleApplies>false</allowMultipleApplies>
+  <parentFolderId>f0d6fe41-55fc-486f-998b-5b49efa2e07f</parentFolderId>
+  <order>0</order>
+  <packageId>a0636ab7-d3a1-430b-9609-11a18aa3cc7f</packageId>
+  <packageName>Intent.VisualStudio.Projects</packageName>
+  <properties>
+    <property id="9163e435-1135-457b-a257-7a60f26ed7f6">
+      <name>Should run npm install</name>
+      <type>string</type>
+      <controlType>select</controlType>
+      <optionsSource>options</optionsSource>
+      <placeholder />
+      <defaultValue>(unspecified)</defaultValue>
+      <valueOptions>
+        <option>(unspecified)</option>
+        <option>false</option>
+        <option>true</option>
+      </valueOptions>
+      <lookupTypes />
+      <isActiveFunction />
+      <isRequiredFunction>return true;</isRequiredFunction>
+    </property>
+    <property id="fd5c8c5e-b005-4f5b-9796-6e384dbf5662">
+      <name>Should run build script</name>
+      <type>string</type>
+      <controlType>select</controlType>
+      <optionsSource>options</optionsSource>
+      <placeholder />
+      <defaultValue>(unspecified)</defaultValue>
+      <valueOptions>
+        <option>(unspecified)</option>
+        <option>false</option>
+        <option>true</option>
+      </valueOptions>
+      <lookupTypes />
+      <isRequiredFunction>return true;</isRequiredFunction>
+    </property>
+    <property id="21436a87-591f-41b9-8024-c397d33a9159">
+      <name>Build command</name>
+      <type>string</type>
+      <controlType>text</controlType>
+      <optionsSource>n/a</optionsSource>
+      <placeholder>(unspecified)</placeholder>
+      <valueOptions />
+      <lookupTypes />
+    </property>
+    <property id="7d8108b4-32ef-447a-b5a7-53be87c4721b">
+      <name>Startup command</name>
+      <type>string</type>
+      <controlType>text</controlType>
+      <optionsSource>n/a</optionsSource>
+      <placeholder>(unspecified)</placeholder>
+      <valueOptions />
+      <lookupTypes />
+    </property>
+    <property id="2d30620f-f358-4313-94f8-aa1068789c40">
+      <name>Test command</name>
+      <type>string</type>
+      <controlType>text</controlType>
+      <optionsSource>n/a</optionsSource>
+      <placeholder>(unspecified)</placeholder>
+      <valueOptions />
+      <lookupTypes />
+    </property>
+    <property id="bd6bcd2c-1afd-4255-8bb8-84151af05d05">
+      <name>Clean command</name>
+      <type>string</type>
+      <controlType>text</controlType>
+      <optionsSource>n/a</optionsSource>
+      <placeholder>(unspecified)</placeholder>
+      <valueOptions />
+      <lookupTypes />
+    </property>
+    <property id="ce4dbe58-6ed7-47ac-b3c1-a85e932af6c5">
+      <name>Publish command</name>
+      <type>string</type>
+      <controlType>text</controlType>
+      <optionsSource>n/a</optionsSource>
+      <placeholder>(unspecified)</placeholder>
+      <valueOptions />
+      <lookupTypes />
+    </property>
+  </properties>
+</stereotypeDefinition>

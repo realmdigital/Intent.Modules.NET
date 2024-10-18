@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Intent.Engine;
 using Intent.Modelers.Domain.Api;
@@ -22,15 +23,35 @@ namespace Intent.Modules.Entities.Templates.DataContract
         public DataContractTemplate(IOutputTarget outputTarget, DataContractModel model) : base(TemplateId, outputTarget, model)
         {
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
-                .AddRecord($"{Model.Name}", @class =>
+                .AddRecord($"{Model.Name}", record =>
                 {
-                    @class.AddConstructor(ctor =>
+                    record.RepresentsModel(Model);
+
+                    if (Model.BaseDataContract is not null)
                     {
+                        record.WithBaseType(GetTypeName(TemplateId, Model.BaseDataContract));
+                    }
+
+                    record.AddConstructor(ctor =>
+                    {
+                        if (Model.BaseDataContract is not null)
+                        {
+                            foreach (var baseAttribute in Model.BaseDataContract.Attributes)
+                            {
+                                ctor.AddParameter(GetTypeName(baseAttribute), baseAttribute.Name.ToCamelCase(), param =>
+                                {
+                                    param.RepresentsModel(baseAttribute);
+                                    ctor.CallsBase(x => x.AddArgument(param.Name));
+                                });
+                            }
+                        }
+
                         foreach (var attribute in Model.Attributes)
                         {
                             ctor.AddParameter(GetTypeName(attribute), attribute.Name.ToCamelCase(), param =>
                             {
-                                param.IntroduceProperty(prop => prop.Init());
+                                param.RepresentsModel(attribute);
+                                param.IntroduceProperty(prop => prop.Init().RepresentsModel(attribute));
                             });
                         }
                     });

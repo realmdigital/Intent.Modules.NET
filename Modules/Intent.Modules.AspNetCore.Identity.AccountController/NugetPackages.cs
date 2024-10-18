@@ -1,25 +1,41 @@
-﻿using System;
+using System;
 using Intent.Engine;
-using Intent.Modules.Common.CSharp.VisualStudio;
+using Intent.Modules.Common.CSharp.Nuget;
 using Intent.Modules.Common.VisualStudio;
+using Intent.RoslynWeaver.Attributes;
+
+[assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.NugetPackages", Version = "1.0")]
 
 namespace Intent.Modules.AspNetCore.Identity.AccountController
 {
-    public static class NugetPackages
+    public class NugetPackages : INugetPackages
     {
-        public static NugetPackageInfo MicrosoftAspNetCoreAuthenticationJwtBearer(IOutputTarget outputTarget) => new ("Microsoft.AspNetCore.Authentication.JwtBearer", GetJwtVersion(outputTarget.GetProject()));
-        public static readonly NugetPackageInfo IdentityModel = new NugetPackageInfo("IdentityModel", "6.0.0");
-        
-        private static string GetJwtVersion(ICSharpProject project)
+        public const string IdentityModelPackageName = "IdentityModel";
+        public const string MicrosoftAspNetCoreAuthenticationJwtBearerPackageName = "Microsoft.AspNetCore.Authentication.JwtBearer";
+
+        public void RegisterPackages()
         {
-            return project switch
-            {
-                _ when project.IsNetApp(5) => "5.0.17",
-                _ when project.IsNetApp(6) => "6.0.20",
-                _ when project.IsNetApp(7) => "7.0.9",
-                _ when project.IsNetApp(8) => "8.0.0-preview.6.23329.11",
-                _ => throw new Exception("Not supported version of .NET") 
-            };
+            NugetRegistry.Register(IdentityModelPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 6, 0) => new PackageVersion("7.0.0"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{IdentityModelPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftAspNetCoreAuthenticationJwtBearerPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.7"),
+                        ( >= 7, 0) => new PackageVersion("7.0.20"),
+                        ( >= 6, 0) => new PackageVersion("6.0.32"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftAspNetCoreAuthenticationJwtBearerPackageName}'"),
+                    }
+                );
         }
+
+        public static NugetPackageInfo IdentityModel(IOutputTarget outputTarget) => NugetRegistry.GetVersion(IdentityModelPackageName, outputTarget.GetMaxNetAppVersion());
+
+        public static NugetPackageInfo MicrosoftAspNetCoreAuthenticationJwtBearer(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftAspNetCoreAuthenticationJwtBearerPackageName, outputTarget.GetMaxNetAppVersion());
     }
 }

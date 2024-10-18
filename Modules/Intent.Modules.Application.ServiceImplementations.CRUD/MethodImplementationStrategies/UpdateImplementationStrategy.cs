@@ -5,27 +5,45 @@ using Intent.Engine;
 using Intent.Metadata.Models;
 using Intent.Modelers.Domain.Api;
 using Intent.Modelers.Services.Api;
+using Intent.Modelers.Services.DomainInteractions.Api;
 using Intent.Modules.Application.ServiceImplementations.Templates.ServiceImplementation;
 using Intent.Modules.Common.CSharp.Builder;
 using Intent.Modules.Common.CSharp.Templates;
+using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Constants;
-using Intent.Modules.Entities.Repositories.Api.Templates;
+using Intent.Modules.Entities.Settings;
+using Intent.Modules.Modelers.Domain.Settings;
+using Intent.Templates;
 using OperationModel = Intent.Modelers.Services.Api.OperationModel;
 
 namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.MethodImplementationStrategies
 {
     public class UpdateImplementationStrategy : IImplementationStrategy
     {
-        private readonly ServiceImplementationTemplate _template;
+        private readonly ICSharpFileBuilderTemplate _template;
 
-        public UpdateImplementationStrategy(ServiceImplementationTemplate template, IApplication application)
+        public UpdateImplementationStrategy(ICSharpFileBuilderTemplate template, IApplication application)
         {
             _template = template;
         }
 
         public bool IsMatch(OperationModel operationModel)
         {
+            if (operationModel.CreateEntityActions().Any()
+                || operationModel.UpdateEntityActions().Any()
+                || operationModel.DeleteEntityActions().Any()
+                || operationModel.QueryEntityActions().Any())
+            {
+                return false;
+            }
+            
+            if (_template.CSharpFile.Classes.First()
+                    .FindMethod(m => m.TryGetMetadata<OperationModel>("model", out var model) && model.Id == operationModel.Id) is null)
+            {
+                return false;
+            }
+
             if (operationModel.Parameters.Count > 2)
             {
                 return false;
@@ -49,18 +67,27 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
                 return false;
             }
 
+            if (!_template.TryGetTemplate<ITemplate>(TemplateRoles.Repository.Interface.Entity, domainModel, out _))
+            {
+                return false;
+            }
+
             var lowerOperationName = operationModel.Name.ToLower();
             return new[] { "put", "update" }.Any(x => lowerOperationName.Contains(x));
+        }
+        public void BindToTemplate(ICSharpFileBuilderTemplate template, OperationModel operationModel)
+        {
+            template.CSharpFile.AfterBuild(_ => ApplyStrategy(operationModel));
         }
 
         public void ApplyStrategy(OperationModel operationModel)
         {
-            _template.AddTypeSource(TemplateFulfillingRoles.Domain.Entity.Primary);
-            _template.AddTypeSource(TemplateFulfillingRoles.Domain.ValueObject);
+            _template.AddTypeSource(TemplateRoles.Domain.Entity.Primary);
+            _template.AddTypeSource(TemplateRoles.Domain.ValueObject);
             _template.AddUsing("System.Linq");
 
             var (dtoModel, domainModel) = operationModel.GetUpdateModelPair();
-            var repositoryTypeName = _template.GetEntityRepositoryInterfaceName(domainModel);
+            var repositoryTypeName = _template.GetTypeName(TemplateRoles.Repository.Interface.Entity, domainModel);
             var repositoryParameterName = repositoryTypeName.Split('.').Last()[1..].ToLocalVariableName();
             var repositoryFieldName = repositoryParameterName.ToPrivateMemberName();
             var dtoParam = operationModel.Parameters.First(p => !p.Name.EndsWith("id", StringComparison.OrdinalIgnoreCase));
@@ -86,7 +113,7 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
             }
 
             var @class = _template.CSharpFile.Classes.First();
-            var method = @class.FindMethod(m => m.Name.Equals(operationModel.Name, StringComparison.OrdinalIgnoreCase));
+            var method = @class.FindMethod(m => m.TryGetMetadata<OperationModel>("model", out var model) && model.Id == operationModel.Id);
             var attr = method.Attributes.OfType<CSharpIntentManagedAttribute>().FirstOrDefault();
             if (attr == null)
             {
@@ -111,7 +138,7 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
         private bool RepositoryRequiresExplicitUpdate(ClassModel domainModel)
         {
             return _template.TryGetTemplate<ICSharpFileBuilderTemplate>(
-                       TemplateFulfillingRoles.Repository.Interface.Entity,
+                       TemplateRoles.Repository.Interface.Entity,
                        domainModel,
                        out var repositoryInterfaceTemplate) &&
                    repositoryInterfaceTemplate.CSharpFile.Interfaces[0].TryGetMetadata<bool>("requires-explicit-update", out var requiresUpdate) &&
@@ -218,22 +245,29 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
                                 codeLines.Add($"{property} = {_template.GetTypeName("Domain.Common.UpdateHelper")}.CreateOrUpdateCollection({property}, {dtoVarName}.{field.Name.ToPascalCase()}, (e, d) => e.{targetClass.GetEntityIdAttribute().IdName} == d.{dtoEntityIdField.Name.ToPascalCase()}, {updateMethodName});");
                             }
 
-                            var entityTypeName = _template.GetTypeName(targetEntityElement);
+                            var createEntityInterfaces = _template.ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces();
+                            var implementationName = _template.GetTypeName(TemplateRoles.Domain.Entity.EntityImplementation, targetEntityElement);
+                            var interfaceName = createEntityInterfaces ? _template.GetTypeName(TemplateRoles.Domain.Entity.Interface, targetEntityElement) : implementationName;
+                            string nullableChar = _template.OutputTarget.GetProject().NullableEnabled ? "?" : "";
+
+                            var fieldIsNullable = field.TypeReference.IsNullable;
+                            var nullable = fieldIsNullable ? "?" : string.Empty;
+
                             var @class = _template.CSharpFile.Classes.First();
-                            @class.AddMethod(entityTypeName,
+                            @class.AddMethod($"{interfaceName}{nullable}",
                                 updateMethodName,
                                 method =>
                                 {
                                     method.Private()
                                         .Static()
                                         .AddAttribute(CSharpIntentManagedAttribute.Fully())
-                                        .AddParameter(entityTypeName, "entity")
-                                        .AddParameter(_template.GetTypeName((IElement)field.TypeReference.Element),
+                                        .AddParameter($"{interfaceName}{nullableChar}", "entity")
+                                        .AddParameter($"{_template.GetTypeName((IElement)field.TypeReference.Element)}{nullable}",
                                             "dto")
                                         .AddStatementBlock("if (dto == null)", s => s
                                             .AddStatement("return null;")
                                         )
-                                        .AddStatement($"entity ??= new {entityTypeName}();", s => s.SeparatedFromPrevious())
+                                        .AddStatement($"entity ??= new {implementationName}();", s => s.SeparatedFromPrevious())
                                         .AddStatements(GetDTOPropertyAssignments("entity", "dto", targetEntityElement,
                                             ((IElement)field.TypeReference.Element).ChildElements
                                             .Where(x => x.IsDTOFieldModel()).Select(x => x.AsDTOFieldModel()).ToList(),
@@ -254,8 +288,17 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
             var targetDto = field.TypeReference.Element.AsDTOModel();
             if (!MethodExists(mappingMethodName, @class, targetDto))
             {
-                var domainType = _template.GetTypeName(domain);
-                @class.AddMethod(domainType, mappingMethodName, method =>
+                var createEntityInterfaces = _template.ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces();
+                if (!_template.TryGetTypeName(TemplateRoles.Domain.Entity.EntityImplementation, domain, out var implementationName))
+                {
+                    if (!_template.TryGetTypeName("Intent.ValueObjects.ValueObject", domain, out implementationName))
+                    {
+                        throw new Exception("unexpected attribute type : " + domain.GetType().Name);
+                    }
+				}
+                var interfaceName = createEntityInterfaces ? _template.GetTypeName(TemplateRoles.Domain.Entity.Interface, domain) : implementationName;
+
+                @class.AddMethod(interfaceName, mappingMethodName, method =>
                 {
                     method.Static()
                         .AddAttribute(CSharpIntentManagedAttribute.Fully())
@@ -269,7 +312,7 @@ namespace Intent.Modules.Application.ServiceImplementations.Conventions.CRUD.Met
                         method.AddStatement(@"#warning Not all fields specified for ValueObject.");
                     }
                     var ctorParameters = string.Join(",", attributeMap.Select(m => $"{m.Domain.Name.ToParameterName()}: {(m.Dto == null ? $"default({_template.GetTypeName(m.Domain.TypeReference)})" : $"dto.{m.Dto.Name.ToPascalCase()}")}"));
-                    method.AddStatement($"return new {domainType}({ctorParameters});");
+                    method.AddStatement($"return new {implementationName}({ctorParameters});");
                 });
             }
         }

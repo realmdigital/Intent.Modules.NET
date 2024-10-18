@@ -29,7 +29,7 @@ namespace Intent.Modules.MongoDb.Templates.ApplicationMongoDbContext
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public ApplicationMongoDbContextTemplate(IOutputTarget outputTarget, IList<ClassModel> model) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NugetPackages.MongoFramework);
+            AddNugetDependency(NugetPackages.MongoFramework(OutputTarget));
 
             CSharpFile = new CSharpFile(this.GetNamespace(), this.GetFolderPath())
                 .AddUsing("System.Threading")
@@ -59,7 +59,7 @@ namespace Intent.Modules.MongoDb.Templates.ApplicationMongoDbContext
                             continue;
                         }
 
-                        @class.AddProperty($"MongoDbSet<{GetTypeName(TemplateFulfillingRoles.Domain.Entity.Primary, aggregate)}>", aggregate.Name.Pluralize().ToPascalCase());
+                        @class.AddProperty($"MongoDbSet<{GetTypeName(TemplateRoles.Domain.Entity.Primary, aggregate)}>", aggregate.Name.Pluralize().ToPascalCase());
                     }
 
                     @class.InsertMethod(0, "Task<int>", "SaveChangesAsync", method =>
@@ -107,15 +107,19 @@ namespace Intent.Modules.MongoDb.Templates.ApplicationMongoDbContext
         private CSharpStatement GetEntityRegistrationStatements(ClassModel aggregate)
         {
 
-            var result = new CSharpMethodChainStatement($"mappingBuilder.Entity<{GetTypeName(TemplateFulfillingRoles.Domain.Entity.Primary, aggregate)}>()");
+            var result = new CSharpMethodChainStatement($"mappingBuilder.Entity<{GetTypeName(TemplateRoles.Domain.Entity.Primary, aggregate)}>()");
 
             var pk = aggregate.Attributes.SingleOrDefault(x => x.HasPrimaryKey());
             if (pk != null)
             {
-                result.AddChainStatement(new CSharpInvocationStatement("HasKey")
+                var invocation = new CSharpInvocationStatement("HasKey")
                     .WithoutSemicolon()
-                    .AddArgument(new CSharpLambdaBlock("entity").WithExpressionBody($"entity.{pk.Name.ToPascalCase()}"))
-                    .AddArgument(new CSharpLambdaBlock("build").WithExpressionBody(GetKeyGeneratorExpression(pk.Type.Element, aggregate))));
+                    .AddArgument(new CSharpLambdaBlock("entity").WithExpressionBody($"entity.{pk.Name.ToPascalCase()}"));
+                if (!pk.GetPrimaryKey().DataSource().IsUserSupplied())
+                {
+                    invocation.AddArgument(new CSharpLambdaBlock("build").WithExpressionBody(GetKeyGeneratorExpression(pk.Type.Element, aggregate)));
+                }
+                result.AddChainStatement(invocation);
             }
 
             if (aggregate.HasCollection() || aggregate.Folder?.HasCollection() == true)
@@ -195,13 +199,11 @@ namespace Intent.Modules.MongoDb.Templates.ApplicationMongoDbContext
 
         private static string GetKeyGeneratorExpression(ICanBeReferencedType typeElement, ClassModel aggregate)
         {
+
             return typeElement switch
             {
-                //_ when typeElement.IsObjectIdType() => "build.HasKeyGenerator(EntityKeyGenerators.ObjectIdKeyGenerator)",
                 _ when typeElement.IsStringType() => "build.HasKeyGenerator(EntityKeyGenerators.StringKeyGenerator)",
                 _ when typeElement.IsGuidType() => "build.HasKeyGenerator(EntityKeyGenerators.GuidKeyGenerator)",
-                //_ when typeElement.IsIntType() => "new Int32KeyGenerator<MyEntity>(this.Connection)",
-                //_ when typeElement.IsLongType() => "new Int64KeyGenerator<MyEntity>(this.Connection)",
                 _ => throw new InvalidOperationException($"Given Type [{typeElement.Name}] is not valid for an Id for Element {aggregate.Name} [{aggregate.Id}].")
             };
         }

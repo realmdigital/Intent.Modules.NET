@@ -1,4 +1,4 @@
-using System;
+using Entities.PrivateSetters.TestApplication.Application.Common.Validation;
 using FluentValidation;
 using Intent.RoslynWeaver.Attributes;
 
@@ -7,19 +7,21 @@ using Intent.RoslynWeaver.Attributes;
 
 namespace Entities.PrivateSetters.TestApplication.Application.Invoices.Operation
 {
+    [IntentManaged(Mode.Fully, Body = Mode.Merge)]
     public class OperationCommandValidator : AbstractValidator<OperationCommand>
     {
         [IntentManaged(Mode.Fully, Body = Mode.Merge, Signature = Mode.Merge)]
-        public OperationCommandValidator()
+        public OperationCommandValidator(IValidatorProvider provider)
         {
-            ConfigureValidationRules();
+            ConfigureValidationRules(provider);
         }
 
         [IntentManaged(Mode.Fully)]
-        private void ConfigureValidationRules()
+        private void ConfigureValidationRules(IValidatorProvider provider)
         {
             RuleFor(v => v.Lines)
-                .NotNull();
+                .NotNull()
+                .ForEach(x => x.SetValidator(provider.GetValidator<OperationLineDataContractDto>()!));
         }
     }
 }

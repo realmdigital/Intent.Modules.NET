@@ -1,4 +1,63 @@
-﻿### Version 2.0.7
+### Version 2.2.11
+
+- Fixed: HttpClients are able to generate into `netstandard2.*` projects.
+
+### Version 2.2.10
+
+- Improvement: improved content type filter int the `HttpClientRequestException`.
+
+### Version 2.2.9
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 2.2.8
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 2.2.7
+
+- Improvement: Proxies now respecting Applications Services `Serialize Enums as Strings` setting.
+
+### Version 2.2.6
+
+- Improvement: Added shared template infrastructure to support service proxies being able to respect `Serialize Enum as String` setting.
+
+### Version 2.2.5
+
+- Improvement: Updated the logic which converts types to query parameters to be more standard in how it coverts types to string.
+
+### Version 2.2.4
+
+- Improvement: Improved internal module code.
+
+### Version 2.2.3
+
+- Improvement: Added support for deserializing ProblemDetails for client HTTP calls.
+
+### Version 2.2.2
+
+- Improvement: Added support for Dapr Http Client URL configuration.
+
+### Version 2.2.1
+
+- Improvement: File transfer ( upload / download ) support.
+- Improvement: Improved internal processes for working with Service Proxies.
+ 
+### Version 2.2.0
+
+- Improvement: Underlying proxy templates updated to support alternate Metadata models.
+- Improvement: Upgraded Microsoft.Extensions.Http NuGet package to version 8.0.0
+
+### Version 2.1.0
+
+- Improvement: Added support for configuring headers in HttpClient requests either through request header propagation.
+- Improvement: Dapr HttpClient construction is now done using the HttpClientBuilder paradigm, to better support extension.
+
+### Version 2.0.8
+
+- Fixed: Bug in HttpClient where the query string was not correctly handling a collection type.
+
+### Version 2.0.7
 
 - Improvement: Will now respect query string parameter names as introduced in [`Intent.Metadata.WebApi` version `4.3.2`](https://github.com/IntentArchitect/Intent.Modules/blob/development/Modules/Intent.Modules.Metadata.WebApi/release-notes.md#version-432).
 

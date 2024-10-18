@@ -11,6 +11,7 @@ using Intent.Modules.Common;
 using Intent.Modules.Common.CSharp.VisualStudio;
 using Intent.Modules.Common.Registrations;
 using Intent.Modules.Common.VisualStudio;
+using Intent.Modules.Contracts.Clients.Http.Shared;
 using Intent.Registrations;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
@@ -42,6 +43,7 @@ namespace Intent.Modules.Integration.HttpClients.Templates.HttpClientConfigurati
 
         public override string TemplateId => HttpClientConfigurationTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, IList<ServiceProxyModel> model)
         {
             return new HttpClientConfigurationTemplate(outputTarget, model);
@@ -51,6 +53,7 @@ namespace Intent.Modules.Integration.HttpClients.Templates.HttpClientConfigurati
         public override IList<ServiceProxyModel> GetModels(IApplication application)
         {
             return _metadataManager.ServiceProxies(application).GetServiceProxyModels()
+                .Union(_metadataManager.Services(application).GetServiceProxyModels())
                 .Where(p => p.GetMappedEndpoints().Any())
                 .ToArray();
         }

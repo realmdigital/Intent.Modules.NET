@@ -3,7 +3,7 @@
   <ApplicationId>1a48b51c-571c-45e5-964a-bd434271a742</ApplicationId>
   <FileLogs>
     <FileLog>
-      <CorrelationId>Intent.VisualStudio.Projects.VisualStudio2015Solution#05345d7b-3b4c-4e2d-8fff-07059a542948</CorrelationId>
+      <CorrelationId>Intent.VisualStudio.Projects.VisualStudioSolution#05345d7b-3b4c-4e2d-8fff-07059a542948</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>../Intent.Modules.NET.sln</ApplicationRelativeFilePath>
       <IsIgnored>false</IsIgnored>
@@ -17,7 +17,7 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>c37e7bea-8424-4574-9755-e47d2980e0fc</ProjectId>
+      <ProjectId>a1f01b33-0de7-4217-804d-34a1e991397b</ProjectId>
       <CorrelationId>Intent.ModuleBuilder.IModSpecFile</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.AzureFunctions.Interop.Contracts.imodspec</ApplicationRelativeFilePath>
@@ -25,19 +25,11 @@
       <IsIgnored>false</IsIgnored>
     </FileLog>
     <FileLog>
-      <ProjectId>c37e7bea-8424-4574-9755-e47d2980e0fc</ProjectId>
-      <CorrelationId>Intent.VisualStudio.Projects.CoreLibrary.CSProject#c37e7bea-8424-4574-9755-e47d2980e0fc</CorrelationId>
+      <ProjectId>a1f01b33-0de7-4217-804d-34a1e991397b</ProjectId>
+      <CorrelationId>Intent.VisualStudio.Projects.CSharpProject#a1f01b33-0de7-4217-804d-34a1e991397b</CorrelationId>
       <OverwriteBehaviour>always</OverwriteBehaviour>
       <ApplicationRelativeFilePath>Intent.Modules.AzureFunctions.Interop.Contracts.csproj</ApplicationRelativeFilePath>
       <ProjectRelativeFilePath>Intent.Modules.AzureFunctions.Interop.Contracts.csproj</ProjectRelativeFilePath>
-      <IsIgnored>false</IsIgnored>
-    </FileLog>
-    <FileLog>
-      <ProjectId>c37e7bea-8424-4574-9755-e47d2980e0fc</ProjectId>
-      <CorrelationId>Intent.ModuleBuilder.ReadMe</CorrelationId>
-      <OverwriteBehaviour>always</OverwriteBehaviour>
-      <ApplicationRelativeFilePath>README.txt</ApplicationRelativeFilePath>
-      <ProjectRelativeFilePath>README.txt</ProjectRelativeFilePath>
       <IsIgnored>false</IsIgnored>
     </FileLog>
   </FileLogs>

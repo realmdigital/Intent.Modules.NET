@@ -1,3 +1,70 @@
+### Version 6.2.6
+
+- Fixed: Disabled TelemetryConfigurationExtension due to new CSharpInvocationStatements representable as method chaining statements. Quick fix applied in `Intent.Eventing.MassTransit` module.
+
+### Version 6.2.5
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 6.2.4
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 6.2.3
+
+- Fixed: Azure Service Bus settings accepting a time span (Default time to live, Lock duration, duplicate detection time window) had an issue where the generated time was different to the specified time in some scenarios.
+
+### Version 6.2.2
+
+- Improvement: Added `TODO` comments on `NotImplementedException`.
+- Improvement: Bumped `Intent.Eventing.Contracts` dependency so that Service Designer event package gets added when installing this module.
+
+### Version 6.2.1
+
+- Fixed: Updated important dependency version.
+
+### Version 6.2.0
+
+- Improvement: Concurrent Message Limit setting was introduced for Azure Service Bus and RabbitMQ.
+- Improvement: Override the subscription endpoint names through the Consumer Settings stereotypes.
+
+> ⚠️ **NOTE**
+>
+> There generated code that introduces the `AddCustomConsumerEndpoint` method in the `MassTransitConfiguration` class has been updated in case you've manually overridden for custom configuration.
+
+### Version 6.1.3
+
+- Fixed: EventBus flush all would not have been invoked if there wasn't a DbContext present.
+
+### Version 6.1.2
+
+- Fixed: Duplicate `IDistributedCacheWithUnitOfWork` would be generated into classes under certain circumstances.
+
+### Version 6.1.1
+
+- Improvement: Added support for `IDistributedCacheWithUnitOfWork` to unit of work implementation.
+
+### Version 6.1.0
+
+- Improvement: Renamed `ConsumerWrapper` to `IntegrationEventConsumer`.
+- Improvement: Bumped MassTransit nuget versions from `8.0.16` to `8.1.3`.
+- Improvement: `MassTransitConfigurationTemplate` has been revamped to allow for `Consumers` and `Producers` to be registered through `Decorators` to simplify config setup.
+
+### Version 6.0.2
+
+- Feature: Support for Sending Commands.
+- Improvement: Added `ArgumentNullException` check on `IUnitOfWork` dependency injection.
+- Improvement: Allow support for Redis OM Unit of Work.
+
+### Version 6.0.0
+
+- Feature: Added support for explicitly modeled Integration Event Handler and the Advance Mapping systems available in Intent Architect 4.1.x
+
+### Version 5.2.4
+
+- Fixed: Issue around Event Bus Messages not publishing when published in Domain Events, with the context of consuming Integration Events.
+- Improvement: When using EF Outbox pattern with.  
+
 ### Version 5.2.4
 
 - Improvement: `ConsumerWrapper` will now universally save changes for all of the following modules:

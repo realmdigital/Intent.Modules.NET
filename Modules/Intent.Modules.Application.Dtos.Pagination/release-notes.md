@@ -1,3 +1,23 @@
+### Version 4.0.13
+
+- TODO
+
+### Version 4.0.12
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 4.0.11
+
+- Improvement: Support for nullable `OrderBy` on Paging.
+
+### Version 4.0.10
+
+- Improvement: Support for `OrderBy` on pagination.
+
+### Version 4.0.9
+
+- Improvement: Support for the renaming of the `IPagedResult` to `IPagedList` from the `Intent.Entities.Repositories.Api` module
+
 ### Version 4.0.7
 
 - Improvement: `PagedResult<TData>` Type-Definition moved to version `3.4.9` of the `Intent.Modelers.Services` module.

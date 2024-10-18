@@ -31,6 +31,7 @@ namespace Intent.Modules.Application.Contracts.Clients.Templates.DtoContract
 
         public override string TemplateId => DtoContractTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget, DTOModel model)
         {
             return new DtoContractTemplate(outputTarget, model);
@@ -39,17 +40,20 @@ namespace Intent.Modules.Application.Contracts.Clients.Templates.DtoContract
         [IntentManaged(Mode.Merge, Body = Mode.Ignore, Signature = Mode.Fully)]
         public override IEnumerable<DTOModel> GetModels(IApplication application)
         {
-            return _metadataManager.ServiceProxies(application).GetMappedServiceProxyDTOModels()
+            var results = _metadataManager.ServiceProxies(application).GetMappedServiceProxyDTOModels()
+                .Union(_metadataManager.Services(application).GetMappedServiceProxyDTOModels())
                 .Where(x =>
                 {
                     if (x.InternalElement.IsCommandModel() || x.InternalElement.IsQueryModel())
                     {
+                        // Only generates DTOs that are used by services
                         return HttpEndpointModelFactory.GetEndpoint(x.InternalElement)?.Inputs.Any(i => i.Id == x.Id) == true;
                     }
 
                     return true;
                 })
                 .ToList();
+            return results;
         }
     }
 }

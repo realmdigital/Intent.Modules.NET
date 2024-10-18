@@ -8,7 +8,7 @@ using Intent.Modules.Common.Registrations;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 
-[assembly: DefaultIntentManaged(Mode.Merge)]
+[assembly: DefaultIntentManaged(Mode.Fully)]
 [assembly: IntentTemplate("Intent.ModuleBuilder.TemplateRegistration.SingleFileNoModel", Version = "1.0")]
 
 namespace Intent.Modules.Application.MediatR.Behaviours.Templates.UnhandledExceptionBehaviour
@@ -18,9 +18,10 @@ namespace Intent.Modules.Application.MediatR.Behaviours.Templates.UnhandledExcep
     {
         public override string TemplateId => UnhandledExceptionBehaviourTemplate.TemplateId;
 
+        [IntentManaged(Mode.Fully)]
         public override ITemplate CreateTemplateInstance(IOutputTarget outputTarget)
         {
-            return new UnhandledExceptionBehaviourTemplate(outputTarget, null);
+            return new UnhandledExceptionBehaviourTemplate(outputTarget);
         }
     }
 }

@@ -1,3 +1,23 @@
+### Version 5.2.3
+
+- Improvement: Updated module NuGet packages infrastructure.
+
+### Version 5.2.2
+
+- Improvement: Updated NuGet packages to latest stables.
+
+### Version 5.2.1
+
+- Fixed: Missing using directive for Outbox pattern in EF DbContext.
+
+### Version 5.2.0
+
+- Improvement: Updates based on changes made in `Intent.Eventing.MassTransit`.
+
+### Version 5.1.0
+
+- Improvement: Upgraded module to support new 4.1 SDK features.
+
 ### Version 5.0.1
 
 - Logic for saving changes to Entity Framework's unit of work has been moved to version 5.2.4 of the `Intent.Eventing.MassTransit` module which now also handles saving changes for other technologies.

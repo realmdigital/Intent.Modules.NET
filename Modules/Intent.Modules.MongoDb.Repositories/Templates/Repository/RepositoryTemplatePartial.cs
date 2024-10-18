@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Intent.Engine;
@@ -9,6 +10,7 @@ using Intent.Modules.Common.CSharp.Templates;
 using Intent.Modules.Common.Templates;
 using Intent.Modules.Entities.Repositories.Api.Templates;
 using Intent.Modules.Entities.Repositories.Api.Templates.EntityRepositoryInterface;
+using Intent.Modules.Modelers.Domain.Settings;
 using Intent.RoslynWeaver.Attributes;
 using Intent.Templates;
 using Intent.Utils;
@@ -19,7 +21,7 @@ using Intent.Utils;
 namespace Intent.Modules.MongoDb.Repositories.Templates.Repository
 {
     [IntentManaged(Mode.Fully, Body = Mode.Merge)]
-    partial class RepositoryTemplate : CSharpTemplateBase<ClassModel>, ICSharpFileBuilderTemplate
+    public partial class RepositoryTemplate : CSharpTemplateBase<ClassModel>, ICSharpFileBuilderTemplate
     {
         public const string TemplateId = "Intent.MongoDb.Repositories.Repository";
 
@@ -34,7 +36,16 @@ namespace Intent.Modules.MongoDb.Repositories.Templates.Repository
                 .AddUsing("System.Threading.Tasks")
                 .AddClass($"{Model.Name}MongoRepository", @class =>
                 {
-                    @class.WithBaseType($"{this.GetMongoRepositoryBaseName()}<{EntityInterfaceName}, {EntityName}>");
+                    var createEntityInterfaces = ExecutionContext.Settings.GetDomainSettings().CreateEntityInterfaces();
+                    if (createEntityInterfaces)
+                    {
+                        @class.WithBaseType($"{this.GetMongoRepositoryBaseName()}<{EntityInterfaceName}, {EntityName}>");
+                    }
+                    else
+                    {
+                        @class.WithBaseType($"{this.GetMongoRepositoryBaseName()}<{EntityName}>");
+                    }
+
                     @class.ImplementsInterface(RepositoryContractName);
                     @class.AddConstructor(ctor =>
                     {
@@ -53,7 +64,14 @@ namespace Intent.Modules.MongoDb.Repositories.Templates.Repository
                         }
 
                         @interface.Interfaces.Clear();
-                        @interface.ExtendsInterface($"{this.GetMongoRepositoryInterfaceName()}<{EntityInterfaceName}, {EntityName}>");
+                        if (createEntityInterfaces)
+                        {
+                            @interface.ExtendsInterface($"{this.GetMongoRepositoryInterfaceName()}<{EntityInterfaceName}, {EntityName}>");
+                        }
+                        else
+                        {
+                            @interface.ExtendsInterface($"{this.GetMongoRepositoryInterfaceName()}<{EntityName}>");
+                        }
                     });
 
                     if (TryGetTemplate<ICSharpFileBuilderTemplate>("Domain.Entity", Model, out var entityTemplate))
@@ -72,7 +90,7 @@ namespace Intent.Modules.MongoDb.Repositories.Templates.Repository
                             }
                             else
                             {
-                                @class.AddMethod($"Task<{GetTypeName("Domain.Entity.Interface", Model)}>", "FindByIdAsync", method =>
+                                @class.AddMethod($"Task<{GetTypeName("Domain.Entity.Interface", Model)}?>", "FindByIdAsync", method =>
                                 {
                                     var pk = rootEntity.GetPropertyWithPrimaryKey();
                                     method.Async();

@@ -1,24 +1,67 @@
-﻿using Intent.Engine;
-using Intent.Modules.Common.CSharp.VisualStudio;
+using System;
+using Intent.Engine;
+using Intent.Modules.Common.CSharp.Nuget;
 using Intent.Modules.Common.VisualStudio;
+using Intent.RoslynWeaver.Attributes;
 
-namespace Intent.Modules.EntityFrameworkCore.DesignTimeDbContextFactory;
+[assembly: DefaultIntentManaged(Mode.Fully)]
+[assembly: IntentTemplate("Intent.ModuleBuilder.CSharp.Templates.NugetPackages", Version = "1.0")]
 
-public static class NugetPackages
+namespace Intent.Modules.EntityFrameworkCore.DesignTimeDbContextFactory
 {
-    public static INugetPackageInfo MicrosoftExtensionsConfigurationFileExtensions(IOutputTarget outputTarget) =>
-        new NugetPackageInfo("Microsoft.Extensions.Configuration.FileExtensions", GetVersion(outputTarget.GetProject()));
-    public static INugetPackageInfo MicrosoftExtensionsConfigurationJson(IOutputTarget outputTarget) =>
-        new NugetPackageInfo("Microsoft.Extensions.Configuration.Json", GetVersion(outputTarget.GetProject()));
-
-    private static string GetVersion(ICSharpProject project)
+    public class NugetPackages : INugetPackages
     {
-        return project switch
+        public const string MicrosoftExtensionsConfigurationEnvironmentVariablesPackageName = "Microsoft.Extensions.Configuration.EnvironmentVariables";
+        public const string MicrosoftExtensionsConfigurationFileExtensionsPackageName = "Microsoft.Extensions.Configuration.FileExtensions";
+        public const string MicrosoftExtensionsConfigurationJsonPackageName = "Microsoft.Extensions.Configuration.Json";
+        public const string MicrosoftExtensionsConfigurationUserSecretsPackageName = "Microsoft.Extensions.Configuration.UserSecrets";
+
+        public void RegisterPackages()
         {
-            _ when project.IsNetApp(5) => "5.0.0",
-            _ when project.IsNetApp(6) => "6.0.0",
-            _ when project.IsNetApp(7) => "7.0.0",
-            _ => "6.0.0"
-        };
+            NugetRegistry.Register(MicrosoftExtensionsConfigurationEnvironmentVariablesPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("8.0.0"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsConfigurationEnvironmentVariablesPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftExtensionsConfigurationFileExtensionsPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.1"),
+                        ( >= 7, 0) => new PackageVersion("8.0.1"),
+                        ( >= 6, 0) => new PackageVersion("8.0.1"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsConfigurationFileExtensionsPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftExtensionsConfigurationJsonPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("6.0.0"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsConfigurationJsonPackageName}'"),
+                    }
+                );
+            NugetRegistry.Register(MicrosoftExtensionsConfigurationUserSecretsPackageName,
+                (framework) => framework switch
+                    {
+                        ( >= 8, 0) => new PackageVersion("8.0.0"),
+                        ( >= 7, 0) => new PackageVersion("8.0.0"),
+                        ( >= 6, 0) => new PackageVersion("8.0.0"),
+                        _ => throw new Exception($"Unsupported Framework `{framework.Major}` for NuGet package '{MicrosoftExtensionsConfigurationUserSecretsPackageName}'"),
+                    }
+                );
+        }
+
+        public static NugetPackageInfo MicrosoftExtensionsConfigurationFileExtensions(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsConfigurationFileExtensionsPackageName, outputTarget.GetMaxNetAppVersion());
+
+        public static NugetPackageInfo MicrosoftExtensionsConfigurationJson(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsConfigurationJsonPackageName, outputTarget.GetMaxNetAppVersion());
+
+        public static NugetPackageInfo MicrosoftExtensionsConfigurationUserSecrets(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsConfigurationUserSecretsPackageName, outputTarget.GetMaxNetAppVersion());
+
+        public static NugetPackageInfo MicrosoftExtensionsConfigurationEnvironmentVariables(IOutputTarget outputTarget) => NugetRegistry.GetVersion(MicrosoftExtensionsConfigurationEnvironmentVariablesPackageName, outputTarget.GetMaxNetAppVersion());
     }
 }

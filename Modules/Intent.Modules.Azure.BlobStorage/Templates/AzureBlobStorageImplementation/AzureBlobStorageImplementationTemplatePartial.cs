@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Intent.Engine;
 using Intent.Modules.Azure.BlobStorage.Templates.BlobStorageInterface;
@@ -22,7 +23,7 @@ namespace Intent.Modules.Azure.BlobStorage.Templates.AzureBlobStorageImplementat
         [IntentManaged(Mode.Fully, Body = Mode.Ignore)]
         public AzureBlobStorageImplementationTemplate(IOutputTarget outputTarget, object model = null) : base(TemplateId, outputTarget, model)
         {
-            AddNugetDependency(NuGetPackages.AzureStorageBlobs);
+            AddNugetDependency(NugetPackages.AzureStorageBlobs(OutputTarget));
         }
 
         public override void BeforeTemplateExecution()

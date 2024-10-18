@@ -11,7 +11,7 @@ using Intent.RoslynWeaver.Attributes;
 namespace Intent.Modules.VisualStudio.Projects.Api
 {
     [IntentManaged(Mode.Merge, Signature = Mode.Fully)]
-    public class SolutionFolderModel : IMetadataModel, IHasStereotypes, IHasName
+    public class SolutionFolderModel : IMetadataModel, IHasStereotypes, IHasName, IElementWrapper
     {
         public const string SpecializationType = "Solution Folder";
         protected readonly IElement _element;
@@ -25,6 +25,10 @@ namespace Intent.Modules.VisualStudio.Projects.Api
             }
             _element = element;
         }
+
+        public SolutionFolderModel ParentFolder => InternalElement.ParentElement.IsSolutionFolderModel()
+            ? InternalElement.ParentElement.AsSolutionFolderModel()
+            : null;
 
         [IntentManaged(Mode.Fully)]
         public string Id => _element.Id;
@@ -68,8 +72,7 @@ namespace Intent.Modules.VisualStudio.Projects.Api
             .Select(x => new ASPNETWebApplicationNETFrameworkModel(x))
             .ToList();
 
-        [IntentManaged(Mode.Fully)]
-        public IList<WCFServiceApplicationModel> WCFServiceApplications => _element.ChildElements
+        public IList<WCFServiceApplicationModel> WCFServiceApplicationNETFrameworks => _element.ChildElements
             .GetElementsOfType(WCFServiceApplicationModel.SpecializationTypeId)
             .Select(x => new WCFServiceApplicationModel(x))
             .ToList();
@@ -122,6 +125,11 @@ namespace Intent.Modules.VisualStudio.Projects.Api
         public IList<CSharpProjectNETModel> CSharpProjectNETs => _element.ChildElements
             .GetElementsOfType(CSharpProjectNETModel.SpecializationTypeId)
             .Select(x => new CSharpProjectNETModel(x))
+            .ToList();
+
+        public IList<JavaScriptProjectModel> JavaScriptProjects => _element.ChildElements
+            .GetElementsOfType(JavaScriptProjectModel.SpecializationTypeId)
+            .Select(x => new JavaScriptProjectModel(x))
             .ToList();
 
         public IList<ConsoleAppNETCoreModel> ConsoleAppNETCores => _element.ChildElements

@@ -1,6 +1,8 @@
 using System;
 using Intent.RoslynWeaver.Attributes;
 
+[assembly: IntentTemplate("Intent.Entities.DomainEntity", Version = "2.0")]
+
 namespace Entities.PrivateSetters.EF.CosmosDb.Domain.Entities
 {
     [DefaultIntentManaged(Mode.Fully, Targets = Targets.Methods, Body = Mode.Ignore, AccessModifiers = AccessModifiers.Public)]
@@ -20,7 +22,7 @@ namespace Entities.PrivateSetters.EF.CosmosDb.Domain.Entities
             Description = null!;
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
         public Guid InvoiceId { get; private set; }
 
